@@ -1,4 +1,4 @@
-# Contrails Notebook Analysis
+# Contrails Notebook Dashboards
 
 This is an [Observable Framework](https://observablehq.com/framework/) app. To install the required dependencies, run:
 
@@ -16,7 +16,28 @@ Then visit <http://localhost:3000> to preview your app.
 
 For more, see <https://observablehq.com/framework/getting-started>.
 
-## Project structure
+
+## Create new dashboard
+
+1. **Copy** [src/template](src/template) directory in the `src/` directory. Add files and subdirectories for components and data as necessary.
+2. **Update** template with dashboard
+3. **Embed** dashboard by pasting the snippet below and updating dashboard url:
+
+```html run=false
+<iframe id="dash1" width="100%" height="500" frameborder="0" scrolling="no"
+  src="https://dash.contrails.org/template/index.html">
+</iframe>
+<script type="text/javascript">
+addEventListener("message", (event) => dash1.height = event.data.height);
+</script>
+```
+
+> Note iframe `id` (`"dash1"` in the example) must match the variable in the event listener.
+>
+> If you have two embeds in the same post, they must have different `id` values.
+
+
+## Observable Project structure
 
 A typical Framework project looks like this:
 

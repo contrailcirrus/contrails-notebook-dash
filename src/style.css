@@ -1,0 +1,156 @@
+/* 
+Default stylesheet for all pages
+
+https://observablehq.observablehq.cloud/framework-example-custom-stylesheet/
+*/
+
+@import url("observablehq:default.css");
+
+/* Contrails.org brand colors */
+:root {
+  --color-exo-black: #161a26;
+  --color-meso-blue: #162440;
+  --color-stratos-white: #ffffff;
+  --color-solar-orange: #f26400;
+  --color-tropo-blue: #1093ff;
+}
+
+/* Ghost template brand font */
+:root {
+  --sans-serif: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+}
+
+/* Add Inter font from Ghost template brand */
+@font-face {
+  font-family: "Inter";
+  src: url("https://storage.googleapis.com/contrails-301217-public-data/website/inter-roman.woff2") format("woff2");
+}
+
+/* Add Aeonik font from Contrails.org website  */
+@font-face {
+  font-family: "Aeonik";
+  src: url("https://storage.googleapis.com/contrails-301217-public-data/website/aeonik-light-0825.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Aeonik";
+  src: url("https://storage.googleapis.com/contrails-301217-public-data/website/aeonik-regular-0825.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Override Observable framework defaults */
+:root {
+  --theme-foreground: var(--color-exo-black);
+  --theme-foreground-focus: var(--color-solar-orange);
+  --theme-background: var(--color-stratos-white);
+  --theme-background-alt: color-mix(in srgb, var(--theme-foreground) 4%, var(--theme-background));
+  --theme-foreground-alt: var(--theme-foreground);
+  --theme-blue: var(--color-tropo-blue);
+  --theme-green: #3ca951;
+  --theme-red: var(--color-solar-orange);
+  --theme-yellow: #efb118;
+}
+
+:root {
+  --theme-foreground-muted: color-mix(in srgb, var(--theme-foreground) 60%, var(--theme-background));
+  --theme-foreground-faint: color-mix(in srgb, var(--theme-foreground) 50%, var(--theme-background));
+  --theme-foreground-fainter: color-mix(in srgb, var(--theme-foreground) 30%, var(--theme-background));
+  --theme-foreground-faintest: color-mix(in srgb, var(--theme-foreground) 14%, var(--theme-background));
+}
+
+:root {
+  --syntax-keyword: #d73a49;
+  --syntax-entity: #6f42c1;
+  --syntax-constant: #005cc5;
+  --syntax-string: #032f62;
+  --syntax-variable: #e36209;
+  --syntax-comment: var(--theme-foreground-muted);
+  --syntax-entity-tag: #22863a;
+  --syntax-storage-modifier-import: #24292e;
+  --syntax-markup-heading: #005cc5;
+  --syntax-markup-list: #735c0f;
+  --syntax-markup-italic: #24292e;
+  --syntax-markup-bold: #24292e;
+  --syntax-markup-inserted: #22863a;
+  --syntax-markup-inserted-background: #f0fff4;
+  --syntax-markup-deleted: #b31d28;
+  --syntax-markup-deleted-background: #ffeef0;
+}
+
+body {
+  font-family: var(--sans-serif);
+
+  /* Ghost post max-width */
+  max-width: 720px;
+}
+
+/* Set header font to Aeonik outside cards  */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Aeonik", sans-serif;
+  font-weight: 400;
+}
+
+/* Increase the font weight of card headings */
+.card :is(h1, h2, h3, h4, h5, h6) {
+  font-weight: 600;
+}
+
+/* Add a little padding to subsequent card headings */
+.card :is(h1, h2, h3, h4, h5, h6):not(:first-child) {
+  padding-top: 1em;
+}
+
+/* Remove arrows from number input fields */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Reduce the width of number & range inputs */
+input[type="number"] {
+  width: 100px;
+}
+
+input[type="range"] {
+  width: 100%;
+  max-width: 200px;
+  flex-shrink: 1.5;
+}
+
+/* Add a little margin to the top of inputs */
+form {
+  margin-top: 0.25rem !important;
+}
+
+/* Source links */
+.source {
+  text-align: right;
+
+  p {
+    max-width: 100%;
+  }
+
+  a {
+    color: var(--theme-foreground-muted);
+  }
+}
+
+/* Don't add extra margin around body */
+#observablehq-center {
+  margin: 0;
+}

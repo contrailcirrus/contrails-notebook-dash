@@ -13,11 +13,20 @@ title: Dashboard Template
 // Resize observer. Required to update parent `iframe` height dynamically.
 // See README for script tag required in post body.
 import "../components/observer.js";
+
 ```
+
+<!-- For e-mail newsletter, add noscript tag with link to web post-->
+<noscript>
+  <div class="note">
+  See <a href="https://notebook.contrails.org/slug">web version of this post</a> for interactive dashboard.
+  </div>
+</noscript>
 
 <!-- ----------------------------- -->
 
 # Dashboard Template
+
 
 
 ## Content

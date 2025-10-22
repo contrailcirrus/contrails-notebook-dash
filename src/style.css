@@ -155,3 +155,8 @@ form {
 #observablehq-center {
   margin: 0;
 }
+
+/* Set note, tip etc to fill container width */
+.note, .tip, .warning, .caution {
+  max-width: 100%;
+}

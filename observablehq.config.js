@@ -3,15 +3,14 @@ export default {
   // The app’s title; used in the sidebar and webpage titles.
   title: "Dashboards",
 
-  pages: [
-    {},
-    // {
-    //   name: "Notebook Dashboards",
-    //   pages: [
-    //     {name: "Cost Explorer", path: "/cost-explorer/index.html"},
-    //   ]
-    // }
-  ],
+  // pages: [
+  //   {
+  //     name: "Notebook Dashboards",
+  //     pages: [
+  //       {name: "Cost Explorer", path: "/cost-explorer/index.html"},
+  //     ]
+  //   }
+  // ],
 
 // Register custom stylesheet.
   style: "style.css",

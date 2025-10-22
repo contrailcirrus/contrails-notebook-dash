@@ -71,6 +71,8 @@ const costPie = [
 ]
 ```
 
+# Cost Explorer
+
 <div class="card">
 
 ## Development cost

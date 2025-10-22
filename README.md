@@ -24,7 +24,7 @@ For more, see <https://observablehq.com/framework/getting-started>.
 3. **Embed** dashboard by pasting the snippet below and updating dashboard url:
 
 ```html run=false
-<iframe id="dash1" width="100%" height="500" frameborder="0" scrolling="no"
+<iframe id="dash1" width="100%" height="0" frameborder="0" scrolling="no"
   src="https://dash.contrails.org/template/index.html">
 </iframe>
 <script type="text/javascript">
@@ -32,7 +32,9 @@ addEventListener("message", (event) => dash1.height = event.data.height);
 </script>
 ```
 
-> Note iframe `id` (`"dash1"` in the example) must match the variable in the event listener.
+> Note the height of the iframe is set to "0" so that `<noscript>` tag takes precedence.
+>
+> iframe `id` (`"dash1"` in the example) must match the variable in the event listener to set the height dynamically from `observer.js`
 >
 > If you have two embeds in the same post, they must have different `id` values.
 

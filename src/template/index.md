@@ -16,13 +16,6 @@ import "../components/observer.js";
 
 ```
 
-<!-- For e-mail newsletter, add noscript tag with link to web post-->
-<noscript>
-  <div class="note">
-  See <a href="https://notebook.contrails.org/slug">web version of this post</a> for interactive dashboard.
-  </div>
-</noscript>
-
 <!-- ----------------------------- -->
 
 # Dashboard Template

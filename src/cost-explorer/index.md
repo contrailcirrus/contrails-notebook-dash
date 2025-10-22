@@ -71,12 +71,6 @@ const costPie = [
 ]
 ```
 
-<noscript>
-  <div class="note">
-  See <a href="https://notebook.contrails.org/the-cost-of-contrail-management">web version of this post</a> for interactive cost explorer.
-  </div>
-</noscript>
-
 <div class="card">
 
 ## Development cost

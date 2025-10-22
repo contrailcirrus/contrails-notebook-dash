@@ -16,14 +16,14 @@ import {DonutChart} from "../components/donutChart.js";
 const AGWP100 = 8.8e-14 // yr W m-2 / kg-CO2 (Gaillot 2023)
 const fuelIntensityCO2 = 3.89 // kg CO2 / kg fuel (Teoh 2024)
 const contrailCirrusERF = 0.0574 // W m-2 (Lee 2021)
-const fuelConsumption = 280 // Mtonnes / year
+const fuelConsumption = 280 // Mtonnes fuel / year
 
 // Mitigation efficacy (%)
 const efficacyInput = Inputs.range([0, 100], { value: 50, step: 5 })
 const efficacy = Generators.input(efficacyInput)
 
 // Fuel penalty across fleet (%)
-const fuelPenaltyInput = Inputs.range([0, 1], { value: 0.5, step: 0.05 })
+const fuelPenaltyInput = Inputs.range([0, 1], { value: 0.3, step: 0.05 })
 const fuelPenalty = Generators.input(fuelPenaltyInput)
 
 // Annual aviation fuel cost ($B / yr)
@@ -37,13 +37,13 @@ const upfrontRDInput = Inputs.range([0, 500], { value: 100, step: 10})
 const upfrontRD = Generators.input(upfrontRDInput)
 
 // Annual monitoring infrastructure costs
-const annualInfraInput = Inputs.range([0, 500], { value: 250, step: 10})
+const annualInfraInput = Inputs.range([0, 500], { value: 150, step: 10})
 const annualInfra = Generators.input(annualInfraInput)
 ```
 
 <!-- Model -->
 ```js
-// Aviation fuel CO2 emission, including upstream CO2 (Mtonnes / yr,)
+// Aviation fuel CO2 emission, including upstream CO2 (Mtonnes / yr)
 const fuelCO2 = fuelConsumption * fuelIntensityCO2
 
 // Contrail warming in CO2-eq, GWP100 (Mtonnes / yr)
@@ -98,7 +98,7 @@ Aviation Fuel Cost ($B / year) ${fuelCostInput}
 <span class="big">${Math.round(contrailWarmingAvoided)}</span><br/>
 <span class="muted">Mtonnes CO<sub>2-eq</sub> per year (GWP-100)</span>
 
-## Amortized cost
+## Annual cost
 
 <span class="big">$${Math.round(totalCost).toLocaleString('en-US')} M</span><br/>
 <span class="muted">per year</span>
@@ -111,7 +111,7 @@ Aviation Fuel Cost ($B / year) ${fuelCostInput}
   </div>
   <div class="card">
 
-${DonutChart(costPie, {centerText: "Contrail Cost", width: 300, colorDomain: costPie.map(c => c.name), colorRange: costPie.map(c => c.color)})}
+${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costPie.map(c => c.name), colorRange: costPie.map(c => c.color)})}
 
   </div>
 </div>

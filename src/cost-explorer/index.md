@@ -13,10 +13,11 @@ import {DonutChart} from "../components/donutChart.js";
 <!-- Inputs -->
 ```js
 // constants
-const AGWP100 = 8.8e-14 // yr W m-2 / kg-CO2 (Gaillot 2023)
-const fuelIntensityCO2 = 3.89 // kg CO2 / kg fuel (Teoh 2024)
-const contrailCirrusERF = 0.0574 // W m-2 (Lee 2021)
-const fuelConsumption = 280 // Mtonnes fuel / year
+const AGWP100 = 8.8e-14           // yr W m-2 / kg-CO2 (Gaillot 2023)
+const contrailCirrusERF = 0.0574  // W m-2 (Lee 2021)
+const fuelIntensityCO2 = 3.89     // kg CO2 / kg fuel (ICAO - TODO)
+const tonnesPerBarrel = 0.127     // tonnes / barrel Jet-A
+const gallonsPerBarrel = 42       // 42 US gallons / barrel
 
 // Mitigation efficacy (%)
 const efficacyInput = Inputs.range([0, 100], { value: 50, step: 5 })
@@ -26,9 +27,15 @@ const efficacy = Generators.input(efficacyInput)
 const fuelPenaltyInput = Inputs.range([0, 1], { value: 0.3, step: 0.05 })
 const fuelPenalty = Generators.input(fuelPenaltyInput)
 
-// Annual aviation fuel cost ($B / yr)
-const fuelCostInput = Inputs.range([190, 300], { value: 260, step: 10 })
+// Annual aviation fuel cost ($ / barrel)
+// https://www.iata.org/en/publications/economics/fuel-monitor/
+const fuelCostInput = Inputs.range([70, 130], { value: 90, step: 5 })
 const fuelCost = Generators.input(fuelCostInput)
+
+// Annual aviation fuel consumption (Billions gallons / year)
+// https://www.iata.org/en/iata-repository/pressroom/fact-sheets/industry-statistics/
+const fuelConsumptionInput = Inputs.range([90, 110], { value: 103, step: 1 })
+const fuelConsumption = Generators.input(fuelConsumptionInput)
 
 // R&D costs
 const discountRate = 0.02  // 2%, assumed economic discount rate
@@ -43,22 +50,25 @@ const annualInfra = Generators.input(annualInfraInput)
 
 <!-- Model -->
 ```js
-// Aviation fuel CO2 emission, including upstream CO2 (Mtonnes / yr)
-const fuelCO2 = fuelConsumption * fuelIntensityCO2
+// Aviation fuel consumption (Mtonnes fuel / year)
+const fuelConsumptionMt = (fuelConsumption * 1e9 / gallonsPerBarrel) * tonnesPerBarrel / 1e6
 
-// Contrail warming in CO2-eq, GWP100 (Mtonnes / yr)
+// Aviation fuel CO2 emission, including upstream CO2 (Mtonnes / year)
+const fuelCO2 = fuelConsumptionMt * fuelIntensityCO2
+
+// Contrail warming in CO2-eq, GWP100 (Mtonnes / year)
 const contrailWarming = contrailCirrusERF / AGWP100 / 1e3 / 1e6
 
-// Contrail warming avoided in CO2-eq, GWP100 (Mtonnes / yr)
+// Contrail warming avoided in CO2-eq, GWP100 (Mtonnes / year)
 const contrailWarmingAvoided = ((efficacy / 100) * contrailWarming) - ((fuelPenalty / 100) * fuelCO2)
 
-// Fuel costs ($M / yr)
-const additionalFuelCost = (fuelPenalty / 100) * fuelCost * 1e3
+// Fuel costs ($M / year)
+const additionalFuelCost = (fuelPenalty / 100) * (fuelCost / 0.127 * fuelConsumptionMt)
 
-// R&D costs ($M / yr)
+// R&D costs ($M / year)
 const amortizedRDCost = upfrontRD * discountRate / (1 - (1 + discountRate)**(-years))
 
-// Total annual ($M / yr)
+// Total annual ($M / year)
 const totalCost = additionalFuelCost + amortizedRDCost + annualInfra
 ```
 
@@ -87,7 +97,9 @@ Mitigation Efficacy (%) ${efficacyInput}
 
 Fuel penalty (%) ${fuelPenaltyInput}
 
-Aviation Fuel Cost ($B / year) ${fuelCostInput}
+Fuel Cost ($ / barrel) ${fuelCostInput}
+
+Annual Fuel Consumption (Billions gallons / year) ${fuelConsumptionInput}
 
 </div>
 

@@ -25,7 +25,7 @@ For more, see <https://observablehq.com/framework/getting-started>.
 
 ## Embed in Notebook Post
 
-**Embed** a dashboard by pasting the snippet below and updating dashboard `src="https://dash.contrails.org/..."` url:
+**Embed** a dashboard by pasting the snippet below and updating dashboard `src="https://dash.contrails.org/..."` url in the `<iframe>` below:
 
 ```html run=false
 <noscript>
@@ -46,7 +46,7 @@ addEventListener("message", (event) => dash1.height = event.data.height);
 Edit the content of the `<noscript>` block to show content in the e-mail newsletter. As its written,
 the e-mail version of the Notebook post will show a blockquote:
 
-```
+```md
 > See <a href="https://notebook.contrails.org/<slug>">web version of this post</a> for interactive dashboard.
 ```
 
@@ -58,7 +58,7 @@ The height of the `<iframe>` is set to "0" so that `<noscript>` tag takes preced
 The `<script>` tag creates an event listener that will receive a dynamic height from the dashboard
 (see [components/observer.js](components/observer.js)).
 
-- iframe `id` (`"dash1"` in the example) must match the variable in the event listener to set the height dynamically from `observer.js`
+iframe `id` (`"dash1"` in the example) must match the variable in the event listener to set the height dynamically from `observer.js`
 
 If you have two embeds in the same post, they must have different `id` values.
 

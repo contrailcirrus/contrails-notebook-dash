@@ -21,12 +21,16 @@ For more, see <https://observablehq.com/framework/getting-started>.
 
 1. **Copy** [src/template](src/template) directory in the `src/` directory. Add files and subdirectories for components and data as necessary.
 2. **Update** template with dashboard
-3. **Embed** dashboard by pasting the snippet below and updating dashboard url:
+3. **Push** to Github and the [static Observable site](https://dash.contrails.org) will update via [the Deploy Action](https://github.com/contrailcirrus/contrails-notebook-dash/blob/main/.github/workflows/deploy.yml)
+
+## Embed in Notebook Post
+
+**Embed** a dashboard by pasting the snippet below and updating dashboard `src="https://dash.contrails.org/..."` url:
 
 ```html run=false
 <noscript>
 
-> See <a href="https://notebook.contrails.org/slug">web version of this post</a> for interactive dashboard.
+> See <a href="https://notebook.contrails.org/<slug>">web version of this post</a> for interactive dashboard.
 
 </noscript>
 <iframe id="dash1" width="100%" height="500" frameborder="0" scrolling="no"
@@ -37,9 +41,24 @@ addEventListener("message", (event) => dash1.height = event.data.height);
 </script>
 ```
 
-Edit the content of the `<noscript>` block to show content in the e-mail newsletter. The height of the iframe is set to "0" so that `<noscript>` tag takes precedence.
+### E-mail Newsletter content
 
-iframe `id` (`"dash1"` in the example) must match the variable in the event listener to set the height dynamically from `observer.js`
+Edit the content of the `<noscript>` block to show content in the e-mail newsletter. As its written,
+the e-mail version of the Notebook post will show a blockquote:
+
+```
+> See <a href="https://notebook.contrails.org/<slug>">web version of this post</a> for interactive dashboard.
+```
+
+Update the Notebook post url with the post `<slug>`.
+
+### Dashboard height
+
+The height of the `<iframe>` is set to "0" so that `<noscript>` tag takes precedence in the e-mail.
+The `<script>` tag creates an event listener that will receive a dynamic height from the dashboard
+(see [components/observer.js](components/observer.js)).
+
+- iframe `id` (`"dash1"` in the example) must match the variable in the event listener to set the height dynamically from `observer.js`
 
 If you have two embeds in the same post, they must have different `id` values.
 

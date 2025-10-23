@@ -56,7 +56,7 @@ Update the Notebook post url with the post `<slug>`.
 
 The height of the `<iframe>` is set to "0" so that `<noscript>` tag takes precedence in the e-mail.
 The `<script>` tag creates an event listener that will receive a dynamic height from the dashboard
-(see [components/observer.js](components/observer.js)).
+(see [src/components/observer.js](src/components/observer.js)).
 
 iframe `id` (`"dash1"` in the example) must match the variable in the event listener to set the height dynamically from `observer.js`
 

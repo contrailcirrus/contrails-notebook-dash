@@ -16,7 +16,10 @@ export default {
   style: "style.css",
 
   // Content to add to the head of the page, e.g. for a favicon:
-  head: '<link rel="icon" href="https://storage.googleapis.com/contrails-301217-public-data/website/dynamic.svg" type="image/svg+xml">',
+  head: `
+    <meta name="robots" content="noindex">
+    <link rel="icon" href="https://storage.googleapis.com/contrails-301217-public-data/website/dynamic.svg" type="image/svg+xml">
+  `,
 
   // The path to the source root.
   root: "src",

@@ -89,6 +89,11 @@ body {
   max-width: 720px;
 }
 
+/* Don't add extra margin around body */
+#observablehq-center {
+  margin: 0;
+}
+
 /* Set header font to Aeonik outside cards  */
 h1,
 h2,
@@ -149,11 +154,6 @@ form {
   a {
     color: var(--theme-foreground-muted);
   }
-}
-
-/* Don't add extra margin around body */
-#observablehq-center {
-  margin: 0;
 }
 
 /* Set note, tip etc to fill container width */

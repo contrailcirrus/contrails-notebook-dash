@@ -63,6 +63,22 @@ iframe `id` (`"dash1"` in the example) must match the variable in the event list
 If you have two embeds in the same post, they must have different `id` values.
 
 
+## Share outside of a notebook
+
+If using the dashboard outside of a notebook context, include this snippet in your dashboard preamble to provide padding on mobile screens:
+
+```css
+
+<style>
+  /* If using outside a notebook post, this snippet required for mobile screens */
+  @media (min-width: 780px) {
+      #observablehq-center {
+        margin: 0;
+      }
+  }
+</style>
+```
+
 ## Observable Project structure
 
 This Framework project looks like this:
@@ -93,9 +109,9 @@ This Framework project looks like this:
 
 ## Command reference
 
-| Command           | Description                                              |
-| ----------------- | -------------------------------------------------------- |
-| `npm install`            | Install or reinstall dependencies                        |
+| Command              | Description                                              |
+| -------------------- | -------------------------------------------------------- |
+| `npm install`        | Install or reinstall dependencies                        |
 | `npm run dev`        | Start local preview server                               |
 | `npm run build`      | Build your static site, generating `./dist`              |
 | `npm run deploy`     | Deploy your app to Observable                            |

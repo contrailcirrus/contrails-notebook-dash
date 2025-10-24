@@ -10,8 +10,40 @@ import "../components/observer.js";
 import {DonutChart} from "../components/donutChart.js";
 ```
 
+<!-- Scenario Input -->
+```js
+const scenarioInput = Inputs.radio(["Pessimistic", "Default", "Optimistic"], {value: "Default",});
+const scenario = Generators.input(scenarioInput)
+```
+
 <!-- Inputs -->
 ```js
+const inputs = (scenario === "Default") ? {
+  contrailCirrusERF: 57,  // mW m-2
+  efficacy: 70,           // %
+  fuelPenalty: 0.57,      // %
+  fuelCost: 90,           // $ / barrel
+  fuelConsumption: 103,   // Billions gallons / year
+  upfrontRD: 200,         // $M / year
+  annualInfra: 100       // $M / year
+} : (scenario === "Pessimistic") ? {
+  contrailCirrusERF: 26,
+  efficacy: 50,
+  fuelPenalty: 1,
+  fuelCost: 120,
+  fuelConsumption: 110,
+  upfrontRD: 500,
+  annualInfra: 450
+} : (scenario === "Optimistic") ? {
+  contrailCirrusERF: 57,
+  efficacy: 85,
+  fuelPenalty: 0.1,
+  fuelCost: 90,
+  fuelConsumption: 103,
+  upfrontRD: 100,
+  annualInfra: 20
+} : {};
+
 // constants
 const AGWP100 = 8.8e-14           // yr W m-2 / kg-CO2 (Gaillot 2023)
 const fuelIntensityCO2 = 3.89     // kg CO2 / kg fuel (ICAO - TODO)
@@ -20,44 +52,36 @@ const gallonsPerBarrel = 42       // 42 US gallons / barrel
 
 // Mitigation potential (mW m-2).
 // Default and bounds from Lee 2021.
-const contrailCirrusERFDefault = 57
-const contrailCirrusERFInput = Inputs.range([17, 98], { value: contrailCirrusERFDefault, step: 1 })
+const contrailCirrusERFInput = Inputs.range([17, 98], { value: inputs.contrailCirrusERF, step: 1 })
 const contrailCirrusERF = Generators.input(contrailCirrusERFInput)
 
 // Mitigation efficacy (%)
-const efficacyDefault = 70
-const efficacyInput = Inputs.range([0, 100], { value: efficacyDefault, step: 5 })
+const efficacyInput = Inputs.range([0, 100], { value: inputs.efficacy, step: 5 })
 const efficacy = Generators.input(efficacyInput)
 
 // Fuel penalty across fleet (%)
-const fuelPenaltyDefault = 0.5
-const fuelPenaltyInput = Inputs.range([0, 1], { value: fuelPenaltyDefault, step: 0.05 })
+const fuelPenaltyInput = Inputs.range([0, 1], { value: inputs.fuelPenalty, step: 0.05 })
 const fuelPenalty = Generators.input(fuelPenaltyInput)
 
 // Annual aviation fuel cost ($ / barrel)
 // https://www.iata.org/en/publications/economics/fuel-monitor/
-const fuelCostDefault = 90
-const fuelCostInput = Inputs.range([70, 130], { value: fuelCostDefault, step: 5 })
+const fuelCostInput = Inputs.range([70, 130], { value: inputs.fuelCost, step: 5 })
 const fuelCost = Generators.input(fuelCostInput)
 
 // Annual aviation fuel consumption (Billions gallons / year)
 // https://www.iata.org/en/iata-repository/pressroom/fact-sheets/industry-statistics/
-const fuelConsumptionDefault = 103
-const fuelConsumptionInput = Inputs.range([90, 110], { value: fuelConsumptionDefault, step: 1 })
+const fuelConsumptionInput = Inputs.range([90, 110], { value: inputs.fuelConsumption, step: 1 })
 const fuelConsumption = Generators.input(fuelConsumptionInput)
 
-// R&D costs
+// R&D costs ($M / year)
 const discountRate = 0.02   // 2%, assumed economic discount rate
 const years = 20            // assumed investment amortized over 20 years
-const upfrontRDDefault = 200
-const upfrontRDInput = Inputs.range([0, 500], { value: upfrontRDDefault, step: 10})
+const upfrontRDInput = Inputs.range([0, 500], { value: inputs.upfrontRD, step: 10})
 const upfrontRD = Generators.input(upfrontRDInput)
 
-// Annual monitoring infrastructure costs
-const annualInfraDefault = 100
-const annualInfraInput = Inputs.range([0, 500], { value: annualInfraDefault, step: 10})
+// Annual monitoring infrastructure costs ($M / year)
+const annualInfraInput = Inputs.range([0, 500], { value: inputs.annualInfra, step: 10})
 const annualInfra = Generators.input(annualInfraInput)
-
 ```
 
 <!-- Model -->
@@ -96,6 +120,10 @@ const costPie = [
 # Cost Explorer
 
 <div class="card">
+
+## Scenarios
+
+${scenarioInput}
 
 ## Development cost
 

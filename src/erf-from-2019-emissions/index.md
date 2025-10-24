@@ -54,7 +54,6 @@ for (var t = 0; t <= 50; t++) {
       contrails.push({"t": 2019 + t, "erf": 0.0});
    }
    
-   // set CO2 radiative forcing
    // calculate CO2 radiative forcing (mass -> concentration -> forcing)
    const m = co2_emissions * (a0 + a1*Math.exp(-t/t1) + a2*Math.exp(-t/t2) + a3*Math.exp(-t/t3));
    const c = m / mass_atmosphere * m_air / m_co2;

@@ -30,7 +30,7 @@ const efficacyInput = Inputs.range([0, 100], { value: efficacyDefault, step: 5 }
 const efficacy = Generators.input(efficacyInput)
 
 // Fuel penalty across fleet (%)
-const fuelPenaltyDefault = 0.3
+const fuelPenaltyDefault = 0.5
 const fuelPenaltyInput = Inputs.range([0, 1], { value: fuelPenaltyDefault, step: 0.05 })
 const fuelPenalty = Generators.input(fuelPenaltyInput)
 

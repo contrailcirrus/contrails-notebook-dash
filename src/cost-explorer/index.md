@@ -14,38 +14,50 @@ import {DonutChart} from "../components/donutChart.js";
 ```js
 // constants
 const AGWP100 = 8.8e-14           // yr W m-2 / kg-CO2 (Gaillot 2023)
-const contrailCirrusERF = 0.0574  // W m-2 (Lee 2021)
 const fuelIntensityCO2 = 3.89     // kg CO2 / kg fuel (ICAO - TODO)
 const tonnesPerBarrel = 0.127     // tonnes / barrel Jet-A
 const gallonsPerBarrel = 42       // 42 US gallons / barrel
 
+// Mitigation potential (mW m-2).
+// Default and bounds from Lee 2021.
+const contrailCirrusERFDefault = 57
+const contrailCirrusERFInput = Inputs.range([17, 98], { value: contrailCirrusERFDefault, step: 1 })
+const contrailCirrusERF = Generators.input(contrailCirrusERFInput)
+
 // Mitigation efficacy (%)
-const efficacyInput = Inputs.range([0, 100], { value: 50, step: 5 })
+const efficacyDefault = 70
+const efficacyInput = Inputs.range([0, 100], { value: efficacyDefault, step: 5 })
 const efficacy = Generators.input(efficacyInput)
 
 // Fuel penalty across fleet (%)
-const fuelPenaltyInput = Inputs.range([0, 1], { value: 0.3, step: 0.05 })
+const fuelPenaltyDefault = 0.3
+const fuelPenaltyInput = Inputs.range([0, 1], { value: fuelPenaltyDefault, step: 0.05 })
 const fuelPenalty = Generators.input(fuelPenaltyInput)
 
 // Annual aviation fuel cost ($ / barrel)
 // https://www.iata.org/en/publications/economics/fuel-monitor/
-const fuelCostInput = Inputs.range([70, 130], { value: 90, step: 5 })
+const fuelCostDefault = 90
+const fuelCostInput = Inputs.range([70, 130], { value: fuelCostDefault, step: 5 })
 const fuelCost = Generators.input(fuelCostInput)
 
 // Annual aviation fuel consumption (Billions gallons / year)
 // https://www.iata.org/en/iata-repository/pressroom/fact-sheets/industry-statistics/
-const fuelConsumptionInput = Inputs.range([90, 110], { value: 103, step: 1 })
+const fuelConsumptionDefault = 103
+const fuelConsumptionInput = Inputs.range([90, 110], { value: fuelConsumptionDefault, step: 1 })
 const fuelConsumption = Generators.input(fuelConsumptionInput)
 
 // R&D costs
-const discountRate = 0.02  // 2%, assumed economic discount rate
-const years = 20
-const upfrontRDInput = Inputs.range([0, 500], { value: 100, step: 10})
+const discountRate = 0.02   // 2%, assumed economic discount rate
+const years = 20            // assumed investment amortized over 20 years
+const upfrontRDDefault = 200
+const upfrontRDInput = Inputs.range([0, 500], { value: upfrontRDDefault, step: 10})
 const upfrontRD = Generators.input(upfrontRDInput)
 
 // Annual monitoring infrastructure costs
-const annualInfraInput = Inputs.range([0, 500], { value: 150, step: 10})
+const annualInfraDefault = 100
+const annualInfraInput = Inputs.range([0, 500], { value: annualInfraDefault, step: 10})
 const annualInfra = Generators.input(annualInfraInput)
+
 ```
 
 <!-- Model -->
@@ -57,7 +69,7 @@ const fuelConsumptionMt = (fuelConsumption * 1e9 / gallonsPerBarrel) * tonnesPer
 const fuelCO2 = fuelConsumptionMt * fuelIntensityCO2
 
 // Contrail warming in CO2-eq, GWP100 (Mtonnes / year)
-const contrailWarming = contrailCirrusERF / AGWP100 / 1e3 / 1e6
+const contrailWarming = (contrailCirrusERF / 1e3) / AGWP100 / 1e3 / 1e6
 
 // Contrail warming avoided in CO2-eq, GWP100 (Mtonnes / year)
 const contrailWarmingAvoided = ((efficacy / 100) * contrailWarming) - ((fuelPenalty / 100) * fuelCO2)
@@ -87,19 +99,23 @@ const costPie = [
 
 ## Development cost
 
-Upfront R&D Cost ($M) ${upfrontRDInput}
+Upfront R&D Cost [$M] ${upfrontRDInput}
 
-Annual Infrastructure Cost ($M / year) ${annualInfraInput}
-
-Mitigation Efficacy (%) ${efficacyInput}
+Annual Infrastructure Cost [$M / year] ${annualInfraInput}
 
 ## Fuel cost
 
-Fuel penalty (%) ${fuelPenaltyInput}
+Fuel penalty [%] ${fuelPenaltyInput}
 
-Fuel Cost ($ / barrel) ${fuelCostInput}
+Fuel Cost [$ / barrel] ${fuelCostInput}
 
-Annual Fuel Consumption (Billions gallons / year) ${fuelConsumptionInput}
+Annual Fuel Consumption [Billions gallons / year] ${fuelConsumptionInput}
+
+## Mitigation Potential
+
+Contrail Cirrus Effective Radiative Forcing [mW / m<sup>2</sup>] ${contrailCirrusERFInput}
+
+Mitigation Efficacy [%] ${efficacyInput}
 
 </div>
 

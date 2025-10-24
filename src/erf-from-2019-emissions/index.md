@@ -1,5 +1,5 @@
 ---
-title: Expected Radiative Forcing from 2019 Aviation Emissions
+title: Effective Radiative Forcing from 2019 Aviation Emissions
 ---
 
 <!-- Imports -->
@@ -33,8 +33,8 @@ const t3 = 4.304; // yr
 const contrail_erf = 26.1    // mW m-2
 
 // aviation co2 emissions in 2019
-// https://doi.org/10.5194/acp-24-6071-2024
-const co2_emissions = 885e9  // kg
+// https://doi.org/10.1016/j.atmosenv.2020.117834
+const co2_emissions = 1020e9  // kg
 
 ```
 

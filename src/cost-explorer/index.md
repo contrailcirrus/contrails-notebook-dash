@@ -12,8 +12,13 @@ import {DonutChart} from "../components/donutChart.js";
 
 <!-- Scenario Input -->
 ```js
+// Scenario
 const scenarioInput = Inputs.radio(["Pessimistic", "Default", "Optimistic"], {value: "Default",});
 const scenario = Generators.input(scenarioInput)
+
+// AGWP timescale
+const agwpTimescaleInput = Inputs.radio([20, 50, 100], {value: 100,});
+const agwpTimescale = Generators.input(agwpTimescaleInput)
 ```
 
 <!-- Inputs -->
@@ -44,8 +49,13 @@ const inputs = (scenario === "Default") ? {
   annualInfra: 20
 } : {};
 
+// AGWP, yr W m-2 / kg-CO2 (Lee 2021, Supplementary Data, Sheet AGWP-CO2)
+const AGWP = (agwpTimescale === 100) ? 8.8e-14
+  : (agwpTimescale === 50) ? 5.08e-14
+  : (agwpTimescale === 20) ? 2.39e-14
+  : null;
+
 // constants
-const AGWP100 = 8.8e-14           // yr W m-2 / kg-CO2 (Gaillot 2023)
 const fuelIntensityCO2 = 3.89     // kg CO2 / kg fuel (ICAO - TODO)
 const tonnesPerBarrel = 0.127     // tonnes / barrel Jet-A
 const gallonsPerBarrel = 42       // 42 US gallons / barrel
@@ -75,7 +85,6 @@ const fuelConsumption = Generators.input(fuelConsumptionInput)
 
 // R&D costs ($M / year)
 const discountRate = 0.02   // 2%, assumed economic discount rate
-const years = 20            // assumed investment amortized over 20 years
 const upfrontRDInput = Inputs.range([0, 500], { value: inputs.upfrontRD, step: 10})
 const upfrontRD = Generators.input(upfrontRDInput)
 
@@ -93,16 +102,17 @@ const fuelConsumptionMt = (fuelConsumption * 1e9 / gallonsPerBarrel) * tonnesPer
 const fuelCO2 = fuelConsumptionMt * fuelIntensityCO2
 
 // Contrail warming in CO2-eq, GWP100 (Mtonnes / year)
-const contrailWarming = (contrailCirrusERF / 1e3) / AGWP100 / 1e3 / 1e6
+const contrailWarming = (contrailCirrusERF / 1e3) / (AGWP * 1e9)
 
-// Contrail warming avoided in CO2-eq, GWP100 (Mtonnes / year)
+// Contrail warming avoided in CO2-eq (Mtonnes / year)
 const contrailWarmingAvoided = ((efficacy / 100) * contrailWarming) - ((fuelPenalty / 100) * fuelCO2)
 
 // Fuel costs ($M / year)
 const additionalFuelCost = (fuelPenalty / 100) * (fuelCost / 0.127 * fuelConsumptionMt)
 
 // R&D costs ($M / year)
-const amortizedRDCost = upfrontRD * discountRate / (1 - (1 + discountRate)**(-years))
+// TODO: Does it make sense to have amortized cost the same as AGWP Timescale?
+const amortizedRDCost = upfrontRD * discountRate / (1 - (1 + discountRate)**(-agwpTimescale))
 
 // Total annual ($M / year)
 const totalCost = additionalFuelCost + amortizedRDCost + annualInfra
@@ -124,6 +134,8 @@ const costPie = [
 ## Scenarios
 
 ${scenarioInput}
+
+Timescale (years): ${agwpTimescaleInput}
 
 ## Development cost
 
@@ -154,7 +166,7 @@ Mitigation Efficacy [%] ${efficacyInput}
 ## Warming avoided
 
 <span class="big">${Math.round(contrailWarmingAvoided)}</span><br/>
-<span class="muted">Mtonnes CO<sub>2-eq</sub> per year (GWP-100)</span>
+<span class="muted">Mtonnes CO<sub>2-eq</sub> per year (GWP-${agwpTimescale})</span>
 
 ## Annual cost
 
@@ -164,7 +176,7 @@ Mitigation Efficacy [%] ${efficacyInput}
 ## Abatement cost
 
 <span class="big">$ ${((additionalFuelCost + amortizedRDCost + annualInfra) / contrailWarmingAvoided).toFixed(2)}</span><br/>
-<span class="muted">per tonne CO<sub>2-eq</sub> (GWP-100)</span>
+<span class="muted">per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale})</span>
 
   </div>
   <div class="card">

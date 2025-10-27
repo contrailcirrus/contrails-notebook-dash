@@ -241,14 +241,23 @@ const shareScenario = async () => {
   const baseUrl = location.origin + location.pathname;
   const params = new URLSearchParams(currentScenario);
   const paramString = params.toString();
+  const shareUrl = `${baseUrl}?${paramString}`
 
   try {
-    await navigator.clipboard.writeText(`${baseUrl}?${paramString}`);
-    alert("Copied scenario URL to clipboard")
-  } catch (error) {
-    console.error(error.message);
+    await navigator.share({
+      title: "Contrail Cost Explorer",
+      url: shareUrl
+    })
+  } catch (e) {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      alert("Copied scenario URL to clipboard")
+    } catch (error) {
+      console.error(error)
+    }
   }
 }
+
 const shareButton = Inputs.button("Share", {value: null, reduce: shareScenario});
 ```
 

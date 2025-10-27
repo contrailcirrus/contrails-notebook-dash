@@ -82,7 +82,6 @@ const labels = [
     {"label": "Contrails", "t": data_contrail[ilabel].t, "erf": data_contrail[ilabel].erf},
     {"label": "CO2", "t": data_co2[ilabel].t, "erf": data_co2[ilabel].erf},
 ]
-console.log
 
 ```
 

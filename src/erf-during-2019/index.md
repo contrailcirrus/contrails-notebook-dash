@@ -80,8 +80,6 @@ const data = [
     {species: "Contrails", source: "2019 flights", "erf": contrail_erf},
 ];
 
-console.log(Plot.stackY(data, {x: "species", y: "erf"}).x)
-
 ```
 
 <!-- Plot -->

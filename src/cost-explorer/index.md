@@ -12,6 +12,9 @@ title: Cost Explorer
     right: 0;
     top: 0.75em;
 
+    form {
+      width: unset;
+    }
     button {
       background: white;
       border: 0px;
@@ -55,7 +58,7 @@ const getParams = (defaults= {}, intParams = new Set([]), floatParams= new Set([
   );
 
   // reset URL params to empty
-  // history.replaceState({}, document.title, location.pathname);
+  history.replaceState({}, document.title, location.pathname);
 
   // add defaults on return
   return { ...defaults, ...params}
@@ -149,6 +152,7 @@ const AGWP = (agwpTimescale === 100) ? 8.8e-14
 const fuelIntensityCO2 = 3.89     // kg CO2 / kg fuel (ICAO - TODO)
 const tonnesPerBarrel = 0.127     // tonnes / barrel Jet-A
 const gallonsPerBarrel = 42       // 42 US gallons / barrel
+const discountRate = 0.02         // 2%, assumed economic discount rate
 ```
 
 <!-- Inputs -->
@@ -177,7 +181,6 @@ const fuelConsumptionInput = Inputs.range([90, 110], { value: inputs.fuelConsump
 const fuelConsumption = Generators.input(fuelConsumptionInput)
 
 // R&D costs ($M / year)
-const discountRate = 0.02   // 2%, assumed economic discount rate
 const upfrontRDInput = Inputs.range([0, 500], { value: inputs.upfrontRD, step: 10})
 const upfrontRD = Generators.input(upfrontRDInput)
 
@@ -220,18 +223,50 @@ const costPie = [
 ]
 ```
 
+<!-- Share -->
+```js
+const currentScenario = {
+  scenario: scenario,
+  agwpTimescale: agwpTimescale,
+  contrailCirrusERF: contrailCirrusERF,
+  efficacy: efficacy,
+  fuelPenalty: fuelPenalty,
+  fuelCost: fuelCost,
+  fuelConsumption: fuelConsumption,
+  upfrontRD: upfrontRD,
+  annualInfra: annualInfra
+}
+```
+
+```js
+const shareScenario = async () => {
+  const baseUrl = location.origin + location.pathname;
+  const params = new URLSearchParams(currentScenario);
+  const paramString = params.toString();
+
+  try {
+    await navigator.clipboard.writeText(`${baseUrl}?${paramString}`);
+    alert("Copied")
+  } catch (error) {
+    console.error(error.message);
+  }
+}
+const shareButton = Inputs.button("Share", {value: null, reduce: shareScenario});
+```
 # Cost Explorer
 
 <!-- Only show this message when on dash.contrails.org -->
 ${(window.location.hostname === "dash.contrails.org") ? html`<em>See original post on the <a href='https://notebook.contrails.org'>Contrails Notebook</a></em>` : ""}
 
 <div class="share">
-  <button title="Share">
+  ${shareButton}
+
+<!--   <button title="Share" onclick="shareScenario()">
     Share
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
       <path d="M 21 5 A 3 3 0 1 1 15 5 A 3 3 0 1 1 21 5 M 9 12 A 3 3 0 1 1 3 12 A 3 3 0 1 1 9 12 M 21 19 A 3 3 0 1 1 15 19 A 3 3 0 1 1 21 19 M 8.5 10.5 L 15.5 6.5 M 8.5 13.5 L 15.5 17.5" stroke-width="2"/>
     </svg>
-  </button>
+  </button> -->
 </div>
 
 <div class="card">

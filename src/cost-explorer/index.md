@@ -10,27 +10,80 @@ import "../components/observer.js";
 import {DonutChart} from "../components/donutChart.js";
 ```
 
+<!-- Parse url inputs -->
+```js
+// parameters from URL ?param1=val1&param2=val2
+const getParams = (defaults= {}, intParams = new Set([]), floatParams= new Set([])) => {
+
+  // cast ints and floats
+  const cast = (key, value) => {
+    if (intParams.has(key)) return parseInt(value, 10);
+    if (floatParams.has(key)) return parseFloat(value);
+    return value;
+  };
+
+  // read params
+  const params = Object.fromEntries(
+    [...new URLSearchParams(location.search)].map(([k, v]) => [k, cast(k, v)])
+  );
+
+  // reset URL params to empty
+  // history.replaceState({}, document.title, location.pathname);
+
+  // add defaults on return
+  return { ...defaults, ...params}
+};
+
+// int and float param keys
+// (by default all URL params are read as strings)
+const intParams = new Set([
+  "agwpTimescale",
+  "contrailCirrusERF",
+  "efficacy",
+  "fuelCost",
+  "fuelConsumption",
+  "upfrontRD",
+  "annualInfra"
+]);
+
+const floatParams = new Set([
+  "fuelPenalty"
+]);
+
+// dashboard defaults
+// most defaults specific in the scenarioInputs below,
+// but all can be overwritten via URL params
+const defaults = {
+  scenario: "Nominal",
+  agwpTimescale: 100,
+};
+const config = getParams(defaults, intParams, floatParams);
+console.log(config)
+```
+
 <!-- Scenario Input -->
 ```js
 // Scenario
-const scenarioInput = Inputs.radio(["Pessimistic", "Default", "Optimistic"], {value: "Default",});
+const scenarioInput = Inputs.radio(["Pessimistic", "Nominal", "Optimistic"], {value: config.scenario});
 const scenario = Generators.input(scenarioInput)
-
+```
+<!-- Timescale Input -->
+```js
 // AGWP timescale
-const agwpTimescaleInput = Inputs.radio([20, 50, 100], {value: 100,});
+const agwpTimescaleInput = Inputs.radio([20, 50, 100], {value: config.agwpTimescale});
 const agwpTimescale = Generators.input(agwpTimescaleInput)
 ```
 
 <!-- Inputs -->
 ```js
-const inputs = (scenario === "Default") ? {
+const scenarioInputs = (scenario === "Nominal") ? {
   contrailCirrusERF: 57,  // mW m-2
   efficacy: 70,           // %
-  fuelPenalty: 0.57,      // %
-  fuelCost: 90,           // $ / barrel
+  fuelPenalty: 0.5,       // %
+  fuelCost: 90,          // $ / barrel
   fuelConsumption: 103,   // Billions gallons / year
   upfrontRD: 200,         // $M / year
-  annualInfra: 100       // $M / year
+  annualInfra: 100        // $M / year
 } : (scenario === "Pessimistic") ? {
   contrailCirrusERF: 26,
   efficacy: 50,
@@ -48,6 +101,8 @@ const inputs = (scenario === "Default") ? {
   upfrontRD: 100,
   annualInfra: 20
 } : {};
+
+const inputs = { ...scenarioInputs, ...config };
 
 // AGWP, yr W m-2 / kg-CO2 (Lee 2021, Supplementary Data, Sheet AGWP-CO2)
 const AGWP = (agwpTimescale === 100) ? 8.8e-14
@@ -128,6 +183,9 @@ const costPie = [
 ```
 
 # Cost Explorer
+
+<!-- Only show this message when on dash.contrails.org -->
+${(window.location.hostname === "dash.contrails.org") ? html`<em>See original post on the <a href='https://notebook.contrails.org'>Contrails Notebook</a></em>` : ""}
 
 <div class="card">
 

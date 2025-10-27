@@ -24,6 +24,14 @@ title: Cost Explorer
     button:hover {
       color: var(--theme-foreground-focus);
     }
+    svg {
+      margin-bottom: -3px;
+    }
+    /* "Copied!" text */
+    .observablehq-pre-copied::before {
+      background: white;
+      padding: 0px 8px;
+    }
   }
 
 </style>
@@ -237,6 +245,14 @@ const currentScenario = {
 
 ```js
 
+const showCopied = () => {
+  const button = document.getElementById("sharecontainer").querySelector('button');
+
+  // hack to steal the "Copied" text and animation from the <pre> code blocks
+  button.classList.add("observablehq-pre-copied");
+  button.addEventListener("animationend", () => button.classList.remove("observablehq-pre-copied"), { once: true });
+}
+
 const shareScenario = async () => {
   const baseUrl = location.origin + location.pathname;
   const params = new URLSearchParams(currentScenario);
@@ -251,19 +267,24 @@ const shareScenario = async () => {
   } catch (e) {
     try {
       await navigator.clipboard.writeText(shareUrl);
-      alert("Copied scenario URL to clipboard")
+      showCopied()
+      // alert("Copied scenario URL to clipboard")
     } catch (error) {
       console.error(error)
     }
   }
 }
 
-const shareButton = Inputs.button("Share", {value: null, reduce: shareScenario});
+const shareButtonText =html`Share
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path d="M 21 5 A 3 3 0 1 1 15 5 A 3 3 0 1 1 21 5 M 9 12 A 3 3 0 1 1 3 12 A 3 3 0 1 1 9 12 M 21 19 A 3 3 0 1 1 15 19 A 3 3 0 1 1 21 19 M 8.5 10.5 L 15.5 6.5 M 8.5 13.5 L 15.5 17.5" stroke-width="2"/>
+    </svg>`
+const shareButton = Inputs.button(shareButtonText, {value: null, reduce: shareScenario});
 ```
 
 # Cost Explorer
 
-<div class="share">${shareButton}</div>
+<div id="sharecontainer" class="share">${shareButton}</div>
 
 <!-- Only show this message when on dash.contrails.org -->
 ${(window.location.hostname === "dash.contrails.org") ? html`<em>See original post on the <a href='https://notebook.contrails.org'>Contrails Notebook</a></em>` : ""}

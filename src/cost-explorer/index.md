@@ -1,6 +1,5 @@
 ---
 title: Cost Explorer
-
 ---
 
 <!-- Imports -->
@@ -51,36 +50,36 @@ const floatParams = new Set([
 ]);
 
 // dashboard defaults
-// most defaults specific in the scenarioInputs below,
+// see scenarioInputs for scenario defaults.
 // but all can be overwritten via URL params
 const defaults = {
   scenario: "Nominal",
   agwpTimescale: 100,
 };
-const config = getParams(defaults, intParams, floatParams);
-console.log(config)
+const userInputs = getParams(defaults, intParams, floatParams);
 ```
 
 <!-- Scenario Input -->
 ```js
 // Scenario
-const scenarioInput = Inputs.radio(["Pessimistic", "Nominal", "Optimistic"], {value: config.scenario});
+const scenarioInput = Inputs.radio(["Pessimistic", "Nominal", "Optimistic"], {value: userInputs.scenario});
 const scenario = Generators.input(scenarioInput)
 ```
+
 <!-- Timescale Input -->
 ```js
 // AGWP timescale
-const agwpTimescaleInput = Inputs.radio([20, 50, 100], {value: config.agwpTimescale});
+const agwpTimescaleInput = Inputs.radio([20, 50, 100], {value: userInputs.agwpTimescale});
 const agwpTimescale = Generators.input(agwpTimescaleInput)
 ```
 
-<!-- Inputs -->
+<!-- Runs when `scenario` is changed -->
 ```js
 const scenarioInputs = (scenario === "Nominal") ? {
   contrailCirrusERF: 57,  // mW m-2
   efficacy: 70,           // %
   fuelPenalty: 0.5,       // %
-  fuelCost: 90,          // $ / barrel
+  fuelCost: 90,           // $ / barrel
   fuelConsumption: 103,   // Billions gallons / year
   upfrontRD: 200,         // $M / year
   annualInfra: 100        // $M / year
@@ -102,8 +101,16 @@ const scenarioInputs = (scenario === "Nominal") ? {
   annualInfra: 20
 } : {};
 
-const inputs = { ...scenarioInputs, ...config };
+// merge the user inputs with the default scenario inputs
+const inputs = { ...scenarioInputs, ...userInputs };
 
+// delete all keys from userInputs after using the first time
+// this makes sure that the scenario inputs take precedent
+Object.keys(userInputs).forEach(key => delete userInputs[key]);
+```
+
+<!-- Constants -->
+```js
 // AGWP, yr W m-2 / kg-CO2 (Lee 2021, Supplementary Data, Sheet AGWP-CO2)
 const AGWP = (agwpTimescale === 100) ? 8.8e-14
   : (agwpTimescale === 50) ? 5.08e-14
@@ -114,7 +121,10 @@ const AGWP = (agwpTimescale === 100) ? 8.8e-14
 const fuelIntensityCO2 = 3.89     // kg CO2 / kg fuel (ICAO - TODO)
 const tonnesPerBarrel = 0.127     // tonnes / barrel Jet-A
 const gallonsPerBarrel = 42       // 42 US gallons / barrel
+```
 
+<!-- Inputs -->
+```js
 // Mitigation potential (mW m-2).
 // Default and bounds from Lee 2021.
 const contrailCirrusERFInput = Inputs.range([17, 98], { value: inputs.contrailCirrusERF, step: 1 })

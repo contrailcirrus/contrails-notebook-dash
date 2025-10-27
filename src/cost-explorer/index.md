@@ -2,12 +2,40 @@
 title: Cost Explorer
 ---
 
+<!-- ----- Dashboard imports ----- -->
+
+<!-- Add any custom styles for this dashboard -->
+<!-- Other global styles in `style.css` -->
+<style>
+  .share {
+    position: absolute;
+    right: 0;
+    top: 0.75em;
+
+    button {
+      background: white;
+      border: 0px;
+      color: var(--theme-foreground-muted);
+      cursor: pointer;
+    }
+    button:hover {
+      color: var(--theme-foreground-focus);
+    }
+    svg {
+      margin-bottom: -3px;
+    }
+
+  }
+</style>
+
 <!-- Imports -->
 ```js
 import "../components/observer.js";
 
 import {DonutChart} from "../components/donutChart.js";
 ```
+
+<!-- ----------------------------- -->
 
 <!-- Parse url inputs -->
 ```js
@@ -196,6 +224,15 @@ const costPie = [
 
 <!-- Only show this message when on dash.contrails.org -->
 ${(window.location.hostname === "dash.contrails.org") ? html`<em>See original post on the <a href='https://notebook.contrails.org'>Contrails Notebook</a></em>` : ""}
+
+<div class="share">
+  <button title="Share">
+    Share
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path d="M 21 5 A 3 3 0 1 1 15 5 A 3 3 0 1 1 21 5 M 9 12 A 3 3 0 1 1 3 12 A 3 3 0 1 1 9 12 M 21 19 A 3 3 0 1 1 15 19 A 3 3 0 1 1 21 19 M 8.5 10.5 L 15.5 6.5 M 8.5 13.5 L 15.5 17.5" stroke-width="2"/>
+    </svg>
+  </button>
+</div>
 
 <div class="card">
 

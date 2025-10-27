@@ -10,7 +10,7 @@ title: Cost Explorer
   .share {
     position: absolute;
     right: 0;
-    top: 0.75em;
+    top: 0.5em;
 
     form {
       width: unset;
@@ -24,11 +24,20 @@ title: Cost Explorer
     button:hover {
       color: var(--theme-foreground-focus);
     }
-    svg {
-      margin-bottom: -3px;
-    }
-
   }
+
+  .copied-message {
+    right: 4em;
+    opacity: 0;
+    transition: opacity 0.25s ease-in-out;
+    font-size: 14px;
+    color: var(--theme-foreground-muted);
+    padding: 0.5em 1em;
+  }
+  .copied-message.show {
+    opacity: 1;
+  }
+
 </style>
 
 <!-- Imports -->
@@ -239,6 +248,18 @@ const currentScenario = {
 ```
 
 ```js
+
+const showCopied = () => {
+  const copiedMessage = document.getElementById("copiedmessage");
+
+  // Show the ephemeral message
+  copiedMessage.classList.toggle("show")
+
+  // Hide after 2 seconds
+  setTimeout(() => {
+    copiedMessage.classList.toggle("show")
+  }, 1000);
+}
 const shareScenario = async () => {
   const baseUrl = location.origin + location.pathname;
   const params = new URLSearchParams(currentScenario);
@@ -246,28 +267,29 @@ const shareScenario = async () => {
 
   try {
     await navigator.clipboard.writeText(`${baseUrl}?${paramString}`);
-    alert("Copied")
+    // alert("Copied")
+    showCopied()
   } catch (error) {
     console.error(error.message);
   }
 }
 const shareButton = Inputs.button("Share", {value: null, reduce: shareScenario});
 ```
+
 # Cost Explorer
+
+<div id="copiedmessage" class="share copied-message"><form>Scenario Copied!</form></div>
+<div class="share">${shareButton}</div>
+
+<!-- <div class="share">
+  <div class="grid grid-cols-2">
+    <div id="copiedmessage" class="copied-message">Scenario Copied!</div>
+    <div>${shareButton}</div>
+  </div>
+</div> -->
 
 <!-- Only show this message when on dash.contrails.org -->
 ${(window.location.hostname === "dash.contrails.org") ? html`<em>See original post on the <a href='https://notebook.contrails.org'>Contrails Notebook</a></em>` : ""}
-
-<div class="share">
-  ${shareButton}
-
-<!--   <button title="Share" onclick="shareScenario()">
-    Share
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-      <path d="M 21 5 A 3 3 0 1 1 15 5 A 3 3 0 1 1 21 5 M 9 12 A 3 3 0 1 1 3 12 A 3 3 0 1 1 9 12 M 21 19 A 3 3 0 1 1 15 19 A 3 3 0 1 1 21 19 M 8.5 10.5 L 15.5 6.5 M 8.5 13.5 L 15.5 17.5" stroke-width="2"/>
-    </svg>
-  </button> -->
-</div>
 
 <div class="card">
 

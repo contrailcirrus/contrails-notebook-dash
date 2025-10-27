@@ -33,7 +33,6 @@ title: Cost Explorer
       padding: 0px 8px;
     }
   }
-
 </style>
 
 <!-- Imports -->

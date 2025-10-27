@@ -160,3 +160,11 @@ form {
 .note, .tip, .warning, .caution {
   max-width: 100%;
 }
+
+/* Improve button style */
+button {
+  border: solid 1px var(--theme-foreground-faint);
+  border-radius: 0.25rem;
+  padding: 0.5em 1em;
+  font: 14px var(--sans-serif);
+}

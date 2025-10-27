@@ -285,7 +285,7 @@ const shareButton = Inputs.button(shareButtonText, {value: null, reduce: shareSc
 <div id="sharecontainer" class="share">${shareButton}</div>
 
 <!-- Only show this message when on dash.contrails.org -->
-${(window.location.hostname === "dash.contrails.org") ? html`<em>See original post on the <a href='https://notebook.contrails.org'>Contrails Notebook</a></em>` : ""}
+${(window.self === window.top) ? html`<em>See original post on the <a href='https://notebook.contrails.org'>Contrails Notebook</a></em>` : ""}
 
 <div class="card">
 

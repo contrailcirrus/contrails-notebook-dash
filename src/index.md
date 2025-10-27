@@ -12,3 +12,4 @@ Notebook Dashboard Index
 
 - [Effective Radiative Forcing from 2019 Aviation Emissions](/erf-from-2019-emissions/index.html)
 - [Effective Radiative Forcing during 2019](/erf-during-2019/index.html)
+- [Effective Radiative Forcing from Future Emissions](/erf-from-future-emissions/index.html)

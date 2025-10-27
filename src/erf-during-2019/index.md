@@ -15,7 +15,7 @@ const seconds_per_year = 31557600; // s
 const mass_atmosphere = 5.1352e18; // kg 
 const m_co2 = 44.01; // g/mol
 const m_air = 28.97; // g/mol
-const eta_co2 = 420e-6;  // mol/mol
+const eta_co2 = 400e-6;  // mol/mol
 const surface_area_earth = 510072000000000.0; // m
 
 // CO2 impulse response function coefficients
@@ -61,8 +61,8 @@ const co2_emissions = [
 var m_pre = 0.0
 for (var t = 1940; t <= 2018; t++) {
     const i = t - 1940;
-    const tp = 2019 - t;
-    m_pre += 1e9 * co2_emissions[i] * (a0 + a1*Math.exp(-tp/t1) + a2*Math.exp(-tp/t2) + a3*Math.exp(-tp/t3));
+    const dt = 2019 - t;
+    m_pre += 1e9 * co2_emissions[i] * (a0 + a1*Math.exp(-dt/t1) + a2*Math.exp(-dt/t2) + a3*Math.exp(-dt/t3));
 }
 
 // Compute radiative forcing
@@ -87,19 +87,22 @@ console.log(Plot.stackY(data, {x: "species", y: "erf"}).x)
 <!-- Plot -->
 ```js
 Plot.plot({
+    width: Math.min(width, 460),
+    height: 400/460*Math.min(width, 460),
+    style: "display: block; margin: auto",
     color: {
         type: "categorical",
         range: ["black", "gray"],
     },
     x: {
         type: "band",
-        padding: 0.4,
         label: null,
-        line: true
+        line: true,
+        padding: 0.2
     },
     y: {
         label: "2019 effective radiative forcing (mW/m²)",
-        domain: [0, 35],
+        domain: [0, 40],
         line: true
     },
     marks: [
@@ -113,7 +116,7 @@ Plot.plot({
 
 ```
 
-<div class="source">
+<div style="max-width: 460px; margin: auto" class="source">
 
 [Source ↗︎](https://github.com/contrailcirrus/contrails-notebook-dash/blob/main/src/erf-during-2019/index.md)
 

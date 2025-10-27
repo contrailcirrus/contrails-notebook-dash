@@ -15,7 +15,7 @@ const seconds_per_year = 31557600; // s
 const mass_atmosphere = 5.1352e18; // kg 
 const m_co2 = 44.01; // g/mol
 const m_air = 28.97; // g/mol
-const eta_co2 = 420e-6;  // mol/mol
+const eta_co2 = 400e-6;  // mol/mol
 const surface_area_earth = 510072000000000.0; // m
 
 // CO2 impulse response function coefficients
@@ -67,17 +67,20 @@ for (var t = 0; t <= 50; t++) {
 <!-- Plot -->
 ```js
 Plot.plot({
+    width: Math.min(width, 600),
+    height: 400/600*Math.min(width, 600),
+    style: "display: block; margin: auto",
     x: {
         label: null,
-        tickFormat: "" // format as 2019 rather than 2,019
+        tickFormat: "d", // format as 2019 rather than 2,019
+        line: true
     },
     y: {
         label: "Effective radiative forcing (mW/m²)",
-        domain: [0, 28]
+        domain: [0, 28],
+        line: true
     },
     marks: [
-        Plot.ruleY([0]),
-        Plot.ruleX([2019]),
         Plot.areaY(contrails, {x: "t", y: "erf", fill: "black"}),
         Plot.text([[2021, 24.5]], {text: ["2019 contrails"], textAnchor: "start", fontWeight: "bold"}),
         Plot.text([[2021, 23.5]], {text: ["Large amount of short-lived warming"], textAnchor: "start"}),
@@ -89,7 +92,7 @@ Plot.plot({
 
 ```
 
-<div class="source">
+<div style="max-width: 600px; margin: auto" class="source">
 
 [Source ↗︎](https://github.com/contrailcirrus/contrails-notebook-dash/blob/main/src/erf-from-2019-emissions/index.md)
 

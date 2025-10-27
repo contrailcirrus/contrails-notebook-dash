@@ -26,18 +26,6 @@ title: Cost Explorer
     }
   }
 
-  .copied-message {
-    right: 4em;
-    opacity: 0;
-    transition: opacity 0.25s ease-in-out;
-    font-size: 14px;
-    color: var(--theme-foreground-muted);
-    padding: 0.5em 1em;
-  }
-  .copied-message.show {
-    opacity: 1;
-  }
-
 </style>
 
 <!-- Imports -->
@@ -249,17 +237,6 @@ const currentScenario = {
 
 ```js
 
-const showCopied = () => {
-  const copiedMessage = document.getElementById("copiedmessage");
-
-  // Show the ephemeral message
-  copiedMessage.classList.toggle("show")
-
-  // Hide after 2 seconds
-  setTimeout(() => {
-    copiedMessage.classList.toggle("show")
-  }, 1000);
-}
 const shareScenario = async () => {
   const baseUrl = location.origin + location.pathname;
   const params = new URLSearchParams(currentScenario);
@@ -267,8 +244,7 @@ const shareScenario = async () => {
 
   try {
     await navigator.clipboard.writeText(`${baseUrl}?${paramString}`);
-    // alert("Copied")
-    showCopied()
+    alert("Copied scenario URL to clipboard")
   } catch (error) {
     console.error(error.message);
   }
@@ -278,15 +254,7 @@ const shareButton = Inputs.button("Share", {value: null, reduce: shareScenario})
 
 # Cost Explorer
 
-<div id="copiedmessage" class="share copied-message"><form>Scenario Copied!</form></div>
 <div class="share">${shareButton}</div>
-
-<!-- <div class="share">
-  <div class="grid grid-cols-2">
-    <div id="copiedmessage" class="copied-message">Scenario Copied!</div>
-    <div>${shareButton}</div>
-  </div>
-</div> -->
 
 <!-- Only show this message when on dash.contrails.org -->
 ${(window.location.hostname === "dash.contrails.org") ? html`<em>See original post on the <a href='https://notebook.contrails.org'>Contrails Notebook</a></em>` : ""}

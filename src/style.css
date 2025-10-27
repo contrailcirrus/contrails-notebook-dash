@@ -85,16 +85,8 @@ https://observablehq.observablehq.cloud/framework-example-custom-stylesheet/
 body {
   font-family: var(--sans-serif);
 
-  /* Padding inside body can be overwritten by iframe */
-  padding: 2rem;
-
   /* Ghost post max-width */
   max-width: 720px;
-}
-
-/* Don't add extra margin around body, use padding above instead */
-#observablehq-center {
-  margin: 0;
 }
 
 /* Set header font to Aeonik outside cards  */

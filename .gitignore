@@ -7,3 +7,6 @@ node_modules/
 # Build
 /dist/
 yarn-error.log
+
+# python
+.ipynb_checkpoints/

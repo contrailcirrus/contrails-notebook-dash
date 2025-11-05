@@ -29,18 +29,14 @@ import "../components/observer.js";
 <!-- ----------------------------- -->
 
 ```js
-import deck from "npm:deck.gl";
-
-const {DeckGL, _GlobeView, MapView, BitmapLayer, GeoJsonLayer,COORDINATE_SYSTEM} = deck;
+import { Deck, _GlobeView, MapView, COORDINATE_SYSTEM } from "npm:@deck.gl/core";
+import { GeoJsonLayer, BitmapLayer } from 'npm:@deck.gl/layers';
 ```
 
 ```js
-// const erf = FileAttachment("2019-percent.nc").arrayBuffer().then((data) => new NetCDFReader(data));
-
 // geojson natural earth polygons
 const land = FileAttachment("ne_110m_land.geojson")
 const ocean = FileAttachment("ne_110m_ocean.geojson")
-
 const erfImage = FileAttachment("2019.png")
 ```
 
@@ -50,12 +46,9 @@ const mapType = Generators.input(mapTypeInput)
 ```
 
 ```js
-const globeView = new _GlobeView()
-```
-
-```js
-const deckInstance = new DeckGL({
-  container,
+const deckInstance = new Deck({
+  parent: document.getElementById("container"),
+  style: {"position": "relative"},
   views: mapType === "globe" ? [
     new _GlobeView()
   ] : [
@@ -103,11 +96,9 @@ deckInstance.setProps({
       stroked: false,
       filled: true,
       getFillColor: [22, 36, 64],
-      // lineWidthMinPixels: 1,
-      // getLineColor: [60, 60, 60],
     }),
     new BitmapLayer({
-      id: "BitmapLayer",
+      id: "erfImage",
       bounds: [-180.0, -90.0, 180.0, 90.0],
       image: erfImage.href,
       _imageCoordinateSystem: COORDINATE_SYSTEM.LNGLAT,
@@ -115,7 +106,7 @@ deckInstance.setProps({
       pickable: true,
       // makes sure that layer sites above geojson layers above
       parameters: { cullMode: 'back', depthCompare: 'always' }
-    })
+    }),
   ]
 });
 ```
@@ -123,7 +114,7 @@ deckInstance.setProps({
 # 2019 Global Contrail ERF heatmap
 
 
-This map shows the proprtion of contrail forcing relative to the 2019 global annual contrail forcing.
+This map shows the proportion of contrail forcing relative to the 2019 global annual contrail forcing.
 
 
 <div class="card">
@@ -132,7 +123,8 @@ This map shows the proprtion of contrail forcing relative to the 2019 global ann
 
   ${mapTypeInput}
 
-  <div id="container" style="border-radius: 8px; overflow: hidden; background: rgb(0,0,0); height: 75vh; margin: 1rem 0; "></div>
+  <div id="container" style="border-radius: 8px; overflow: hidden; background: rgb(0,0,0); height: 75vh; margin: 1rem 0; ">
+  </div>
   <figcaption>Data: <a href="https://acp.copernicus.org/articles/24/6071/2024/">Teoh 2024</a></figcaption>
 </figure>
 

@@ -25,90 +25,77 @@ title: 2019 Contrail ERF Percentage
 // See README for script tag required in post body.
 import "../components/observer.js";
 ```
-
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
 <!-- ----------------------------- -->
 
 ```js
-import { Deck, _GlobeView, MapView, COORDINATE_SYSTEM } from "npm:@deck.gl/core";
-import { GeoJsonLayer, BitmapLayer } from 'npm:@deck.gl/layers';
+import * as L from "npm:leaflet";
+import "npm:leaflet-draw"
 ```
 
 ```js
 // geojson natural earth polygons
-const land = FileAttachment("ne_110m_land.geojson")
-const ocean = FileAttachment("ne_110m_ocean.geojson")
-const erfImage = FileAttachment("2019.png")
+const land = FileAttachment("ne_110m_land.geojson").json()
+const ocean = FileAttachment("ne_110m_ocean.geojson").json()
+const erfImage = FileAttachment("2019wm.png")
 ```
 
 ```js
-const mapTypeInput = Inputs.radio(["globe", "flat"], {value: "globe"});
-const mapType = Generators.input(mapTypeInput)
-```
+const map = L.map("map")
+  .setView([0,0], 3);
 
-```js
-const deckInstance = new Deck({
-  parent: document.getElementById("container"),
-  style: {"position": "relative"},
-  views: mapType === "globe" ? [
-    new _GlobeView()
-  ] : [
-    new MapView()
-  ],
-  initialViewState,
-  // getTooltip: ({bitmap}) => bitmap && `${bitmap.pixel}`,
-  controller: true,
+L.geoJSON(land, {
+    style: {stroke: true, color: "#ffffff", opacity: 0.3, fill: true, fillColor: "#161a26", fillOpacity: 1}
+}).addTo(map);
+
+L.geoJSON(ocean, {
+    style: {stroke: false, fill: true, fillColor: "#162440", fillOpacity: 1}
+}).addTo(map);
+
+L.imageOverlay(erfImage.href, [[90, -180], [-90, 180]], {
+  zIndex: 1000,
+  opacity: 0.5
+}).addTo(map);
+
+// Layer to hold drawn items
+const drawnItems = new L.FeatureGroup().addTo(map);
+
+// Activate Leaflet.draw with rectangle tool only
+const drawControl = new L.Control.Draw({
+  draw: {
+    polygon: true,
+    rectangle: false,
+    marker: false,
+    circlemarker: false,
+    circle: false,
+    polyline: false,
+  },
+  edit: false
+});
+map.addControl(drawControl);
+
+map.on('draw:drawstart', function () {
+  drawnItems.clearLayers();
+});
+
+// Capture the rectangle once drawn
+map.on('draw:created', function (e) {
+  const layer = e.layer;
+  drawnItems.addLayer(layer);
+
+  // Get corner coordinates
+  const corners = layer.getLatLngs()[0]; // clockwise starting SW
+  console.log('Rectangle corners:', corners);
 });
 
 // clean up if this code re-runs
 invalidation.then(() => {
-  deckInstance.finalize();
-  container.innerHTML = "";
+  map.innerHTML = "";
 });
-```
 
-```js
-const initialViewState = {
-  longitude: -2,
-  latitude: 53.5,
-  zoom: 2,
-  minZoom: 1,
-  maxZoom: 6,
-  pitch: 0,
-  bearing: 0
-};
-```
-
-```js
-deckInstance.setProps({
-  layers: [
-    new GeoJsonLayer({
-      id: "land",
-      data: land.href,
-      stroked: true,
-      filled: true,
-      getFillColor: [22, 36, 38],
-      lineWidthMinPixels: 1,
-      getLineColor: [255, 255, 255, 50],
-    }),
-    new GeoJsonLayer({
-      id: "ocean",
-      data: ocean.href,
-      stroked: false,
-      filled: true,
-      getFillColor: [22, 36, 64],
-    }),
-    new BitmapLayer({
-      id: "erfImage",
-      bounds: [-180.0, -90.0, 180.0, 90.0],
-      image: erfImage.href,
-      _imageCoordinateSystem: COORDINATE_SYSTEM.LNGLAT,
-      opacity: 0.1,
-      pickable: true,
-      // makes sure that layer sites above geojson layers above
-      parameters: { cullMode: 'back', depthCompare: 'always' }
-    }),
-  ]
-});
 ```
 
 # 2019 Global Contrail ERF heatmap
@@ -121,9 +108,7 @@ This map shows the proportion of contrail forcing relative to the 2019 global an
 
 <figure>
 
-  ${mapTypeInput}
-
-  <div id="container" style="border-radius: 8px; overflow: hidden; background: rgb(0,0,0); height: 75vh; margin: 1rem 0; ">
+  <div id="map" style="border-radius: 8px; overflow: hidden; background: rgb(0,0,0); height: 75vh; margin: 1rem 0; ">
   </div>
   <figcaption>Data: <a href="https://acp.copernicus.org/articles/24/6071/2024/">Teoh 2024</a></figcaption>
 </figure>

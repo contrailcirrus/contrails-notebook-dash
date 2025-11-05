@@ -1,13 +1,23 @@
 ---
 title: 2019 Contrail ERF Percentage
-theme: slate
+# theme: slate
 ---
 
 <!-- ----- Dashboard imports ----- -->
 
 <!-- Add any custom styles for this dashboard -->
 <!-- Other global styles in `style.css` -->
-<style></style>
+<style>
+  body {
+    font-family: var(--sans-serif);
+
+    /* Ghost post max-width */
+    max-width: 1000px;
+  }
+  p, table, figure, figcaption, h1, h2, h3, h4, h5, h6, .katex-display {
+    max-width: 100%
+  }
+</style>
 
 
 ```js
@@ -20,13 +30,9 @@ import "../components/observer.js";
 
 ```js
 import deck from "npm:deck.gl";
-// import maplibregl from "npm:maplibre-gl";
 
 const {DeckGL, _GlobeView, MapView, BitmapLayer, GeoJsonLayer,COORDINATE_SYSTEM} = deck;
 ```
-<!-- MapLibre Stylesheet -->
-<!-- <link rel="stylesheet" href="npm:maplibre-gl/dist/maplibre-gl.css"> -->
-<!-- <script src="https://unpkg.com/@geomatico/maplibre-cog-protocol@0.5.0/dist/index.js"></script> -->
 
 ```js
 // const erf = FileAttachment("2019-percent.nc").arrayBuffer().then((data) => new NetCDFReader(data));
@@ -35,21 +41,10 @@ const {DeckGL, _GlobeView, MapView, BitmapLayer, GeoJsonLayer,COORDINATE_SYSTEM}
 const land = FileAttachment("ne_110m_land.geojson")
 const ocean = FileAttachment("ne_110m_ocean.geojson")
 
-// map style
-// const mapstyle = FileAttachment("mapstyle.json")
-
-// const cogFile = FileAttachment("2019.tif")
-// const geotiff = FileAttachment("2019.geotiff")
 const erfImage = FileAttachment("2019.png")
 ```
 
 ```js
-// const longitudeInput = Inputs.range([-180, 180], { value: 1, step: 1})
-// const longitude = Generators.input(longitudeInput)
-
-// const latitudeInput = Inputs.range([-180, 180], { value: 1, step: 1})
-// const latitude = Generators.input(latitudeInput)
-
 const mapTypeInput = Inputs.radio(["globe", "flat"], {value: "globe"});
 const mapType = Generators.input(mapTypeInput)
 ```
@@ -90,7 +85,6 @@ const initialViewState = {
 };
 ```
 
-
 ```js
 deckInstance.setProps({
   layers: [
@@ -126,20 +120,20 @@ deckInstance.setProps({
 });
 ```
 
-# 2019 Contrail ERF Proportion
+# 2019 Global Contrail ERF heatmap
 
-Proportion of 2019 global contrail ERF per grid cell
 
+This map shows the proprtion of contrail forcing relative to the 2019 global annual contrail forcing.
 
 
 <div class="card">
 
-<figure style="max-width: 95%; position: relative;">
+<figure>
+
   ${mapTypeInput}
 
-  <!-- <div id="map" style="width: 90%; height: 550px;"></div> -->
-  <div id="container" style="border-radius: 8px; overflow: hidden; background: rgb(18, 35, 48); height: 800px; margin: 1rem 0; "></div>
-  <!-- <figcaption>Data: <a href="https://www.data.gov.uk/dataset/cb7ae6f0-4be6-4935-9277-47e5ce24a11f/road-safety-data">Department for Transport</a></figcaption> -->
+  <div id="container" style="border-radius: 8px; overflow: hidden; background: rgb(0,0,0); height: 75vh; margin: 1rem 0; "></div>
+  <figcaption>Data: <a href="https://acp.copernicus.org/articles/24/6071/2024/">Teoh 2024</a></figcaption>
 </figure>
 
 </div>

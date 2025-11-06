@@ -45,14 +45,14 @@ const erfImage = FileAttachment("2019wm.png")
 
 ```js
 const map = L.map("map")
-  .setView([0,0], 3);
+  .setView([30,-30], 2);
 
 L.geoJSON(land, {
-    style: {stroke: true, color: "#ffffff", opacity: 0.3, fill: true, fillColor: "#161a26", fillOpacity: 1}
+    style: {stroke: true, color: "#ffffff", opacity: 0.3, fill: true, fillColor: "#aaaaaa", fillOpacity: 1}
 }).addTo(map);
 
 L.geoJSON(ocean, {
-    style: {stroke: false, fill: true, fillColor: "#162440", fillOpacity: 1}
+    style: {stroke: false, fill: true, fillColor: "#ffffff", fillOpacity: 1}
 }).addTo(map);
 
 L.imageOverlay(erfImage.href, [[90, -180], [-90, 180]], {
@@ -108,7 +108,7 @@ This map shows the proportion of contrail forcing relative to the 2019 global an
 
 <figure>
 
-  <div id="map" style="border-radius: 8px; overflow: hidden; background: rgb(0,0,0); height: 75vh; margin: 1rem 0; ">
+  <div id="map" style="border-radius: 8px; overflow: hidden; background: #ffffff; height: 60vh; margin: 1rem 0; ">
   </div>
   <figcaption>Data: <a href="https://acp.copernicus.org/articles/24/6071/2024/">Teoh 2024</a></figcaption>
 </figure>

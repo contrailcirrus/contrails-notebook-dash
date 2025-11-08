@@ -2,18 +2,16 @@
 Default stylesheet for all pages
 
 https://observablehq.observablehq.cloud/framework-example-custom-stylesheet/
+
+Build in themes
+https://github.com/observablehq/framework/tree/main/src/style
 */
 
 @import url("observablehq:default.css");
 
-/* Contrails.org brand colors */
-:root {
-  --color-exo-black: #161a26;
-  --color-meso-blue: #162440;
-  --color-stratos-white: #ffffff;
-  --color-solar-orange: #f26400;
-  --color-tropo-blue: #1093ff;
-}
+/* --------------
+   Fonts
+   --------------- */
 
 /* Ghost template brand font */
 :root {
@@ -41,6 +39,29 @@ https://observablehq.observablehq.cloud/framework-example-custom-stylesheet/
   font-weight: 400;
   font-style: normal;
   font-display: swap;
+}
+
+/* --------------
+   Colors
+   --------------- */
+
+/* Contrails.org brand colors */
+:root {
+  --color-exo-black: #161a26;
+  --color-meso-blue: #162440;
+  --color-stratos-white: #ffffff;
+  --color-solar-orange: #f26400;
+  --color-tropo-blue: #1093ff;
+  --color-yellow-50: oklch(98.7% .026 102.212);
+  --color-yellow-200: oklch(94.5% .129 101.54);
+  --color-yellow-700: oklch(55.4% .135 66.442);
+  --color-yellow-800: oklch(47.6% .114 61.907);
+  --color-gray-50: oklch(98.5% .002 247.839);
+  --color-gray-100: oklch(96.7% .003 264.542);
+  --color-gray-400: oklch(70.7% .022 261.325);
+  --color-gray-600: oklch(44.6% .03 256.802);
+  --color-gray-700: oklch(37.3% .034 259.733);
+  --color-gray-800: oklch(27.8% .033 256.848);
 }
 
 /* Override Observable framework defaults */
@@ -81,6 +102,43 @@ https://observablehq.observablehq.cloud/framework-example-custom-stylesheet/
   --syntax-markup-deleted: #b31d28;
   --syntax-markup-deleted-background: #ffeef0;
 }
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+
+  :root {
+    --theme-foreground: var(--color-stratos-white);
+    --theme-foreground-focus: var(--color-tropo-blue);
+    --theme-background: color-mix(in srgb, var(--theme-foreground) 4%, var(--color-exo-black));
+    --theme-background-alt: var(--theme-background);
+    --theme-foreground-alt: color-mix(in srgb, var(--theme-foreground) 90%, var(--theme-background));
+    color-scheme: dark;
+  }
+
+  /*https://github.com/observablehq/framework/blob/main/src/style/syntax-dark.css*/
+  :root {
+    --syntax-keyword: #ff7b72;
+    --syntax-entity: #d2a8ff;
+    --syntax-constant: #79c0ff;
+    --syntax-string: #a5d6ff;
+    --syntax-variable: #ffa657;
+    --syntax-comment: var(--theme-foreground-muted);
+    --syntax-entity-tag: #7ee787;
+    --syntax-storage-modifier-import: #c9d1d9;
+    --syntax-markup-heading: #1f6feb;
+    --syntax-markup-list: #f2cc60;
+    --syntax-markup-italic: #c9d1d9;
+    --syntax-markup-bold: #c9d1d9;
+    --syntax-markup-inserted: #aff5b4;
+    --syntax-markup-inserted-background: #033a16;
+    --syntax-markup-deleted: #ffdcd7;
+    --syntax-markup-deleted-background: #67060c;
+  }
+}
+
+/* --------------
+   Element overrides
+   --------------- */
 
 body {
   font-family: var(--sans-serif);
@@ -158,8 +216,9 @@ form {
 
 /* Improve button style */
 button {
-  border: solid 1px var(--theme-foreground-faint);
+  border: solid 1px var(--theme-foreground-fainter);
   border-radius: 0.25rem;
   padding: 0.5em 1em;
   font: 14px var(--sans-serif);
+  cursor: pointer;
 }

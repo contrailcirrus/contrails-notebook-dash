@@ -10,26 +10,16 @@ title: Cost Explorer
   .share {
     position: absolute;
     right: 0;
-    top: 0.5em;
+    top: 0;
 
     form {
       width: unset;
-    }
-    button {
-      background: white;
-      border: 0px;
-      color: var(--theme-foreground-muted);
-      cursor: pointer;
-    }
-    button:hover {
-      color: var(--theme-foreground-focus);
     }
     svg {
       margin-bottom: -3px;
     }
     /* "Copied!" text */
     .observablehq-pre-copied::before {
-      background: white;
       padding: 0px 8px;
     }
   }
@@ -221,9 +211,9 @@ const totalCost = additionalFuelCost + amortizedRDCost + annualInfra
 <!-- Visuals -->
 ```js
 const costPie = [
-  {name: "Fuel", value: Math.round(100*(additionalFuelCost / totalCost)), format: (v) => `${v}%`, color: "#f26400"},
-  {name: "R&D", value: Math.round(100*(amortizedRDCost / totalCost)), format: (v) => `${v}%`, color: "#162440"},
-  {name: "Infrastructure", value: Math.round(100*(annualInfra / totalCost)), format: (v) => `${v}%`, color: "#1093ff"}
+  {name: "Fuel", value: Math.round(100*(additionalFuelCost / totalCost)), format: (v) => `${v}%`, color: "#f26400"}, // solar-orange
+  {name: "R&D", value: Math.round(100*(amortizedRDCost / totalCost)), format: (v) => `${v}%`, color: "#99a1af"}, // gray-400
+  {name: "Infrastructure", value: Math.round(100*(annualInfra / totalCost)), format: (v) => `${v}%`, color: "#1093ff"} // tropo-blue
 ]
 ```
 

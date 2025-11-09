@@ -103,8 +103,8 @@ const agwpTimescale = Generators.input(agwpTimescaleInput)
 const scenarioInputs = (scenario === "Nominal") ? {
   contrailCirrusERF: 57,  // mW m-2
   efficacy: 70,           // %
-  fuelPenalty: 0.5,       // %
-  fuelCost: 90,           // $ / barrel
+  fuelPenalty: 0.3,       // %
+  fuelCost: 100,           // $ / barrel
   fuelConsumption: 103,   // Billions gallons / year
   upfrontRD: 200,         // $M / year
   annualInfra: 100        // $M / year
@@ -120,7 +120,7 @@ const scenarioInputs = (scenario === "Nominal") ? {
   contrailCirrusERF: 57,
   efficacy: 85,
   fuelPenalty: 0.1,
-  fuelCost: 90,
+  fuelCost: 100,
   fuelConsumption: 103,
   upfrontRD: 100,
   annualInfra: 20

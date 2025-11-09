@@ -279,11 +279,9 @@ ${(window.self === window.top) ? html`<em>See original post on the <a href='http
 
 <div class="card">
 
-## Scenarios
+## Scenario
 
 ${scenarioInput}
-
-Timescale (years): ${agwpTimescaleInput}
 
 ## Development cost
 
@@ -295,15 +293,31 @@ Annual Infrastructure Cost [$M / year] ${annualInfraInput}
 
 Fuel penalty [%] ${fuelPenaltyInput}
 
-Fuel Cost [$ / barrel] ${fuelCostInput}
-
-Annual Fuel Consumption [Billions gallons / year] ${fuelConsumptionInput}
 
 ## Mitigation Potential
 
 Contrail Cirrus Effective Radiative Forcing [mW / m<sup>2</sup>] ${contrailCirrusERFInput}
 
 Mitigation Efficacy [%] ${efficacyInput}
+
+</div>
+
+<div class="card">
+
+<details>
+  <summary><b>Advanced Inputs</b></summary>
+
+## Scenario
+
+Timescale (years): ${agwpTimescaleInput}
+
+## Fuel
+
+Fuel Cost [$ / barrel] ${fuelCostInput}
+
+Annual Fuel Consumption [Billions gallons / year] ${fuelConsumptionInput}
+
+</details>
 
 </div>
 
@@ -332,6 +346,18 @@ Mitigation Efficacy [%] ${efficacyInput}
 ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costPie.map(c => c.name), colorRange: costPie.map(c => c.color)})}
 
   </div>
+</div>
+
+<div class="card">
+
+<details>
+  <summary><b>Additional Outputs</b></summary>
+
+- **Additional fuel cost**: $${Math.round(additionalFuelCost)}M / year ($${(additionalFuelCost / contrailWarmingAvoided).toFixed(2)} per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale}))
+- **Annual infrastructure**: $${annualInfra}M / year ($${(annualInfra / contrailWarmingAvoided).toFixed(2)} per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale}))
+- **Amortized R&D cost**: $${Math.round(amortizedRDCost)}M / year ($${(amortizedRDCost / contrailWarmingAvoided).toFixed(2)} per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale}))
+
+</details>
 </div>
 
 <div class="source">

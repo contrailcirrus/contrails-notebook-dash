@@ -222,3 +222,20 @@ button {
   font: 14px var(--sans-serif);
   cursor: pointer;
 }
+
+
+/* Summary / details */
+summary {
+  margin-bottom: 0.25rem;
+}
+
+summary:hover {
+  cursor: pointer;
+  /*text-decoration: underline;*/
+}
+
+/* Inherit <p> to <details> in cards */
+.card details {
+  margin-top: 1rem;
+  max-width: 640px;
+}

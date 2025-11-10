@@ -114,7 +114,7 @@ deckInstance.setProps({
 # 2019 Global Contrail ERF heatmap
 
 
-This map shows the proportion of contrail forcing relative to the 2019 global annual contrail forcing.
+This map shows the proportion of local contrail forcing relative to the 2019 global annual contrail forcing.
 
 
 <div class="card">

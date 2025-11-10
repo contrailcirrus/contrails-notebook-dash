@@ -37,12 +37,20 @@ import { GeoJsonLayer, BitmapLayer } from 'npm:@deck.gl/layers';
 // geojson natural earth polygons
 const land = FileAttachment("ne_110m_land.geojson")
 const ocean = FileAttachment("ne_110m_ocean.geojson")
-const erfImage = FileAttachment("2019.png")
+
+const erfImages = {
+  "2019": FileAttachment("2019.png"),
+  "2024": FileAttachment("2024.png")
+}
 ```
 
+<!-- Inputs -->
 ```js
-const mapTypeInput = Inputs.radio(["globe", "flat"], {value: "globe"});
+const mapTypeInput = Inputs.radio(["globe", "flat"], {value: "globe", label: "Map type"});
 const mapType = Generators.input(mapTypeInput)
+
+const yearInput = Inputs.radio(Object.keys(erfImages), { value: "2024", label: "Year"})
+const year = Generators.input(yearInput)
 ```
 
 ```js
@@ -100,7 +108,7 @@ deckInstance.setProps({
     new BitmapLayer({
       id: "erfImage",
       bounds: [-180.0, -90.0, 180.0, 90.0],
-      image: erfImage.href,
+      image: erfImages[year].href,
       _imageCoordinateSystem: COORDINATE_SYSTEM.LNGLAT,
       opacity: 0.1,
       pickable: true,
@@ -116,7 +124,13 @@ deckInstance.setProps({
 
 This map shows the proportion of local contrail forcing relative to the 2019 global annual contrail forcing.
 
+<div class="card">
 
+## Inputs
+
+${yearInput}
+
+</div>
 <div class="card">
 
 <figure>

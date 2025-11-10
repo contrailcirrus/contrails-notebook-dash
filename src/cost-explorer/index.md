@@ -67,7 +67,8 @@ const intParams = new Set([
   "fuelCost",
   "fuelConsumption",
   "upfrontRD",
-  "annualInfra"
+  "annualInfra",
+  "flights"
 ]);
 
 const floatParams = new Set([
@@ -102,12 +103,13 @@ const agwpTimescale = Generators.input(agwpTimescaleInput)
 ```js
 const scenarioInputs = (scenario === "Nominal") ? {
   contrailCirrusERF: 57,  // mW m-2
-  efficacy: 70,           // %
+  efficacy: 65,           // %
   fuelPenalty: 0.3,       // %
-  fuelCost: 100,           // $ / barrel
+  fuelCost: 90,           // $ / barrel
   fuelConsumption: 103,   // Billions gallons / year
-  upfrontRD: 200,         // $M / year
-  annualInfra: 100        // $M / year
+  upfrontRD: 250,         // $M / year
+  annualInfra: 50,        // $M / year
+  flights: 35             // M flights / year
 } : (scenario === "Pessimistic") ? {
   contrailCirrusERF: 26,
   efficacy: 50,
@@ -115,15 +117,17 @@ const scenarioInputs = (scenario === "Nominal") ? {
   fuelCost: 120,
   fuelConsumption: 110,
   upfrontRD: 500,
-  annualInfra: 450
+  annualInfra: 400,
+  flights: 35
 } : (scenario === "Optimistic") ? {
   contrailCirrusERF: 57,
-  efficacy: 85,
+  efficacy: 80,
   fuelPenalty: 0.1,
-  fuelCost: 100,
+  fuelCost: 90,
   fuelConsumption: 103,
-  upfrontRD: 100,
-  annualInfra: 20
+  upfrontRD: 150,
+  annualInfra: 20,
+  flights: 35
 } : {};
 
 // merge the user inputs with the default scenario inputs
@@ -181,6 +185,10 @@ const upfrontRD = Generators.input(upfrontRDInput)
 // Annual monitoring infrastructure costs ($M / year)
 const annualInfraInput = Inputs.range([0, 500], { value: inputs.annualInfra, step: 10})
 const annualInfra = Generators.input(annualInfraInput)
+
+// Global aviation activity (M flights / year)
+const flightsInput = Inputs.range([10, 100], { value: inputs.flights, step: 5})
+const flights = Generators.input(flightsInput)
 ```
 
 <!-- Model -->
@@ -228,7 +236,8 @@ const currentScenario = {
   fuelCost: fuelCost,
   fuelConsumption: fuelConsumption,
   upfrontRD: upfrontRD,
-  annualInfra: annualInfra
+  annualInfra: annualInfra,
+  flights: flights
 }
 ```
 
@@ -311,6 +320,8 @@ Mitigation Efficacy [%] ${efficacyInput}
 
 Timescale (years): ${agwpTimescaleInput}
 
+Flights [Millions flights / year]: ${flightsInput}
+
 ## Fuel
 
 Fuel Cost [$ / barrel] ${fuelCostInput}
@@ -318,12 +329,11 @@ Fuel Cost [$ / barrel] ${fuelCostInput}
 Annual Fuel Consumption [Billions gallons / year] ${fuelConsumptionInput}
 
 </details>
-
 </div>
 
 
 <div class="grid grid-cols-2">
-  <div class="card">
+<div class="card">
 
 ## Warming avoided
 
@@ -337,15 +347,19 @@ Annual Fuel Consumption [Billions gallons / year] ${fuelConsumptionInput}
 
 ## Abatement cost
 
-<span class="big">$ ${((additionalFuelCost + amortizedRDCost + annualInfra) / contrailWarmingAvoided).toFixed(2)}</span><br/>
+<span class="big">$ ${(totalCost / contrailWarmingAvoided).toFixed(2)}</span><br/>
 <span class="muted">per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale})</span>
 
-  </div>
-  <div class="card">
+<span class="big">$ ${(totalCost / flights ).toFixed(2)}</span><br/>
+<span class="muted">per flight</span>
+
+</div>
+
+<div class="card">
 
 ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costPie.map(c => c.name), colorRange: costPie.map(c => c.color)})}
 
-  </div>
+</div>
 </div>
 
 <div class="card">

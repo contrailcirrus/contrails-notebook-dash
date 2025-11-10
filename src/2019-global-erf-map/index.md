@@ -1,5 +1,5 @@
 ---
-title: 2019 Contrail ERF Percentage
+title: Global Contrail Heatmap
 # theme: slate
 ---
 
@@ -119,10 +119,10 @@ deckInstance.setProps({
 });
 ```
 
-# 2019 Global Contrail ERF heatmap
+# Global Contrail Heatmap
 
 
-This map shows the proportion of local contrail forcing relative to the 2019 global annual contrail forcing.
+This map shows a heat map of local contrail forcing normalized by the global annual contrail forcing.
 
 <div class="card">
 

@@ -66,31 +66,58 @@ if (firLayer === "Upper") {
   firs["features"] = firs["features"].filter(d => d.properties.lower === 0)
 }
 
-const firData = firs["features"].map(d => d.properties).filter(d => d.type === "FIR")
+const firData = firs["features"].map(d => d.properties)
 const firSearchInput = Inputs.search(firData, {placeholder: "Search FIRs..."})
 const firSearch = Generators.input(firSearchInput)
 ```
 
 ```js
-const firTable = Inputs.table(firSearch, {
+const firTableInput = Inputs.table(firSearch, {
   columns: [
     "designator",
     "name",
     "value"
   ],
   format: {
-    value: (v) => `${v.toFixed(2)}%`
+    value: (v) => v ? `${v.toFixed(2)}%` : ``
   },
   sort: "value",
-  reverse: true
+  reverse: true,
+  required: false
 })
+const selectedFIRs = Generators.input(firTableInput)
+
+// const selectedFIRs2 = []
+// function selectFIR(info, event) {
+//   if (info.object) {
+//     selectedFIRs2.push(info.object.properties.designator)
+//   }
+//   console.log(selectedFIRs2)
+// }
+```
+
+```js
+const selectedDesignators = selectedFIRs.map(d => d.designator)
+const selectedPotential = selectedFIRs.reduce((acc, d) => acc + d.value, 0)
+
+const contrailCirrusERF = 57.4
+const AGWP = 8.8e-14
+const efficacy = 70
+
+// Contrail warming in CO2-eq, GWP100 (Mtonnes / year)
+const contrailWarming = (contrailCirrusERF / 1e3) / (AGWP * 1e9)
+
+// Contrail warming avoided in CO2-eq (Mtonnes / year)
+const contrailWarmingAvoided = (selectedPotential / 100) * ((efficacy / 100) * contrailWarming)
+
 ```
 
 <!-- Deck setup -->
 ```js
 
 const getTooltip = ({object}) => {
-  return object && `${object.properties.designator}\n${object.properties.name}\n${object.properties.value.toFixed(2)}%`
+  return object && object.properties &&
+    `${object.properties.designator}\n${object.properties.name}\n${object.properties.value.toFixed(2)}%`
 }
 const deckInstance = new DeckGL({
   container: document.getElementById("container"),
@@ -156,8 +183,18 @@ deckInstance.setProps({
       lineWidthMinPixels: 1,
       // autoHighlight: true,
       // highlightColor: [242, 100, 0, 50],
-      getLineColor: [0, 0, 0],
+      // getLineColor: [0, 0, 0],
+      getLineColor: d => {
+        if (selectedDesignators.includes(d.properties.designator)) {
+          return [242, 100, 0, 225]
+        }
+        return [0,0,0]
+      },
       getFillColor: [0,0,0,0], // required for getTooltip
+      // onClick: selectFIR,
+      // updateTriggers: {
+      //   getLineColor: selectedFIRs
+      // },
       parameters: { cullMode: 'back', depthCompare: 'always' },
     }),
     new TextLayer({
@@ -214,9 +251,19 @@ ${firLayerInput}
 
 ${firSearchInput}
 
-${firTable}
+${firTableInput}
 
 </div>
+<div class="card">
+
+<span class="big">${selectedPotential.toFixed(2)}%</span><br/>
+<span class="muted">global contrail forcing</span>
+
+<span class="big">${Math.round(contrailWarmingAvoided)}</span><br/>
+<span class="muted">Mtonnes CO<sub>2-eq</sub> per year (GWP-100)</span>
+
+</div>
+
 
 <div class="source">
 

@@ -29,8 +29,9 @@ import "../components/observer.js";
 <!-- ----------------------------- -->
 
 ```js
-import { Deck, _GlobeView, MapView, COORDINATE_SYSTEM } from "npm:@deck.gl/core";
-import { GeoJsonLayer, BitmapLayer } from 'npm:@deck.gl/layers';
+import deck from "npm:deck.gl";
+
+const {DeckGL, _GlobeView, MapView, COORDINATE_SYSTEM, GeoJsonLayer, BitmapLayer} = deck;
 ```
 
 ```js
@@ -61,8 +62,8 @@ const year = Generators.input(yearInput)
 
 <!-- Deck setup -->
 ```js
-const deckInstance = new Deck({
-  parent: document.getElementById("container"),
+const deckInstance = new DeckGL({
+  container: document.getElementById("container"),
   style: {"position": "relative"},
   views: mapType === "globe" ? [
     new _GlobeView()

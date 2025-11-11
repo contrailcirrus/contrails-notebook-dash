@@ -131,8 +131,8 @@ deckInstance.setProps({
       stroked: true,
       filled: true,
       lineWidthMinPixels: 1,
-      // autoHighlight: true,
-      // highlightColor: [242, 100, 0, 125],
+      autoHighlight: true,
+      highlightColor: [242, 100, 0, 50],
       getLineColor: [0, 0, 0],
       getFillColor: [0,0,0,0], // required for getTooltip
       parameters: { cullMode: 'back', depthCompare: 'always' },

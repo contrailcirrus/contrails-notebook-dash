@@ -45,6 +45,11 @@ const erfImages = {
 }
 ```
 
+<!-- Data prep -->
+```js
+const firs = topojson.feature(firsTopo, firsTopo.objects.data);
+```
+
 <!-- Inputs -->
 ```js
 const mapTypeInput = Inputs.radio(["globe", "flat"], {value: "globe", label: "Map type"});
@@ -64,37 +69,18 @@ const deckInstance = new Deck({
   ] : [
     new MapView()
   ],
-  initialViewState,
+  initialViewState: {
+    longitude: -2,
+    latitude: 53.5,
+    zoom: 2,
+    minZoom: 1,
+    maxZoom: 6,
+    pitch: 0,
+    bearing: 0
+  },
   // getTooltip: ({bitmap}) => bitmap && `${bitmap.pixel}`,
   controller: true,
-});
-
-// clean up if this code re-runs
-invalidation.then(() => {
-  deckInstance.finalize();
-  container.innerHTML = "";
-});
-```
-
-<!-- Data prep -->
-```js
-const firs = topojson.feature(firsTopo, firsTopo.objects.data);
-
-const initialViewState = {
-  longitude: -2,
-  latitude: 53.5,
-  zoom: 2,
-  minZoom: 1,
-  maxZoom: 6,
-  pitch: 0,
-  bearing: 0
-};
-```
-
-```js
-deckInstance.setProps({
   layers: [
-
     new GeoJsonLayer({
       id: "land",
       data: land.href,
@@ -130,6 +116,12 @@ deckInstance.setProps({
       parameters: { cullMode: 'back', depthCompare: 'always' }
     }),
   ]
+});
+
+// clean up if this code re-runs
+invalidation.then(() => {
+  deckInstance.finalize();
+  container.innerHTML = "";
 });
 ```
 

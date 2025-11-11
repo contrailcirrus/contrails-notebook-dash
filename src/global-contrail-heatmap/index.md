@@ -31,7 +31,7 @@ import "../components/observer.js";
 ```js
 import deck from "npm:deck.gl";
 
-const {DeckGL, _GlobeView, MapView, COORDINATE_SYSTEM, GeoJsonLayer, BitmapLayer} = deck;
+const {DeckGL, _GlobeView, MapView, COORDINATE_SYSTEM, GeoJsonLayer, BitmapLayer, TextLayer} = deck;
 ```
 
 ```js
@@ -79,7 +79,7 @@ const deckInstance = new DeckGL({
     pitch: 0,
     bearing: 0
   },
-  getTooltip: ({object}) => object && `${object.properties.name}`,
+  getTooltip: ({object}) => object && `${object.properties.designator}\n${object.properties.name}`,
   controller: true,
   layers: [
     new GeoJsonLayer({
@@ -113,10 +113,29 @@ const deckInstance = new DeckGL({
       stroked: true,
       filled: true,
       lineWidthMinPixels: 1,
+      // autoHighlight: true,
+      // highlightColor: [242, 100, 0, 125],
       getLineColor: [0, 0, 0],
-      getFillColor: [0,0,0, 0], // required for getTooltip
-      parameters: { cullMode: 'back', depthCompare: 'always' }
+      getFillColor: [0,0,0,0], // required for getTooltip
+      parameters: { cullMode: 'back', depthCompare: 'always' },
     }),
+    new TextLayer({
+      id: "firLabels",
+      data: firs.features,
+      getText: f => f.properties.designator,
+      getPosition: f => {
+        // Calculate centroid
+        const coords = f.geometry.coordinates[0];
+        const lon = coords.reduce((sum, c) => sum + c[0], 0) / coords.length;
+        const lat = coords.reduce((sum, c) => sum + c[1], 0) / coords.length;
+        return [lon, lat];
+      },
+      getSize: 10,
+      getColor: [0, 0, 0],
+      billboard: false,
+      getAngle: 180,
+      fontFamily: "monospace"
+    })
   ]
 });
 

@@ -28,8 +28,6 @@ import "../components/observer.js";
 <!-- ----------------------------- -->
 
 ```js
-import {Mutable} from "observablehq:stdlib";
-
 import deck from "npm:deck.gl";
 const {DeckGL, _GlobeView, MapView, COORDINATE_SYSTEM, GeoJsonLayer, BitmapLayer, TextLayer} = deck;
 ```
@@ -67,9 +65,6 @@ if (firLayer === "Upper") {
 } else {
   firs["features"] = firs["features"].filter(d => d.properties.lower === 0)
 }
-
-const hovered = Mutable("")
-const setHovered = ({object}) => hovered.value = object.properties.designator;
 ```
 
 <!-- Deck setup -->
@@ -138,18 +133,8 @@ deckInstance.setProps({
       lineWidthMinPixels: 1,
       // autoHighlight: true,
       // highlightColor: [242, 100, 0, 125],
-      // getLineColor: [0, 0, 0],
-      getLineColor: d => {
-        if (hovered === d.properties.designator) {
-          return [242, 100, 0, 225]
-        }
-        return [0,0,0]
-      },
+      getLineColor: [0, 0, 0],
       getFillColor: [0,0,0,0], // required for getTooltip
-      onHover: setHovered,
-      updateTriggers: {
-        getLineColor: hovered
-      },
       parameters: { cullMode: 'back', depthCompare: 'always' },
     }),
     new TextLayer({

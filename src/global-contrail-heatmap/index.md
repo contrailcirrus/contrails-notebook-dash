@@ -79,7 +79,7 @@ const deckInstance = new DeckGL({
     pitch: 0,
     bearing: 0
   },
-  // getTooltip: ({bitmap}) => bitmap && `${bitmap.pixel}`,
+  getTooltip: ({object}) => object && `${object.properties.name}`,
   controller: true,
   layers: [
     new GeoJsonLayer({
@@ -109,11 +109,12 @@ const deckInstance = new DeckGL({
     new GeoJsonLayer({
       id: "firs",
       data: firs,
+      pickable: true,
       stroked: true,
-      filled: false,
+      filled: true,
       lineWidthMinPixels: 1,
       getLineColor: [0, 0, 0],
-      // getLineColor: [242, 100, 0],
+      getFillColor: [0,0,0, 0], // required for getTooltip
       parameters: { cullMode: 'back', depthCompare: 'always' }
     }),
   ]

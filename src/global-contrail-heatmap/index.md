@@ -1,6 +1,5 @@
 ---
 title: Global Contrail Heatmap
-# theme: slate
 ---
 
 <!-- ----- Dashboard imports ----- -->
@@ -30,7 +29,6 @@ import "../components/observer.js";
 
 ```js
 import deck from "npm:deck.gl";
-
 const {DeckGL, _GlobeView, MapView, COORDINATE_SYSTEM, GeoJsonLayer, BitmapLayer, TextLayer} = deck;
 ```
 
@@ -46,11 +44,6 @@ const erfImages = {
 }
 ```
 
-<!-- Data prep -->
-```js
-const firs = topojson.feature(firsTopo, firsTopo.objects.data);
-```
-
 <!-- Inputs -->
 ```js
 const mapTypeInput = Inputs.radio(["globe", "flat"], {value: "globe", label: "Map type"});
@@ -58,6 +51,20 @@ const mapType = Generators.input(mapTypeInput)
 
 const yearInput = Inputs.radio(Object.keys(erfImages), { value: "2024", label: "Year"})
 const year = Generators.input(yearInput)
+
+const firLayerInput = Inputs.radio(["Lower", "Upper"], { value: "Upper", label: "FIR Regions"})
+const firLayer = Generators.input(firLayerInput)
+```
+
+<!-- Data prep -->
+```js
+const firs = topojson.feature(firsTopo, firsTopo.objects.data)
+
+if (firLayer === "Upper") {
+  firs["features"] = firs["features"].filter(d => d.properties.upper === null)
+} else {
+  firs["features"] = firs["features"].filter(d => d.properties.lower === 0)
+}
 ```
 
 <!-- Deck setup -->
@@ -81,6 +88,17 @@ const deckInstance = new DeckGL({
   },
   getTooltip: ({object}) => object && `${object.properties.designator}\n${object.properties.name}`,
   controller: true,
+});
+
+// clean up if this code re-runs
+invalidation.then(() => {
+  deckInstance.finalize();
+  container.innerHTML = "";
+});
+```
+
+```js
+deckInstance.setProps({
   layers: [
     new GeoJsonLayer({
       id: "land",
@@ -121,7 +139,7 @@ const deckInstance = new DeckGL({
     }),
     new TextLayer({
       id: "firLabels",
-      data: firs.features,
+      data: firs["features"],
       getText: f => f.properties.designator,
       getPosition: f => {
         // Calculate centroid
@@ -133,19 +151,12 @@ const deckInstance = new DeckGL({
       getSize: 10,
       getColor: [0, 0, 0],
       billboard: false,
-      getAngle: 180,
+      getAngle: mapType === "globe" ? 180 : 0,
       fontFamily: "monospace"
     })
   ]
 });
-
-// clean up if this code re-runs
-invalidation.then(() => {
-  deckInstance.finalize();
-  container.innerHTML = "";
-});
 ```
-
 # Global Contrail Heatmap
 
 
@@ -156,6 +167,8 @@ This map shows a heat map of local contrail forcing normalized by the global ann
 ## Inputs
 
 ${yearInput}
+
+${firLayerInput}
 
 </div>
 <div class="card">

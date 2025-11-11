@@ -37,6 +37,7 @@ import { GeoJsonLayer, BitmapLayer } from 'npm:@deck.gl/layers';
 // geojson natural earth polygons
 const land = FileAttachment("ne_110m_land.geojson")
 const ocean = FileAttachment("ne_110m_ocean.geojson")
+const firsTopo = FileAttachment("firs.topojson").json()
 
 const erfImages = {
   "2019": FileAttachment("2019.png"),
@@ -53,6 +54,7 @@ const yearInput = Inputs.radio(Object.keys(erfImages), { value: "2024", label: "
 const year = Generators.input(yearInput)
 ```
 
+<!-- Deck setup -->
 ```js
 const deckInstance = new Deck({
   parent: document.getElementById("container"),
@@ -74,7 +76,10 @@ invalidation.then(() => {
 });
 ```
 
+<!-- Data prep -->
 ```js
+const firs = topojson.feature(firsTopo, firsTopo.objects.data);
+
 const initialViewState = {
   longitude: -2,
   latitude: 53.5,
@@ -89,14 +94,13 @@ const initialViewState = {
 ```js
 deckInstance.setProps({
   layers: [
+
     new GeoJsonLayer({
       id: "land",
       data: land.href,
-      stroked: true,
+      stroked: false,
       filled: true,
       getFillColor: [210, 210, 210],
-      lineWidthMinPixels: 1,
-      getLineColor: [220, 220, 220],
     }),
     new GeoJsonLayer({
       id: "ocean",
@@ -115,6 +119,17 @@ deckInstance.setProps({
       // makes sure that layer sites above geojson layers above
       parameters: { cullMode: 'back', depthCompare: 'always' }
     }),
+    new GeoJsonLayer({
+      id: "firs",
+      data: firs,
+      stroked: true,
+      filled: false,
+      lineWidthMinPixels: 1,
+      getLineColor: [0, 0, 0],
+      // getLineColor: [242, 100, 0],
+      parameters: { cullMode: 'back', depthCompare: 'always' }
+    }),
+
   ]
 });
 ```

@@ -65,10 +65,33 @@ if (firLayer === "Upper") {
 } else {
   firs["features"] = firs["features"].filter(d => d.properties.lower === 0)
 }
+
+const firData = firs["features"].map(d => d.properties).filter(d => d.type === "FIR")
+const firSearchInput = Inputs.search(firData, {placeholder: "Search FIRs..."})
+const firSearch = Generators.input(firSearchInput)
+```
+
+```js
+const firTable = Inputs.table(firSearch, {
+  columns: [
+    "designator",
+    "name",
+    "value"
+  ],
+  format: {
+    value: (v) => `${v.toFixed(2)}%`
+  },
+  sort: "value",
+  reverse: true
+})
 ```
 
 <!-- Deck setup -->
 ```js
+
+const getTooltip = ({object}) => {
+  return object && `${object.properties.designator}\n${object.properties.name}\n${object.properties.value.toFixed(2)}%`
+}
 const deckInstance = new DeckGL({
   container: document.getElementById("container"),
   style: {"position": "relative"},
@@ -86,7 +109,7 @@ const deckInstance = new DeckGL({
     pitch: 0,
     bearing: 0
   },
-  getTooltip: ({object}) => object && `${object.properties.designator}\n${object.properties.name}`,
+  getTooltip: getTooltip,
   controller: true,
 });
 
@@ -131,8 +154,8 @@ deckInstance.setProps({
       stroked: true,
       filled: true,
       lineWidthMinPixels: 1,
-      autoHighlight: true,
-      highlightColor: [242, 100, 0, 50],
+      // autoHighlight: true,
+      // highlightColor: [242, 100, 0, 50],
       getLineColor: [0, 0, 0],
       getFillColor: [0,0,0,0], // required for getTooltip
       parameters: { cullMode: 'back', depthCompare: 'always' },
@@ -184,6 +207,14 @@ ${firLayerInput}
     FIR Regions: <a href="https://observablehq.com/@openaviation/flight-information-regions">Open Aviation</a>
   </figcaption>
 </figure>
+
+</div>
+
+<div class="card">
+
+${firSearchInput}
+
+${firTable}
 
 </div>
 

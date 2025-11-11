@@ -129,7 +129,6 @@ deckInstance.setProps({
       // getLineColor: [242, 100, 0],
       parameters: { cullMode: 'back', depthCompare: 'always' }
     }),
-
   ]
 });
 ```
@@ -154,7 +153,10 @@ ${yearInput}
 
   <div id="container" style="border-radius: 8px; overflow: hidden; background: rgb(0,0,0); height: 75vh; margin: 1rem 0; ">
   </div>
-  <figcaption>Data: <a href="https://acp.copernicus.org/articles/24/6071/2024/">Teoh 2024</a></figcaption>
+  <figcaption>
+    Contrail Data: <a href="https://acp.copernicus.org/articles/24/6071/2024/">Teoh 2024</a><br/>
+    FIR Regions: <a href="https://observablehq.com/@openaviation/flight-information-regions">Open Aviation</a>
+  </figcaption>
 </figure>
 
 </div>

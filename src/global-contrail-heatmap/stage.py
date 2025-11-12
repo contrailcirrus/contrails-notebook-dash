@@ -36,6 +36,7 @@ $ uv run stage
 """
 
 import json
+import hashlib
 
 import matplotlib.pyplot as plt
 from matplotlib import colormaps
@@ -48,10 +49,6 @@ import xarray as xr
 
 
 years = ["2019", "2024"]
-
-rpath = "data/worldfirs.topojson"
-with open(rpath, "r") as f:
-    FIRS_TOPOJSON = json.load(f)
 
 def process_year(year: str) -> None:
     """Process single netcdf file
@@ -82,7 +79,10 @@ def process_year(year: str) -> None:
     # --- Intersect with FIRs
 
     # load TopoJSON
-    firs_topo = tp.Topology(FIRS_TOPOJSON)
+    with open("data/firs.topojson", "r") as f:
+        firs_topojson = json.load(f)
+
+    firs_topo = tp.Topology(firs_topojson)
     firs_geojson = json.loads(firs_topo.to_geojson())
 
     # create points from the lon/lat grid of contrail coordinates
@@ -98,13 +98,9 @@ def process_year(year: str) -> None:
         # add summed value to the properties
         feature["properties"]["value"] = ds[var].where(mask).sum().item()
 
-    # output topojson file with values in it
-    # firs_topo_out = tp.Topology(firs_geojson)
-    # firs_topo_out.to_json(f"{year}.topojson")
-
     # csv output
     pd.DataFrame(f["properties"] for f in firs_geojson["features"]).to_csv(
-        f"data/{year}.csv", index=False
+        f"staging/{year}.csv", index=False
     )
 
 def aggregate_outputs(years: list[str]) -> None:
@@ -128,7 +124,39 @@ def aggregate_outputs(years: list[str]) -> None:
     df.to_csv("data/fir-impacts.csv", index=False)
     df.to_json("data/fir-impacts.json", orient="records")
 
+def add_fir_ids() -> None:
+    """Add id to each FIR Geometry and save off new TopoJSON."""
+
+    with open("staging/worldfirs.topojson", "r") as f:
+        firs_topojson = json.load(f)
+
+    # load TopoJSON
+    firs_topo = tp.Topology(firs_topojson)
+    firs_json = json.loads(firs_topo.to_json())
+    for geom in firs_json["objects"]["data"]["geometries"]:
+        geom["properties"]["id"] = hash_geom(geom)
+
+    with open("data/firs.topojson", "w") as f:
+        json.dump(firs_json, f, separators=(',', ':'))
+
+def hash_geom(geom: dict) -> str:
+    """Create unique hashed id for each FIR geometry
+    
+    Parameters
+    ----------
+    geom : dict
+        TopoJSON Geometry
+    
+    Returns
+    -------
+    str
+    """
+    j = json.dumps(geom, sort_keys=True, separators=(',', ':'))
+    return hashlib.sha256(j.encode()).hexdigest()[:8]
+
 if __name__ == "__main__":
+    print(f"Adding ids to FIRs")
+    add_fir_ids()
 
     # calculate interesections and save off as CSVs
     for year in years:

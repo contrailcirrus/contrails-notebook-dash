@@ -8,9 +8,7 @@ title: Global Contrail Heatmap
 <!-- Other global styles in `style.css` -->
 <style>
   body {
-    font-family: var(--sans-serif);
-
-    /* Ghost post max-width */
+    /*font-family: var(--sans-serif);*/
     max-width: 1000px;
   }
   p, table, figure, figcaption, h1, h2, h3, h4, h5, h6, .katex-display {
@@ -43,8 +41,8 @@ const {
 // geojson natural earth polygons
 const land = FileAttachment("data/ne_110m_land.geojson")
 const ocean = FileAttachment("data/ne_110m_ocean.geojson")
-const firsTopo = FileAttachment("data/worldfirs.topojson").json()
-const firImpacts = FileAttachment("data/fir-impacts.json").json()
+const firsTopo = FileAttachment("data/firs.topojson").json()
+const firsImpact = FileAttachment("data/fir-impacts.json").json()
 
 const erfImages = {
   "2019": FileAttachment("data/2019.png"),
@@ -92,6 +90,12 @@ const efficacy = Generators.input(efficacyInput);
 
 <!-- Data prep -->
 ```js
+// make a hash map from firImpacts key'd by id
+const firsImpactObject = firsImpact.reduce((acc, obj) => {
+  acc[obj.id] = obj;
+  return acc;
+}, {});
+
 // load world FIRs to GeoJSON
 const firs = topojson.feature(firsTopo, firsTopo.objects.data)
 
@@ -105,8 +109,7 @@ if (firLayer === "Upper") {
 }
 
 // Create search input FIR data from
-const firData = firs["features"].map((d) => d.properties);
-const firSearchInput = Inputs.search(firData, {
+const firSearchInput = Inputs.search(firsImpact, {
   placeholder: "Search FIRs...",
 });
 const firSearch = Generators.input(firSearchInput);
@@ -114,11 +117,11 @@ const firSearch = Generators.input(firSearchInput);
 
 ```js
 const firTableInput = Inputs.table(firSearch, {
-  columns: ["designator", "name", "value"],
+  columns: ["type", "designator", "name", year],
   format: {
-    value: (v) => (v ? `${v.toFixed(2)}%` : ``),
+    [year]: (v) => (v ? `${v.toFixed(2)}%` : ``),
   },
-  sort: "value",
+  sort: year,
   reverse: true,
   required: false,
 });
@@ -139,8 +142,8 @@ function selectFIR(info, event) {
 <!-- Calculate migitation potential -->
 
 ```js
-const selectedDesignators = selectedFIRs.map((d) => d.designator);
-const selectedPotential = selectedFIRs.reduce((acc, d) => acc + d.value, 0);
+const selectedIds = selectedFIRs.map((d) => d.id);
+const selectedPotential = selectedFIRs.reduce((acc, d) => acc + d[year], 0);
 
 // AGWP, yr W m-2 / kg-CO2 (Lee 2021, Supplementary Data, Sheet AGWP-CO2)
 const AGWP =
@@ -162,16 +165,9 @@ const contrailWarmingAvoided =
 
 <!-- Deck setup -->
 
+
+<!-- Nothing here should update with inputs -->
 ```js
-const getTooltip = ({ object }) => {
-  return (
-    object &&
-    object.properties &&
-    `${object.properties.designator}\n${
-      object.properties.name
-    }\n${object.properties.value.toFixed(2)}%`
-  );
-};
 const deckInstance = new DeckGL({
   container: document.getElementById("container"),
   style: { position: "relative" },
@@ -185,7 +181,6 @@ const deckInstance = new DeckGL({
     pitch: 0,
     bearing: 0,
   },
-  getTooltip: getTooltip,
   controller: true,
 });
 
@@ -196,8 +191,23 @@ invalidation.then(() => {
 });
 ```
 
+<!-- Anything that needs to update with inputs should be here -->
 ```js
+const getTooltip = ({ object }) => {
+  if (object && object.properties) {
+    const val = firsImpactObject[object.properties.id][year]
+    return (
+      `${object.properties.designator}
+       ${object.properties.name}
+       ${val.toFixed(2)}%`
+    );
+  }
+
+  return ""
+};
+
 deckInstance.setProps({
+  getTooltip: getTooltip,
   layers: [
     new GeoJsonLayer({
       id: "land",
@@ -235,14 +245,14 @@ deckInstance.setProps({
       // getLineColor: [0, 0, 0],
       getLineColor: [0, 0, 0],
       getFillColor: (d) => {
-        if (selectedDesignators.includes(d.properties.designator)) {
+        if (selectedIds.includes(d.properties.id)) {
           return [242, 100, 0, 125];
         }
         return [0, 0, 0, 0];
       },
       onClick: selectFIR,
       updateTriggers: {
-        getFillColor: selectedDesignators,
+        getFillColor: selectedIds,
       },
       parameters: { cullMode: "back", depthCompare: "always" },
     }),

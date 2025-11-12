@@ -39,15 +39,15 @@ const {
 
 ```js
 // geojson natural earth polygons
-const land = FileAttachment("data/ne_110m_land.geojson")
-const ocean = FileAttachment("data/ne_110m_ocean.geojson")
-const firsTopo = FileAttachment("data/firs.topojson").json()
-const firsImpact = FileAttachment("data/fir-impacts.json").json()
+const land = FileAttachment("data/ne_110m_land.geojson");
+const ocean = FileAttachment("data/ne_110m_ocean.geojson");
+const firsTopo = FileAttachment("data/firs.topojson").json();
+const firsImpact = FileAttachment("data/fir-impacts.json").json();
 
 const erfImages = {
-  "2019": FileAttachment("data/2019.png"),
-  "2024": FileAttachment("data/2024.png")
-}
+  2019: FileAttachment("data/2019.png"),
+  2024: FileAttachment("data/2024.png"),
+};
 ```
 
 <!-- Inputs -->
@@ -89,6 +89,7 @@ const efficacy = Generators.input(efficacyInput);
 ```
 
 <!-- Data prep -->
+
 ```js
 // make a hash map from firImpacts key'd by id
 const firsImpactObject = firsImpact.reduce((acc, obj) => {
@@ -97,7 +98,7 @@ const firsImpactObject = firsImpact.reduce((acc, obj) => {
 }, {});
 
 // load world FIRs to GeoJSON
-const firs = topojson.feature(firsTopo, firsTopo.objects.data)
+const firs = topojson.feature(firsTopo, firsTopo.objects.data);
 
 // Filter by upper/lower regions
 if (firLayer === "Upper") {
@@ -128,14 +129,14 @@ const firTableInput = Inputs.table(firSearch, {
 const selectedFIRs = Generators.input(firTableInput);
 
 function selectFIR(info, event) {
-  console.log(info)
-//   console.log(selectedFIRs);
-//   if (info.object) {
-//     const tableRow = firTableInput.value.filter(
-//       (d) => d.designator === info.object.properties.designator,
-//     );
-//     selectedFIRs.value.push(tableRow);
-//   }
+  console.log(info);
+  //   console.log(selectedFIRs);
+  //   if (info.object) {
+  //     const tableRow = firTableInput.value.filter(
+  //       (d) => d.designator === info.object.properties.designator,
+  //     );
+  //     selectedFIRs.value.push(tableRow);
+  //   }
 }
 ```
 
@@ -165,8 +166,8 @@ const contrailWarmingAvoided =
 
 <!-- Deck setup -->
 
-
 <!-- Nothing here should update with inputs -->
+
 ```js
 const deckInstance = new DeckGL({
   container: document.getElementById("container"),
@@ -192,18 +193,17 @@ invalidation.then(() => {
 ```
 
 <!-- Anything that needs to update with inputs should be here -->
+
 ```js
 const getTooltip = ({ object }) => {
   if (object && object.properties) {
-    const val = firsImpactObject[object.properties.id][year]
-    return (
-      `${object.properties.designator}
+    const val = firsImpactObject[object.properties.id][year];
+    return `${object.properties.designator}
        ${object.properties.name}
-       ${val.toFixed(2)}%`
-    );
+       ${val.toFixed(2)}%`;
   }
 
-  return ""
+  return "";
 };
 
 deckInstance.setProps({

@@ -91,12 +91,31 @@ const efficacy = Generators.input(efficacyInput);
 <!-- Data prep -->
 
 ```js
+const mapSelectedFirsInput = Inputs.select(firsImpact.map(d => d.id), {multiple: true})
+const mapSelectedFirs = Generators.input(mapSelectedFirsInput)
+```
+
+```js
+function selectFir(info, event) {
+  if (info.object) {
+    if (!mapSelectedFirs.includes(info.object.properties.id)){
+      mapSelectedFirs.value.push(info.object.properties.id)
+    }
+  }
+}
+```
+
+```js
 // make a hash map from firImpacts key'd by id
 const firsImpactObject = firsImpact.reduce((acc, obj) => {
   acc[obj.id] = obj;
   return acc;
 }, {});
+```
 
+
+
+```js
 // load world FIRs to GeoJSON
 const firs = topojson.feature(firsTopo, firsTopo.objects.data);
 
@@ -108,9 +127,13 @@ if (firLayer === "Upper") {
 } else {
   firs["features"] = firs["features"].filter((d) => d.properties.lower === 0);
 }
+```
 
+```js
 // Create search input FIR data from
-const firSearchInput = Inputs.search(firsImpact, {
+console.log(mapSelectedFirs)
+const firsImpactData = mapSelectedFirs.length ? firsImpact.filter(d => mapSelectedFirs.includes(d.id)) : firsImpact
+const firSearchInput = Inputs.search(firsImpactData, {
   placeholder: "Search FIRs...",
 });
 const firSearch = Generators.input(firSearchInput);
@@ -126,25 +149,14 @@ const firTableInput = Inputs.table(firSearch, {
   reverse: true,
   required: false,
 });
-const selectedFIRs = Generators.input(firTableInput);
-
-function selectFIR(info, event) {
-  console.log(info);
-  //   console.log(selectedFIRs);
-  //   if (info.object) {
-  //     const tableRow = firTableInput.value.filter(
-  //       (d) => d.designator === info.object.properties.designator,
-  //     );
-  //     selectedFIRs.value.push(tableRow);
-  //   }
-}
+const selectedFirs = Generators.input(firTableInput);
 ```
 
 <!-- Calculate migitation potential -->
 
 ```js
-const selectedIds = selectedFIRs.map((d) => d.id);
-const selectedPotential = selectedFIRs.reduce((acc, d) => acc + d[year], 0);
+const selectedIds = selectedFirs.map((d) => d.id);
+const selectedPotential = selectedFirs.reduce((acc, d) => acc + d[year], 0);
 
 // AGWP, yr W m-2 / kg-CO2 (Lee 2021, Supplementary Data, Sheet AGWP-CO2)
 const AGWP =
@@ -250,7 +262,7 @@ deckInstance.setProps({
         }
         return [0, 0, 0, 0];
       },
-      onClick: selectFIR,
+      onClick: selectFir,
       updateTriggers: {
         getFillColor: selectedIds,
       },

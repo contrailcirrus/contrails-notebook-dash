@@ -18,7 +18,6 @@ title: Global Contrail Heatmap
   }
 </style>
 
-
 ```js
 // Resize observer. Required to update parent `iframe` height dynamically.
 // See README for script tag required in post body.
@@ -29,104 +28,154 @@ import "../components/observer.js";
 
 ```js
 import deck from "npm:deck.gl";
-const {DeckGL, _GlobeView, MapView, COORDINATE_SYSTEM, GeoJsonLayer, BitmapLayer, TextLayer} = deck;
+const {
+  DeckGL,
+  _GlobeView,
+  MapView,
+  COORDINATE_SYSTEM,
+  GeoJsonLayer,
+  BitmapLayer,
+  TextLayer,
+} = deck;
 ```
 
 ```js
 // geojson natural earth polygons
-const land = FileAttachment("ne_110m_land.geojson")
-const ocean = FileAttachment("ne_110m_ocean.geojson")
-const firsTopo = FileAttachment("firs.topojson").json()
+const land = FileAttachment("data/ne_110m_land.geojson")
+const ocean = FileAttachment("data/ne_110m_ocean.geojson")
+const firsTopo = FileAttachment("data/worldfirs.topojson").json()
+const firImpacts = FileAttachment("data/fir-impacts.json").json()
 
 const erfImages = {
-  "2019": FileAttachment("2019.png"),
-  "2024": FileAttachment("2024.png")
+  "2019": FileAttachment("data/2019.png"),
+  "2024": FileAttachment("data/2024.png")
 }
 ```
 
 <!-- Inputs -->
+
 ```js
-const mapTypeInput = Inputs.radio(["globe", "flat"], {value: "globe", label: "Map type"});
-const mapType = Generators.input(mapTypeInput)
+// Type of Deck.gl Map
+const mapTypeInput = Inputs.radio(["globe", "flat"], {
+  value: "globe",
+  label: "Map type",
+});
+const mapType = Generators.input(mapTypeInput);
 
-const yearInput = Inputs.radio(Object.keys(erfImages), { value: "2024", label: "Year"})
-const year = Generators.input(yearInput)
+// Time input
+const yearInput = Inputs.radio(Object.keys(erfImages), {
+  value: "2024",
+  label: "Year",
+});
+const year = Generators.input(yearInput);
 
-const firLayerInput = Inputs.radio(["Lower", "Upper"], { value: "Upper", label: "FIR Regions"})
-const firLayer = Generators.input(firLayerInput)
+// FIR upper/lower layers
+const firLayerInput = Inputs.radio(["Lower", "Upper"], {
+  value: "Upper",
+  label: "FIR Layer",
+});
+const firLayer = Generators.input(firLayerInput);
+
+// AGWP timescale
+const agwpTimescaleInput = Inputs.radio([20, 50, 100], { value: 100 });
+const agwpTimescale = Generators.input(agwpTimescaleInput);
+
+// Mitigation potential (mW m-2).
+// Default and bounds from Lee 2021.
+const contrailCirrusERFInput = Inputs.range([17, 98], { value: 57, step: 1 });
+const contrailCirrusERF = Generators.input(contrailCirrusERFInput);
+
+// Mitigation efficacy (%)
+const efficacyInput = Inputs.range([0, 100], { value: 70, step: 5 });
+const efficacy = Generators.input(efficacyInput);
 ```
 
 <!-- Data prep -->
 ```js
+// load world FIRs to GeoJSON
 const firs = topojson.feature(firsTopo, firsTopo.objects.data)
 
+// Filter by upper/lower regions
 if (firLayer === "Upper") {
-  firs["features"] = firs["features"].filter(d => d.properties.upper === null)
+  firs["features"] = firs["features"].filter(
+    (d) => d.properties.upper === null,
+  );
 } else {
-  firs["features"] = firs["features"].filter(d => d.properties.lower === 0)
+  firs["features"] = firs["features"].filter((d) => d.properties.lower === 0);
 }
 
-const firData = firs["features"].map(d => d.properties)
-const firSearchInput = Inputs.search(firData, {placeholder: "Search FIRs..."})
-const firSearch = Generators.input(firSearchInput)
+// Create search input FIR data from
+const firData = firs["features"].map((d) => d.properties);
+const firSearchInput = Inputs.search(firData, {
+  placeholder: "Search FIRs...",
+});
+const firSearch = Generators.input(firSearchInput);
 ```
 
 ```js
 const firTableInput = Inputs.table(firSearch, {
-  columns: [
-    "designator",
-    "name",
-    "value"
-  ],
+  columns: ["designator", "name", "value"],
   format: {
-    value: (v) => v ? `${v.toFixed(2)}%` : ``
+    value: (v) => (v ? `${v.toFixed(2)}%` : ``),
   },
   sort: "value",
   reverse: true,
-  required: false
-})
-const selectedFIRs = Generators.input(firTableInput)
+  required: false,
+});
+const selectedFIRs = Generators.input(firTableInput);
 
-// const selectedFIRs2 = []
-// function selectFIR(info, event) {
+function selectFIR(info, event) {
+  console.log(info)
+//   console.log(selectedFIRs);
 //   if (info.object) {
-//     selectedFIRs2.push(info.object.properties.designator)
+//     const tableRow = firTableInput.value.filter(
+//       (d) => d.designator === info.object.properties.designator,
+//     );
+//     selectedFIRs.value.push(tableRow);
 //   }
-//   console.log(selectedFIRs2)
-// }
+}
 ```
 
-```js
-const selectedDesignators = selectedFIRs.map(d => d.designator)
-const selectedPotential = selectedFIRs.reduce((acc, d) => acc + d.value, 0)
+<!-- Calculate migitation potential -->
 
-const contrailCirrusERF = 57.4
-const AGWP = 8.8e-14
-const efficacy = 70
+```js
+const selectedDesignators = selectedFIRs.map((d) => d.designator);
+const selectedPotential = selectedFIRs.reduce((acc, d) => acc + d.value, 0);
+
+// AGWP, yr W m-2 / kg-CO2 (Lee 2021, Supplementary Data, Sheet AGWP-CO2)
+const AGWP =
+  agwpTimescale === 100
+    ? 8.8e-14
+    : agwpTimescale === 50
+    ? 5.08e-14
+    : agwpTimescale === 20
+    ? 2.39e-14
+    : null;
 
 // Contrail warming in CO2-eq, GWP100 (Mtonnes / year)
-const contrailWarming = (contrailCirrusERF / 1e3) / (AGWP * 1e9)
+const contrailWarming = contrailCirrusERF / 1e3 / (AGWP * 1e9);
 
 // Contrail warming avoided in CO2-eq (Mtonnes / year)
-const contrailWarmingAvoided = (selectedPotential / 100) * ((efficacy / 100) * contrailWarming)
-
+const contrailWarmingAvoided =
+  (selectedPotential / 100) * ((efficacy / 100) * contrailWarming);
 ```
 
 <!-- Deck setup -->
-```js
 
-const getTooltip = ({object}) => {
-  return object && object.properties &&
-    `${object.properties.designator}\n${object.properties.name}\n${object.properties.value.toFixed(2)}%`
-}
+```js
+const getTooltip = ({ object }) => {
+  return (
+    object &&
+    object.properties &&
+    `${object.properties.designator}\n${
+      object.properties.name
+    }\n${object.properties.value.toFixed(2)}%`
+  );
+};
 const deckInstance = new DeckGL({
   container: document.getElementById("container"),
-  style: {"position": "relative"},
-  views: mapType === "globe" ? [
-    new _GlobeView()
-  ] : [
-    new MapView()
-  ],
+  style: { position: "relative" },
+  views: mapType === "globe" ? [new _GlobeView()] : [new MapView()],
   initialViewState: {
     longitude: -2,
     latitude: 53.5,
@@ -134,7 +183,7 @@ const deckInstance = new DeckGL({
     minZoom: 1,
     maxZoom: 6,
     pitch: 0,
-    bearing: 0
+    bearing: 0,
   },
   getTooltip: getTooltip,
   controller: true,
@@ -172,7 +221,7 @@ deckInstance.setProps({
       opacity: 0.1,
       pickable: true,
       // makes sure that layer sites above geojson layers above
-      parameters: { cullMode: 'back', depthCompare: 'always' }
+      parameters: { cullMode: "back", depthCompare: "always" },
     }),
     new GeoJsonLayer({
       id: "firs",
@@ -184,24 +233,24 @@ deckInstance.setProps({
       // autoHighlight: true,
       // highlightColor: [242, 100, 0, 50],
       // getLineColor: [0, 0, 0],
-      getLineColor: d => {
+      getLineColor: [0, 0, 0],
+      getFillColor: (d) => {
         if (selectedDesignators.includes(d.properties.designator)) {
-          return [242, 100, 0, 225]
+          return [242, 100, 0, 125];
         }
-        return [0,0,0]
+        return [0, 0, 0, 0];
       },
-      getFillColor: [0,0,0,0], // required for getTooltip
-      // onClick: selectFIR,
-      // updateTriggers: {
-      //   getLineColor: selectedFIRs
-      // },
-      parameters: { cullMode: 'back', depthCompare: 'always' },
+      onClick: selectFIR,
+      updateTriggers: {
+        getFillColor: selectedDesignators,
+      },
+      parameters: { cullMode: "back", depthCompare: "always" },
     }),
     new TextLayer({
       id: "firLabels",
       data: firs["features"],
-      getText: f => f.properties.designator,
-      getPosition: f => {
+      getText: (f) => f.properties.designator,
+      getPosition: (f) => {
         // Calculate centroid
         const coords = f.geometry.coordinates[0];
         const lon = coords.reduce((sum, c) => sum + c[0], 0) / coords.length;
@@ -212,15 +261,15 @@ deckInstance.setProps({
       getColor: [0, 0, 0],
       billboard: false,
       getAngle: mapType === "globe" ? 180 : 0,
-      fontFamily: "monospace"
-    })
-  ]
+      fontFamily: "monospace",
+    }),
+  ],
 });
 ```
+
 # Global Contrail Heatmap
 
-
-This map shows a heat map of local contrail forcing normalized by the global annual contrail forcing.
+This map shows the proportion of global annual contrail forcing by FIR.
 
 <div class="card">
 
@@ -235,19 +284,22 @@ ${firLayerInput}
 
 <figure>
 
-  ${mapTypeInput}
+## Explore FIRs
 
-  <div id="container" style="border-radius: 8px; overflow: hidden; background: rgb(0,0,0); height: 75vh; margin: 1rem 0; ">
-  </div>
-  <figcaption>
-    Contrail Data: <a href="https://acp.copernicus.org/articles/24/6071/2024/">Teoh 2024</a><br/>
-    FIR Regions: <a href="https://observablehq.com/@openaviation/flight-information-regions">Open Aviation</a>
-  </figcaption>
+${mapTypeInput}
+
+<div id="container" style="border-radius: 8px; overflow: hidden; background: rgb(0,0,0); height: 75vh; margin: 1rem 0; ">
+</div>
+<figcaption>
+  Contrail Data: <a href="https://acp.copernicus.org/articles/24/6071/2024/">Teoh 2024</a><br/>
+  FIR Regions: <a href="https://observablehq.com/@openaviation/flight-information-regions">Open Aviation</a>
+</figcaption>
 </figure>
-
 </div>
 
 <div class="card">
+
+## Select FIR
 
 ${firSearchInput}
 
@@ -255,6 +307,14 @@ ${firTableInput}
 
 </div>
 <div class="card">
+
+## Mitigation Potential
+
+Timescale (years): ${agwpTimescaleInput}
+
+Contrail Cirrus Effective Radiative Forcing [mW / m<sup>2</sup>] ${contrailCirrusERFInput}
+
+Mitigation Efficacy [%] ${efficacyInput}
 
 <span class="big">${selectedPotential.toFixed(2)}%</span><br/>
 <span class="muted">global contrail forcing</span>
@@ -264,10 +324,8 @@ ${firTableInput}
 
 </div>
 
-
 <div class="source">
 
 [Source ↗︎](https://github.com/contrailcirrus/contrails-notebook-dash/blob/main/src/2019-global-erf-map/index.md)
 
 </div>
-

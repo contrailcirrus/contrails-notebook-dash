@@ -10,4 +10,5 @@ dependencies = [
   "topojson",
   "pandas",
   "shapely",
+  "h5netcdf",
 ]

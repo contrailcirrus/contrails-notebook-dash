@@ -91,29 +91,12 @@ const efficacy = Generators.input(efficacyInput);
 <!-- Data prep -->
 
 ```js
-const mapSelectedFirsInput = Inputs.select(firsImpact.map(d => d.id), {multiple: true})
-const mapSelectedFirs = Generators.input(mapSelectedFirsInput)
-```
-
-```js
-function selectFir(info, event) {
-  if (info.object) {
-    if (!mapSelectedFirs.includes(info.object.properties.id)){
-      mapSelectedFirs.value.push(info.object.properties.id)
-    }
-  }
-}
-```
-
-```js
 // make a hash map from firImpacts key'd by id
 const firsImpactObject = firsImpact.reduce((acc, obj) => {
   acc[obj.id] = obj;
   return acc;
 }, {});
 ```
-
-
 
 ```js
 // load world FIRs to GeoJSON
@@ -131,9 +114,7 @@ if (firLayer === "Upper") {
 
 ```js
 // Create search input FIR data from
-console.log(mapSelectedFirs)
-const firsImpactData = mapSelectedFirs.length ? firsImpact.filter(d => mapSelectedFirs.includes(d.id)) : firsImpact
-const firSearchInput = Inputs.search(firsImpactData, {
+const firSearchInput = Inputs.search(firsImpact, {
   placeholder: "Search FIRs...",
 });
 const firSearch = Generators.input(firSearchInput);
@@ -262,7 +243,7 @@ deckInstance.setProps({
         }
         return [0, 0, 0, 0];
       },
-      onClick: selectFir,
+      // onClick: selectFir,
       updateTriggers: {
         getFillColor: selectedIds,
       },

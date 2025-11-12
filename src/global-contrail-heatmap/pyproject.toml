@@ -1,0 +1,13 @@
+[project]
+name = "global-contrail-heatmap"
+version = "0.1.0"
+description = "Data staging for global contrail heatmap"
+requires-python = ">=3.14"
+dependencies = [
+  "xarray",
+  "numpy",
+  "matplotlib",
+  "topojson",
+  "pandas",
+  "shapely",
+]

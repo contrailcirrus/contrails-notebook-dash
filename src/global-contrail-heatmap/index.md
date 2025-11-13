@@ -114,9 +114,14 @@ if (firLayer === "Upper") {
 
 ```js
 // Create search input FIR data from
-const firSearchInput = Inputs.search(firsImpact, {
-  placeholder: "Search FIRs...",
-});
+const firSearchInput = Inputs.search(
+  firLayer === "Upper"
+    ? firsImpact.filter((d) => d.upper === null)
+    : firsImpact.filter((d) => d.lower === 0),
+  {
+    placeholder: "Search FIRs...",
+  },
+);
 const firSearch = Generators.input(firSearchInput);
 ```
 
@@ -137,7 +142,10 @@ const selectedFirs = Generators.input(firTableInput);
 
 ```js
 const selectedIds = selectedFirs.map((d) => d.id);
-const selectedPotential = selectedFirs.reduce((acc, d) => acc + d[year], 0);
+const selectedPotential = Math.min(
+  selectedFirs.reduce((acc, d) => acc + d[year], 0),
+  100,
+);
 
 // AGWP, yr W m-2 / kg-CO2 (Lee 2021, Supplementary Data, Sheet AGWP-CO2)
 const AGWP =
@@ -233,13 +241,10 @@ deckInstance.setProps({
       stroked: true,
       filled: true,
       lineWidthMinPixels: 1,
-      // autoHighlight: true,
-      // highlightColor: [242, 100, 0, 50],
-      // getLineColor: [0, 0, 0],
       getLineColor: [0, 0, 0],
       getFillColor: (d) => {
         if (selectedIds.includes(d.properties.id)) {
-          return [242, 100, 0, 125];
+          return [16, 147, 255, 100];
         }
         return [0, 0, 0, 0];
       },

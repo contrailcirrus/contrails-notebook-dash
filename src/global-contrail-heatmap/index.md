@@ -309,6 +309,11 @@ ${mapTypeInput}
 
 ## Select FIR
 
+See [ICAO Codes](https://observablehq.com/@openaviation/flight-information-regions#cell-1808) for
+list of prefixes by country and region.
+
+*Check box next to row to include FIRs in mitigation potential*
+
 ${firSearchInput}
 
 ${firTableInput}

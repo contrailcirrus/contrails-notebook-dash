@@ -28,6 +28,8 @@ export default {
   // theme: "default", // try "light", "dark", "slate", etc.
   header: false, // what to show in the header (HTML)
   footer: false, // what to show in the footer (HTML)
+  // This snippet would automatically link the source, but I think its better to control within each dashboard
+  // footer: ({path}) => `<div class="source"><a href="https://github.com/contrailcirrus/contrails-notebook-dash/blob/main/src${path}.md?plain=1">Source ↗︎</a></div>`,
   sidebar: false, // whether to show the sidebar
   toc: false, // whether to show the table of contents
   pager: false, // whether to show previous & next links in the footer

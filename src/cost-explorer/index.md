@@ -65,7 +65,6 @@ const intParams = new Set([
   "contrailCirrusERF",
   "efficacy",
   "fuelCost",
-  "fuelConsumption",
   "upfrontRD",
   "annualInfra",
   "flights"
@@ -106,7 +105,6 @@ const scenarioInputs = (scenario === "Nominal") ? {
   efficacy: 65,           // %
   fuelPenalty: 0.3,       // %
   fuelCost: 90,           // $ / barrel
-  fuelConsumption: 103,   // Billions gallons / year
   upfrontRD: 250,         // $M / year
   annualInfra: 50,        // $M / year
   flights: 35             // M flights / year
@@ -115,7 +113,6 @@ const scenarioInputs = (scenario === "Nominal") ? {
   efficacy: 50,
   fuelPenalty: 1,
   fuelCost: 120,
-  fuelConsumption: 110,
   upfrontRD: 500,
   annualInfra: 400,
   flights: 35
@@ -124,7 +121,6 @@ const scenarioInputs = (scenario === "Nominal") ? {
   efficacy: 80,
   fuelPenalty: 0.1,
   fuelCost: 90,
-  fuelConsumption: 103,
   upfrontRD: 150,
   annualInfra: 20,
   flights: 35
@@ -175,8 +171,8 @@ const fuelCost = Generators.input(fuelCostInput)
 
 // Annual aviation fuel consumption (Billions gallons / year)
 // https://www.iata.org/en/iata-repository/pressroom/fact-sheets/industry-statistics/
-const fuelConsumptionInput = Inputs.range([90, 110], { value: inputs.fuelConsumption, step: 1 })
-const fuelConsumption = Generators.input(fuelConsumptionInput)
+// const fuelConsumptionInput = Inputs.range([90, 110], { value: inputs.fuelConsumption, step: 1 })
+// const fuelConsumption = Generators.input(fuelConsumptionInput)
 
 // R&D costs ($M / year)
 const upfrontRDInput = Inputs.range([0, 500], { value: inputs.upfrontRD, step: 10})
@@ -326,7 +322,7 @@ Flights [Millions flights / year]: ${flightsInput}
 
 Fuel Cost [$ / barrel] ${fuelCostInput}
 
-Annual Fuel Consumption [Billions gallons / year] ${fuelConsumptionInput}
+<!-- Annual Fuel Consumption [Billions gallons / year] ${fuelConsumptionInput} -->
 
 </details>
 </div>

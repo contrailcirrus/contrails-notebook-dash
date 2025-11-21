@@ -71,7 +71,7 @@ const intParams = new Set([
 ]);
 
 const floatParams = new Set([
-  "fuelPenalty"
+  "additionalFuel"
 ]);
 
 // dashboard defaults
@@ -102,28 +102,28 @@ const agwpTimescale = Generators.input(agwpTimescaleInput)
 ```js
 const scenarioInputs = (scenario === "Nominal") ? {
   contrailCirrusERF: 57,  // mW m-2
-  efficacy: 65,           // %
-  fuelPenalty: 0.3,       // %
+  efficacy: 70,           // %
+  additionalFuel: 0.3,       // %
   fuelCost: 90,           // $ / barrel
   upfrontRD: 250,         // $M / year
-  annualInfra: 50,        // $M / year
-  flights: 35             // M flights / year
+  annualInfra: 20,        // $M / year
+  flights: 38             // M flights / year
 } : (scenario === "Pessimistic") ? {
   contrailCirrusERF: 26,
   efficacy: 50,
-  fuelPenalty: 1,
+  additionalFuel: 0.5,
   fuelCost: 120,
   upfrontRD: 500,
-  annualInfra: 400,
-  flights: 35
+  annualInfra: 200,
+  flights: 38
 } : (scenario === "Optimistic") ? {
   contrailCirrusERF: 57,
   efficacy: 80,
-  fuelPenalty: 0.1,
+  additionalFuel: 0.1,
   fuelCost: 90,
   upfrontRD: 150,
-  annualInfra: 20,
-  flights: 35
+  annualInfra: 10,
+  flights: 38
 } : {};
 
 // merge the user inputs with the default scenario inputs
@@ -162,12 +162,12 @@ const efficacyInput = Inputs.range([50, 100], { value: inputs.efficacy, step: 5 
 const efficacy = Generators.input(efficacyInput)
 
 // Fuel penalty across fleet (%)
-const fuelPenaltyInput = Inputs.range([0, 0.5], { value: inputs.fuelPenalty, step: 0.05 })
-const fuelPenalty = Generators.input(fuelPenaltyInput)
+const additionalFuelInput = Inputs.range([0, 0.5], { value: inputs.additionalFuel, step: 0.05 })
+const additionalFuel = Generators.input(additionalFuelInput)
 
 // Annual aviation fuel cost ($ / barrel)
 // https://www.iata.org/en/publications/economics/fuel-monitor/
-const fuelCostInput = Inputs.range([70, 130], { value: inputs.fuelCost, step: 5 })
+const fuelCostInput = Inputs.range([80, 120], { value: inputs.fuelCost, step: 1 })
 const fuelCost = Generators.input(fuelCostInput)
 
 // Annual aviation fuel consumption (Billions gallons / year)
@@ -184,14 +184,17 @@ const annualInfraInput = Inputs.range([0, 200], { value: inputs.annualInfra, ste
 const annualInfra = Generators.input(annualInfraInput)
 
 // Global aviation activity (M flights / year)
-const flightsInput = Inputs.range([10, 100], { value: inputs.flights, step: 5})
+const flightsInput = Inputs.range([30, 50], { value: inputs.flights, step: 1})
 const flights = Generators.input(flightsInput)
 ```
 
 <!-- Model -->
 ```js
+// Fuel cost ($ / tonne)
+const fuelCostTonnes = fuelCost / tonnesPerBarrel
+
 // Aviation fuel consumption (Billions gallons / year)
-const fuelConsumption = fuelPerFlight * flights
+const fuelConsumption = fuelPerFlight * flights * 1e6 / 1e9
 
 // Aviation fuel consumption (Mtonnes fuel / year)
 const fuelConsumptionMt = (fuelConsumption * 1e9 / gallonsPerBarrel) * tonnesPerBarrel / 1e6
@@ -203,10 +206,10 @@ const fuelCO2 = fuelConsumptionMt * fuelIntensityCO2
 const contrailWarming = (contrailCirrusERF / 1e3) / (AGWP * 1e9)
 
 // Contrail warming avoided in CO2-eq (Mtonnes / year)
-const contrailWarmingAvoided = Math.max(((efficacy / 100) * contrailWarming) - ((fuelPenalty / 100) * fuelCO2), 0)
+const contrailWarmingAvoided = Math.max(((efficacy / 100) * contrailWarming) - ((additionalFuel / 100) * fuelCO2), 0)
 
 // Fuel costs ($M / year)
-const additionalFuelCost = (fuelPenalty / 100) * (fuelCost / 0.127 * fuelConsumptionMt)
+const additionalFuelCost = (additionalFuel / 100) * (fuelCost / 0.127 * fuelConsumptionMt)
 
 // R&D costs ($M / year)
 // TODO: Does it make sense to have amortized cost the same as AGWP Timescale?
@@ -232,7 +235,7 @@ const currentScenario = {
   agwpTimescale: agwpTimescale,
   contrailCirrusERF: contrailCirrusERF,
   efficacy: efficacy,
-  fuelPenalty: fuelPenalty,
+  additionalFuel: additionalFuel,
   fuelCost: fuelCost,
   fuelConsumption: fuelConsumption,
   upfrontRD: upfrontRD,
@@ -300,7 +303,7 @@ Annual Infrastructure Cost [$M / year] ${annualInfraInput}
 
 ## Fuel cost
 
-Fuel penalty [%] ${fuelPenaltyInput}
+Fuel overhead [%] ${additionalFuelInput}
 
 
 ## Mitigation Potential
@@ -324,7 +327,10 @@ Flights [Millions flights / year]: ${flightsInput}
 
 ## Fuel
 
-Fuel Cost [$ / barrel] ${fuelCostInput}
+Fuel Cost [$ / barrel]${fuelCostInput}
+
+(\$${Math.round(fuelCostTonnes)} / tonne)
+
 
 <!-- Annual Fuel Consumption [Billions gallons / year] ${fuelConsumptionInput} -->
 
@@ -367,7 +373,8 @@ ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costP
 <details>
   <summary><b>Additional Outputs</b></summary>
 
-- **Annual Fuel Consumption** [Billions gallons / year] ${fuelConsumption}
+- **Annual Fuel Consumption** [Billions gallons / year] ${Math.round(fuelConsumption)}
+- **Annual Fuel Consumption** [Mt / year] ${Math.round(fuelConsumptionMt)}
 - **Additional fuel cost**: $${Math.round(additionalFuelCost)}M / year ($${(additionalFuelCost / contrailWarmingAvoided).toFixed(2)} per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale}))
 - **Annual infrastructure**: $${annualInfra}M / year ($${(annualInfra / contrailWarmingAvoided).toFixed(2)} per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale}))
 - **Amortized R&D cost**: $${Math.round(amortizedRDCost)}M / year ($${(amortizedRDCost / contrailWarmingAvoided).toFixed(2)} per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale}))

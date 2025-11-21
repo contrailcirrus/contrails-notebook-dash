@@ -147,6 +147,7 @@ const fuelIntensityCO2 = 3.89     // kg CO2 / kg fuel (ICAO - TODO)
 const tonnesPerBarrel = 0.127     // tonnes / barrel Jet-A
 const gallonsPerBarrel = 42       // 42 US gallons / barrel
 const discountRate = 0.02         // 2%, assumed economic discount rate
+const fuelPerFlight = 2689        // gal / flight, 2025F https://www.iata.org/en/iata-repository/pressroom/fact-sheets/industry-statistics/
 ```
 
 <!-- Inputs -->
@@ -189,6 +190,9 @@ const flights = Generators.input(flightsInput)
 
 <!-- Model -->
 ```js
+// Aviation fuel consumption (Billions gallons / year)
+const fuelConsumption = fuelPerFlight * flights
+
 // Aviation fuel consumption (Mtonnes fuel / year)
 const fuelConsumptionMt = (fuelConsumption * 1e9 / gallonsPerBarrel) * tonnesPerBarrel / 1e6
 
@@ -363,6 +367,7 @@ ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costP
 <details>
   <summary><b>Additional Outputs</b></summary>
 
+- **Annual Fuel Consumption** [Billions gallons / year] ${fuelConsumption}
 - **Additional fuel cost**: $${Math.round(additionalFuelCost)}M / year ($${(additionalFuelCost / contrailWarmingAvoided).toFixed(2)} per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale}))
 - **Annual infrastructure**: $${annualInfra}M / year ($${(annualInfra / contrailWarmingAvoided).toFixed(2)} per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale}))
 - **Amortized R&D cost**: $${Math.round(amortizedRDCost)}M / year ($${(amortizedRDCost / contrailWarmingAvoided).toFixed(2)} per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale}))

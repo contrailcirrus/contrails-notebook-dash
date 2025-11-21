@@ -161,11 +161,11 @@ const contrailCirrusERFInput = Inputs.range([17, 98], { value: inputs.contrailCi
 const contrailCirrusERF = Generators.input(contrailCirrusERFInput)
 
 // Mitigation efficacy (%)
-const efficacyInput = Inputs.range([0, 100], { value: inputs.efficacy, step: 5 })
+const efficacyInput = Inputs.range([50, 100], { value: inputs.efficacy, step: 5 })
 const efficacy = Generators.input(efficacyInput)
 
 // Fuel penalty across fleet (%)
-const fuelPenaltyInput = Inputs.range([0, 1], { value: inputs.fuelPenalty, step: 0.05 })
+const fuelPenaltyInput = Inputs.range([0, 0.5], { value: inputs.fuelPenalty, step: 0.05 })
 const fuelPenalty = Generators.input(fuelPenaltyInput)
 
 // Annual aviation fuel cost ($ / barrel)
@@ -183,7 +183,7 @@ const upfrontRDInput = Inputs.range([0, 500], { value: inputs.upfrontRD, step: 1
 const upfrontRD = Generators.input(upfrontRDInput)
 
 // Annual monitoring infrastructure costs ($M / year)
-const annualInfraInput = Inputs.range([0, 500], { value: inputs.annualInfra, step: 10})
+const annualInfraInput = Inputs.range([0, 200], { value: inputs.annualInfra, step: 5})
 const annualInfra = Generators.input(annualInfraInput)
 
 // Global aviation activity (M flights / year)
@@ -203,7 +203,7 @@ const fuelCO2 = fuelConsumptionMt * fuelIntensityCO2
 const contrailWarming = (contrailCirrusERF / 1e3) / (AGWP * 1e9)
 
 // Contrail warming avoided in CO2-eq (Mtonnes / year)
-const contrailWarmingAvoided = ((efficacy / 100) * contrailWarming) - ((fuelPenalty / 100) * fuelCO2)
+const contrailWarmingAvoided = Math.max(((efficacy / 100) * contrailWarming) - ((fuelPenalty / 100) * fuelCO2), 0)
 
 // Fuel costs ($M / year)
 const additionalFuelCost = (fuelPenalty / 100) * (fuelCost / 0.127 * fuelConsumptionMt)

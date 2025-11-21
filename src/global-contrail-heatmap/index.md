@@ -84,7 +84,7 @@ const contrailCirrusERFInput = Inputs.range([17, 98], { value: 57, step: 1 });
 const contrailCirrusERF = Generators.input(contrailCirrusERFInput);
 
 // Mitigation efficacy (%)
-const efficacyInput = Inputs.range([0, 100], { value: 70, step: 5 });
+const efficacyInput = Inputs.range([50, 100], { value: 70, step: 1 });
 const efficacy = Generators.input(efficacyInput);
 ```
 

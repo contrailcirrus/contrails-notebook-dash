@@ -71,7 +71,8 @@ const intParams = new Set([
 ]);
 
 const floatParams = new Set([
-  "additionalFuel"
+  "additionalFuel",
+  "maintenanceFactor"
 ]);
 
 // dashboard defaults
@@ -103,7 +104,8 @@ const agwpTimescale = Generators.input(agwpTimescaleInput)
 const scenarioInputs = (scenario === "Nominal") ? {
   contrailCirrusERF: 57,  // mW m-2
   efficacy: 70,           // %
-  additionalFuel: 0.3,       // %
+  additionalFuel: 0.3,    // %
+  maintenanceFactor: 1.15, //
   fuelCost: 90,           // $ / barrel
   upfrontRD: 250,         // $M / year
   annualInfra: 20,        // $M / year
@@ -112,6 +114,7 @@ const scenarioInputs = (scenario === "Nominal") ? {
   contrailCirrusERF: 26,
   efficacy: 50,
   additionalFuel: 0.5,
+  maintenanceFactor: 1.2,
   fuelCost: 120,
   upfrontRD: 500,
   annualInfra: 200,
@@ -120,6 +123,7 @@ const scenarioInputs = (scenario === "Nominal") ? {
   contrailCirrusERF: 57,
   efficacy: 80,
   additionalFuel: 0.1,
+  maintenanceFactor: 1.1,
   fuelCost: 90,
   upfrontRD: 150,
   annualInfra: 10,
@@ -165,6 +169,10 @@ const efficacy = Generators.input(efficacyInput)
 const additionalFuelInput = Inputs.range([0, 0.5], { value: inputs.additionalFuel, step: 0.05 })
 const additionalFuel = Generators.input(additionalFuelInput)
 
+// Increases added fuel costs by an additional maintenance / compliance factor
+const maintenanceFactorInput = Inputs.range([1, 1.2], { value: inputs.maintenanceFactor, step: 0.01 })
+const maintenanceFactor = Generators.input(maintenanceFactorInput)
+
 // Annual aviation fuel cost ($ / barrel)
 // https://www.iata.org/en/publications/economics/fuel-monitor/
 const fuelCostInput = Inputs.range([80, 120], { value: inputs.fuelCost, step: 1 })
@@ -209,7 +217,7 @@ const contrailWarming = (contrailCirrusERF / 1e3) / (AGWP * 1e9)
 const contrailWarmingAvoided = Math.max(((efficacy / 100) * contrailWarming) - ((additionalFuel / 100) * fuelCO2), 0)
 
 // Fuel costs ($M / year)
-const additionalFuelCost = (additionalFuel / 100) * (fuelCost / 0.127 * fuelConsumptionMt)
+const additionalFuelCost = (additionalFuel / 100) * (fuelCostTonnes * fuelConsumptionMt) * maintenanceFactor
 
 // R&D costs ($M / year)
 // TODO: Does it make sense to have amortized cost the same as AGWP Timescale?
@@ -303,7 +311,7 @@ Annual Infrastructure Cost [$M / year] ${annualInfraInput}
 
 ## Fuel cost
 
-Fuel overhead [%] ${additionalFuelInput}
+Additional fuel [%] ${additionalFuelInput}
 
 
 ## Mitigation Potential
@@ -327,9 +335,10 @@ Flights [Millions flights / year]: ${flightsInput}
 
 ## Fuel
 
-Fuel Cost [$ / barrel]${fuelCostInput}
+Fuel Cost [$ / barrel] &nbsp;&nbsp; *(\$${Math.round(fuelCostTonnes)} / tonne)* ${fuelCostInput}
 
-(\$${Math.round(fuelCostTonnes)} / tonne)
+Maintenance Factor ${maintenanceFactorInput}
+
 
 
 <!-- Annual Fuel Consumption [Billions gallons / year] ${fuelConsumptionInput} -->

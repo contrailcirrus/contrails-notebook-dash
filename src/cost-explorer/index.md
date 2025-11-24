@@ -106,10 +106,11 @@ const scenarioInputs = (scenario === "Nominal") ? {
   efficacy: 70,           // %
   additionalFuel: 0.3,    // %
   maintenanceFactor: 1.15, //
-  fuelCost: 90,           // $ / barrel
+  fuelCost: 95,           // $ / barrel
   upfrontRD: 250,         // $M / year
   annualInfra: 20,        // $M / year
-  flights: 38             // M flights / year
+  flights: 38,            // M flights / year
+  fuelPerFlight: 2690,    // gal / flight
 } : (scenario === "Pessimistic") ? {
   contrailCirrusERF: 26,
   efficacy: 50,
@@ -118,7 +119,8 @@ const scenarioInputs = (scenario === "Nominal") ? {
   fuelCost: 120,
   upfrontRD: 500,
   annualInfra: 200,
-  flights: 38
+  flights: 38,
+  fuelPerFlight: 2700,
 } : (scenario === "Optimistic") ? {
   contrailCirrusERF: 57,
   efficacy: 80,
@@ -127,7 +129,8 @@ const scenarioInputs = (scenario === "Nominal") ? {
   fuelCost: 90,
   upfrontRD: 150,
   annualInfra: 10,
-  flights: 38
+  flights: 38,
+  fuelPerFlight: 2600,
 } : {};
 
 // merge the user inputs with the default scenario inputs
@@ -151,7 +154,6 @@ const fuelIntensityCO2 = 3.89     // kg CO2 / kg fuel (ICAO - TODO)
 const tonnesPerBarrel = 0.127     // tonnes / barrel Jet-A
 const gallonsPerBarrel = 42       // 42 US gallons / barrel
 const discountRate = 0.02         // 2%, assumed economic discount rate
-const fuelPerFlight = 2689        // gal / flight, 2025F https://www.iata.org/en/iata-repository/pressroom/fact-sheets/industry-statistics/
 ```
 
 <!-- Inputs -->
@@ -168,6 +170,10 @@ const efficacy = Generators.input(efficacyInput)
 // Fuel penalty across fleet (%)
 const additionalFuelInput = Inputs.range([0, 0.5], { value: inputs.additionalFuel, step: 0.05 })
 const additionalFuel = Generators.input(additionalFuelInput)
+
+// gal / flight, 2025F https://www.iata.org/en/iata-repository/pressroom/
+const fuelPerFlightInput = Inputs.range([2500, 2800], { value: inputs.fuelPerFlight, step: 10 })
+const fuelPerFlight = Generators.input(fuelPerFlightInput)
 
 // Increases added fuel costs by an additional maintenance / compliance factor
 const maintenanceFactorInput = Inputs.range([1, 1.2], { value: inputs.maintenanceFactor, step: 0.01 })
@@ -337,7 +343,10 @@ Flights [Millions flights / year]: ${flightsInput}
 
 Fuel Cost [$ / barrel] &nbsp;&nbsp; *(\$${Math.round(fuelCostTonnes)} / tonne)* ${fuelCostInput}
 
+Fuel per flight [gal / flight] ${fuelPerFlightInput}
+
 Maintenance Factor ${maintenanceFactorInput}
+
 
 
 

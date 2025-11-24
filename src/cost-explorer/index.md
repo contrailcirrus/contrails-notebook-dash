@@ -120,7 +120,7 @@ const scenarioInputs = (scenario === "Nominal") ? {
   upfrontRD: 500,
   annualInfra: 200,
   flights: 38,
-  fuelPerFlight: 2700,
+  fuelPerFlight: 2690,
 } : (scenario === "Optimistic") ? {
   contrailCirrusERF: 57,
   efficacy: 80,
@@ -130,7 +130,7 @@ const scenarioInputs = (scenario === "Nominal") ? {
   upfrontRD: 150,
   annualInfra: 10,
   flights: 38,
-  fuelPerFlight: 2600,
+  fuelPerFlight: 2690,
 } : {};
 
 // merge the user inputs with the default scenario inputs

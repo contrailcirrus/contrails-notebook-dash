@@ -102,15 +102,15 @@ const agwpTimescale = Generators.input(agwpTimescaleInput)
 <!-- Runs when `scenario` is changed -->
 ```js
 const scenarioInputs = (scenario === "Nominal") ? {
-  contrailCirrusERF: 57,  // mW m-2
-  efficacy: 70,           // %
-  additionalFuel: 0.3,    // %
-  maintenanceFactor: 1.15, //
-  fuelCost: 95,           // $ / barrel
-  upfrontRD: 250,         // $M / year
-  annualInfra: 20,        // $M / year
-  flights: 38,            // M flights / year
-  fuelPerFlight: 2690,    // gal / flight
+  contrailCirrusERF: 57,    // mW m-2
+  efficacy: 70,             // %
+  additionalFuel: 0.3,      // %
+  maintenanceFactor: 1.15,  //
+  fuelCost: 90,             // $ / barrel
+  upfrontRD: 250,           // $M / year
+  annualInfra: 20,          // $M / year
+  flights: 38,              // M flights / year
+  fuelPerFlight: 2690,      // gal / flight
 } : (scenario === "Pessimistic") ? {
   contrailCirrusERF: 26,
   efficacy: 50,
@@ -356,7 +356,7 @@ Maintenance Factor ${maintenanceFactorInput}
 </div>
 
 
-<div class="grid grid-cols-2">
+<div class="grid grid-cols-2" style="grid-auto-rows: auto;">
 <div class="card">
 
 ## Warming avoided
@@ -369,7 +369,7 @@ Maintenance Factor ${maintenanceFactorInput}
 <span class="big">$${Math.round(totalCost).toLocaleString('en-US')} M</span><br/>
 <span class="muted">per year</span>
 
-## Abatement cost
+## Mitigation cost
 
 <span class="big">$ ${(totalCost / contrailWarmingAvoided).toFixed(2)}</span><br/>
 <span class="muted">per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale})</span>
@@ -379,7 +379,7 @@ Maintenance Factor ${maintenanceFactorInput}
 
 </div>
 
-<div class="card">
+<div class="card" style="text-align: center">
 
 ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costPie.map(c => c.name), colorRange: costPie.map(c => c.color)})}
 

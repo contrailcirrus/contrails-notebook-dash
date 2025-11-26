@@ -413,6 +413,6 @@ ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costP
 
 <div class="source">
 
-[Source ↗︎](https://github.com/contrailcirrus/contrails-notebook-dash/blob/main/src/cost-explorer/index.md)
+[Source ↗︎](https://github.com/contrailcirrus/contrails-notebook-dash/blob/main/src/cost-explorer/index.md?plain=1)
 
 </div>

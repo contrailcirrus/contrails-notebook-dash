@@ -67,7 +67,8 @@ const intParams = new Set([
   "fuelCost",
   "upfrontRD",
   "annualInfra",
-  "flights"
+  "flights",
+  "seatsPerFlight"
 ]);
 
 const floatParams = new Set([
@@ -110,6 +111,7 @@ const scenarioInputs = (scenario === "Nominal") ? {
   upfrontRD: 250,           // $M / year
   annualInfra: 20,          // $M / year
   flights: 38,              // M flights / year
+  seatsPerFlight: 160,      // seats / flight
   fuelPerFlight: 2690,      // gal / flight
 } : (scenario === "Pessimistic") ? {
   contrailCirrusERF: 26,
@@ -119,6 +121,7 @@ const scenarioInputs = (scenario === "Nominal") ? {
   fuelCost: 120,
   upfrontRD: 500,
   annualInfra: 200,
+  seatsPerFlight: 160,
   flights: 38,
   fuelPerFlight: 2690,
 } : (scenario === "Optimistic") ? {
@@ -127,9 +130,10 @@ const scenarioInputs = (scenario === "Nominal") ? {
   additionalFuel: 0.1,
   maintenanceFactor: 1.1,
   fuelCost: 90,
-  upfrontRD: 150,
+  upfrontRD: 200,
   annualInfra: 10,
   flights: 38,
+  seatsPerFlight: 160,
   fuelPerFlight: 2690,
 } : {};
 
@@ -150,10 +154,12 @@ const AGWP = (agwpTimescale === 100) ? 8.8e-14
   : null;
 
 // constants
-const fuelIntensityCO2 = 3.89     // kg CO2 / kg fuel (ICAO - TODO)
+const fuelIntensityCO2 = 3.89     // kg CO2 / kg fuel (ICAO - TODO PH)
 const tonnesPerBarrel = 0.127     // tonnes / barrel Jet-A
 const gallonsPerBarrel = 42       // 42 US gallons / barrel
 const discountRate = 0.02         // 2%, assumed economic discount rate
+const passengerRevenues = 693e9   // $ / year, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
+const loadFactor = 0.83           // 83%, 2019 load factor from Teoh et al 2024
 ```
 
 <!-- Inputs -->
@@ -200,6 +206,11 @@ const annualInfra = Generators.input(annualInfraInput)
 // Global aviation activity (M flights / year)
 const flightsInput = Inputs.range([30, 50], { value: inputs.flights, step: 1})
 const flights = Generators.input(flightsInput)
+
+// Average seats per flight
+// https://www.oag.com/blog/average-flight-capacity-increasing-at-fastest-rate-ever
+const seatsPerFlightInput = Inputs.range([150, 180], { value: inputs.seatsPerFlight, step: 1})
+const seatsPerFlight = Generators.input(seatsPerFlightInput)
 ```
 
 <!-- Model -->
@@ -319,7 +330,6 @@ Annual Infrastructure Cost [$M / year] ${annualInfraInput}
 
 Additional fuel [%] ${additionalFuelInput}
 
-
 ## Mitigation Potential
 
 Contrail Cirrus Effective Radiative Forcing [mW / m<sup>2</sup>] ${contrailCirrusERFInput}
@@ -339,18 +349,15 @@ Timescale (years): ${agwpTimescaleInput}
 
 Flights [Millions flights / year]: ${flightsInput}
 
+Average seats per Flight: ${seatsPerFlightInput}
+
 ## Fuel
 
 Fuel Cost [$ / barrel] &nbsp;&nbsp; *(\$${Math.round(fuelCostTonnes)} / tonne)* ${fuelCostInput}
 
-Fuel per flight [gal / flight] ${fuelPerFlightInput}
+Average fuel per flight [gal / flight] ${fuelPerFlightInput}
 
 Maintenance Factor ${maintenanceFactorInput}
-
-
-
-
-<!-- Annual Fuel Consumption [Billions gallons / year] ${fuelConsumptionInput} -->
 
 </details>
 </div>
@@ -369,6 +376,9 @@ Maintenance Factor ${maintenanceFactorInput}
 <span class="big">$${Math.round(totalCost).toLocaleString('en-US')} M</span><br/>
 <span class="muted">per year</span>
 
+<span class="big">$${(100 * totalCost * 1e6 / passengerRevenues).toFixed(2)} %</span><br/>
+<span class="muted">of annual revenue</span>
+
 ## Mitigation cost
 
 <span class="big">$ ${(totalCost / contrailWarmingAvoided).toFixed(2)}</span><br/>
@@ -376,6 +386,9 @@ Maintenance Factor ${maintenanceFactorInput}
 
 <span class="big">$ ${(totalCost / flights ).toFixed(2)}</span><br/>
 <span class="muted">per flight</span>
+
+<span class="big">$ ${((totalCost / flights) / (loadFactor * seatsPerFlight)).toFixed(2)}</span><br/>
+<span class="muted">per seat</span>
 
 </div>
 
@@ -386,19 +399,17 @@ ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costP
 </div>
 </div>
 
-<div class="card">
+<!-- Additional outputs for reference -->
+<!-- <div class="card">
 
-<details>
-  <summary><b>Additional Outputs</b></summary>
+## Additional Outputs
 
-- **Annual Fuel Consumption** [Billions gallons / year] ${Math.round(fuelConsumption)}
-- **Annual Fuel Consumption** [Mt / year] ${Math.round(fuelConsumptionMt)}
+- **Annual Fuel Consumption** ${Math.round(fuelConsumption)} Billions gallons / year &nbsp; (${Math.round(fuelConsumptionMt)} Mt / year)
 - **Additional fuel cost**: $${Math.round(additionalFuelCost)}M / year ($${(additionalFuelCost / contrailWarmingAvoided).toFixed(2)} per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale}))
 - **Annual infrastructure**: $${annualInfra}M / year ($${(annualInfra / contrailWarmingAvoided).toFixed(2)} per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale}))
 - **Amortized R&D cost**: $${Math.round(amortizedRDCost)}M / year ($${(amortizedRDCost / contrailWarmingAvoided).toFixed(2)} per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale}))
 
-</details>
-</div>
+</div> -->
 
 <div class="source">
 

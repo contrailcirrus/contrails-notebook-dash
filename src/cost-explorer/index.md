@@ -154,7 +154,7 @@ const AGWP = (agwpTimescale === 100) ? 8.8e-14
   : null;
 
 // constants
-const fuelIntensityCO2 = 3.89     // kg CO2 / kg fuel (ICAO - TODO PH)
+const fuelIntensityCO2 = 3.89     // kg CO2 / kg fuel, ICAO's well-to-wake figure for Jet A
 const tonnesPerBarrel = 0.127     // tonnes / barrel Jet-A
 const gallonsPerBarrel = 42       // 42 US gallons / barrel
 const discountRate = 0.02         // 2%, assumed economic discount rate

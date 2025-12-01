@@ -1,6 +1,11 @@
 # Contrails Notebook Dashboards
 
-This is an [Observable Framework](https://observablehq.com/framework/) app. To install the required dependencies, run:
+This repository hosts public code and dashboards that support the [Contrails Notebook](https://notebook.contrails.org/).
+
+
+## Setup
+
+This repository is an [Observable Framework](https://observablehq.com/framework/) app. To install the required dependencies, run:
 
 ```
 npm install
@@ -22,6 +27,7 @@ For more, see <https://observablehq.com/framework/getting-started>.
 1. **Copy** [src/template](src/template) directory in the `src/` directory. Add files and subdirectories for components and data as necessary.
 2. **Update** template with dashboard
 3. **Push** to Github and the [static Observable site](https://dash.contrails.org) will update via [the Deploy Action](https://github.com/contrailcirrus/contrails-notebook-dash/blob/main/.github/workflows/deploy.yml)
+
 
 ## Embed in Notebook Post
 
@@ -106,6 +112,7 @@ This Framework project looks like this:
 **`src/components`** - You can put shared [JavaScript modules](https://observablehq.com/framework/imports) anywhere in your source root, but we recommend putting them here. This helps you pull code out of Markdown files and into JavaScript modules, making it easier to reuse code across pages, write tests and run linters, and even share code with vanilla web applications.
 
 **`observablehq.config.js`** - This is the [app configuration](https://observablehq.com/framework/config) file, such as the pages and sections in the sidebar navigation, and the app’s title.
+
 
 ## Command reference
 

@@ -64,7 +64,6 @@ const intParams = new Set([
   "agwpTimescale",
   "contrailCirrusERF",
   "efficacy",
-  "fuelCost",
   "upfrontRD",
   "annualInfra",
   "flights",
@@ -73,7 +72,8 @@ const intParams = new Set([
 
 const floatParams = new Set([
   "additionalFuel",
-  "maintenanceFactor"
+  "fuelCost",
+  "reroutingFactor"
 ]);
 
 // dashboard defaults
@@ -106,35 +106,32 @@ const scenarioInputs = (scenario === "Nominal") ? {
   contrailCirrusERF: 57,    // mW m-2
   efficacy: 70,             // %
   additionalFuel: 0.3,      // %
-  maintenanceFactor: 1.15,  //
-  fuelCost: 90,             // $ / barrel
+  reroutingFactor: 1.15,    //
+  fuelCost: 2.05,           // $ / gal
   upfrontRD: 250,           // $M / year
   annualInfra: 20,          // $M / year
   flights: 38,              // M flights / year
   seatsPerFlight: 160,      // seats / flight
-  fuelPerFlight: 2690,      // gal / flight
 } : (scenario === "Pessimistic") ? {
   contrailCirrusERF: 26,
   efficacy: 50,
   additionalFuel: 0.5,
-  maintenanceFactor: 1.2,
-  fuelCost: 120,
+  reroutingFactor: 1.2,
+  fuelCost: 2.80,
   upfrontRD: 500,
   annualInfra: 200,
   seatsPerFlight: 160,
   flights: 38,
-  fuelPerFlight: 2690,
 } : (scenario === "Optimistic") ? {
   contrailCirrusERF: 57,
   efficacy: 80,
   additionalFuel: 0.1,
-  maintenanceFactor: 1.1,
-  fuelCost: 90,
+  reroutingFactor: 1.1,
+  fuelCost: 2.00,
   upfrontRD: 200,
   annualInfra: 10,
   flights: 38,
   seatsPerFlight: 160,
-  fuelPerFlight: 2690,
 } : {};
 
 // merge the user inputs with the default scenario inputs
@@ -160,6 +157,8 @@ const gallonsPerBarrel = 42       // 42 US gallons / barrel
 const discountRate = 0.02         // 2%, assumed economic discount rate
 const passengerRevenues = 693e9   // $ / year, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
 const loadFactor = 0.83           // 83%, 2019 load factor from Teoh et al 2024
+const fuelEfficiency = 0.087      // gal / RTK, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
+const RTK = 1.19e12                // RTK, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
 ```
 
 <!-- Inputs -->
@@ -177,23 +176,14 @@ const efficacy = Generators.input(efficacyInput)
 const additionalFuelInput = Inputs.range([0, 0.5], { value: inputs.additionalFuel, step: 0.05 })
 const additionalFuel = Generators.input(additionalFuelInput)
 
-// gal / flight, 2025F https://www.iata.org/en/iata-repository/pressroom/
-const fuelPerFlightInput = Inputs.range([2500, 2800], { value: inputs.fuelPerFlight, step: 10 })
-const fuelPerFlight = Generators.input(fuelPerFlightInput)
-
 // Increases added fuel costs by an additional maintenance / compliance factor
-const maintenanceFactorInput = Inputs.range([1, 1.2], { value: inputs.maintenanceFactor, step: 0.01 })
-const maintenanceFactor = Generators.input(maintenanceFactorInput)
+const reroutingFactorInput = Inputs.range([1, 1.2], { value: inputs.reroutingFactor, step: 0.01 })
+const reroutingFactor = Generators.input(reroutingFactorInput)
 
-// Annual aviation fuel cost ($ / barrel)
+// Annual aviation fuel cost ($ / gal)
 // https://www.iata.org/en/publications/economics/fuel-monitor/
-const fuelCostInput = Inputs.range([80, 120], { value: inputs.fuelCost, step: 1 })
+const fuelCostInput = Inputs.range([2.0, 2.80], { value: inputs.fuelCost, step: 0.05 })
 const fuelCost = Generators.input(fuelCostInput)
-
-// Annual aviation fuel consumption (Billions gallons / year)
-// https://www.iata.org/en/iata-repository/pressroom/fact-sheets/industry-statistics/
-// const fuelConsumptionInput = Inputs.range([90, 110], { value: inputs.fuelConsumption, step: 1 })
-// const fuelConsumption = Generators.input(fuelConsumptionInput)
 
 // R&D costs ($M / year)
 const upfrontRDInput = Inputs.range([0, 500], { value: inputs.upfrontRD, step: 10})
@@ -216,10 +206,10 @@ const seatsPerFlight = Generators.input(seatsPerFlightInput)
 <!-- Model -->
 ```js
 // Fuel cost ($ / tonne)
-const fuelCostTonnes = fuelCost / tonnesPerBarrel
+const fuelCostTonnes = fuelCost * gallonsPerBarrel / tonnesPerBarrel
 
 // Aviation fuel consumption (Billions gallons / year)
-const fuelConsumption = fuelPerFlight * flights * 1e6 / 1e9
+const fuelConsumption = fuelEfficiency * RTK / 1e9
 
 // Aviation fuel consumption (Mtonnes fuel / year)
 const fuelConsumptionMt = (fuelConsumption * 1e9 / gallonsPerBarrel) * tonnesPerBarrel / 1e6
@@ -234,7 +224,7 @@ const contrailWarming = (contrailCirrusERF / 1e3) / (AGWP * 1e9)
 const contrailWarmingAvoided = Math.max(((efficacy / 100) * contrailWarming) - ((additionalFuel / 100) * fuelCO2), 0)
 
 // Fuel costs ($M / year)
-const additionalFuelCost = (additionalFuel / 100) * (fuelCostTonnes * fuelConsumptionMt) * maintenanceFactor
+const additionalFuelCost = (additionalFuel / 100) * (fuelCost * fuelConsumption * 1e9) * reroutingFactor / 1e6
 
 // R&D costs ($M / year)
 // TODO: Does it make sense to have amortized cost the same as AGWP Timescale?
@@ -261,11 +251,12 @@ const currentScenario = {
   contrailCirrusERF: contrailCirrusERF,
   efficacy: efficacy,
   additionalFuel: additionalFuel,
+  reroutingFactor: reroutingFactor,
   fuelCost: fuelCost,
-  fuelConsumption: fuelConsumption,
   upfrontRD: upfrontRD,
   annualInfra: annualInfra,
-  flights: flights
+  flights: flights,
+  seatsPerFlight: seatsPerFlight
 }
 ```
 
@@ -353,11 +344,9 @@ Average seats per Flight: ${seatsPerFlightInput}
 
 ## Fuel
 
-Fuel Cost [$ / barrel] &nbsp;&nbsp; *(\$${Math.round(fuelCostTonnes)} / tonne)* ${fuelCostInput}
+Fuel Cost [$ / gal] &nbsp;&nbsp; *(\$${Math.round(fuelCostTonnes)} / tonne)* ${fuelCostInput}
 
-Average fuel per flight [gal / flight] ${fuelPerFlightInput}
-
-Maintenance Factor ${maintenanceFactorInput}
+Rerouting Factor ${reroutingFactorInput}
 
 </details>
 </div>
@@ -400,7 +389,7 @@ ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costP
 </div>
 
 <!-- Additional outputs for reference -->
-<!-- <div class="card">
+<div class="card">
 
 ## Additional Outputs
 
@@ -409,7 +398,7 @@ ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costP
 - **Annual infrastructure**: $${annualInfra}M / year ($${(annualInfra / contrailWarmingAvoided).toFixed(2)} per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale}))
 - **Amortized R&D cost**: $${Math.round(amortizedRDCost)}M / year ($${(amortizedRDCost / contrailWarmingAvoided).toFixed(2)} per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale}))
 
-</div> -->
+</div>
 
 <div class="source">
 

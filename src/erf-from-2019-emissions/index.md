@@ -69,7 +69,7 @@ for (var t = 0; t <= 50; t++) {
 Plot.plot({
     width: Math.min(width, 600),
     height: 400/600*Math.min(width, 600),
-    style: "display: block; margin: auto",
+    className: "plot",
     x: {
         label: null,
         tickFormat: "d", // format as 2019 rather than 2,019

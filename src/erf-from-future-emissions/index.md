@@ -90,7 +90,7 @@ const labels = [
 Plot.plot({
     width: Math.min(width, 460),
     height: 400/460*Math.min(width, 460),
-    style: "display: block; margin: auto",
+    className: "plot",
     x: {
         label: null,
         tickFormat: "d",

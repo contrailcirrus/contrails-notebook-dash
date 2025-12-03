@@ -240,9 +240,11 @@ summary:hover {
   max-width: 640px;
 }
 
-svg {
+.plot {
    background-color: var(--theme-foreground);
    color: var(--theme-background);
    padding: 0.5em;
    border-radius: 0.25rem;
+   display: block; 
+   margin: auto;
 }

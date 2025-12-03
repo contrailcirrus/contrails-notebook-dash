@@ -66,6 +66,7 @@ const intParams = new Set([
   "efficacy",
   "upfrontRD",
   "annualInfra",
+  "annualWorkload",
   "flights",
   "seatsPerFlight"
 ]);
@@ -110,6 +111,7 @@ const scenarioInputs = (scenario === "Nominal") ? {
   fuelCost: 2.05,           // $ / gal
   upfrontRD: 250,           // $M / year
   annualInfra: 20,          // $M / year
+  annualWorkload: 10,       // $M / year
   flights: 38,              // M flights / year
   seatsPerFlight: 160,      // seats / flight
 } : (scenario === "Pessimistic") ? {
@@ -120,6 +122,7 @@ const scenarioInputs = (scenario === "Nominal") ? {
   fuelCost: 2.80,
   upfrontRD: 500,
   annualInfra: 200,
+  annualWorkload: 30,
   seatsPerFlight: 160,
   flights: 38,
 } : (scenario === "Optimistic") ? {
@@ -130,6 +133,7 @@ const scenarioInputs = (scenario === "Nominal") ? {
   fuelCost: 2.00,
   upfrontRD: 200,
   annualInfra: 10,
+  annualWorkload: 0,
   flights: 38,
   seatsPerFlight: 160,
 } : {};
@@ -193,6 +197,10 @@ const upfrontRD = Generators.input(upfrontRDInput)
 const annualInfraInput = Inputs.range([0, 200], { value: inputs.annualInfra, step: 5})
 const annualInfra = Generators.input(annualInfraInput)
 
+// Annual additional workload costs ($M / year)
+const annualWorkloadInput = Inputs.range([0, 200], { value: inputs.annualWorkload, step: 5})
+const annualWorkload = Generators.input(annualWorkloadInput)
+
 // Global aviation activity (M flights / year)
 const flightsInput = Inputs.range([30, 50], { value: inputs.flights, step: 1})
 const flights = Generators.input(flightsInput)
@@ -231,7 +239,7 @@ const additionalFuelCost = (additionalFuel / 100) * (fuelCost * fuelConsumption 
 const amortizedRDCost = upfrontRD * discountRate / (1 - (1 + discountRate)**(-agwpTimescale))
 
 // Total annual ($M / year)
-const totalCost = additionalFuelCost + amortizedRDCost + annualInfra
+const totalCost = additionalFuelCost + amortizedRDCost + annualInfra + annualWorkload
 ```
 
 <!-- Visuals -->
@@ -239,7 +247,8 @@ const totalCost = additionalFuelCost + amortizedRDCost + annualInfra
 const costPie = [
   {name: "Fuel", value: Math.round(100*(additionalFuelCost / totalCost)), format: (v) => `${v}%`, color: "#f26400"}, // solar-orange
   {name: "R&D", value: Math.round(100*(amortizedRDCost / totalCost)), format: (v) => `${v}%`, color: "#99a1af"}, // gray-400
-  {name: "Infrastructure", value: Math.round(100*(annualInfra / totalCost)), format: (v) => `${v}%`, color: "#1093ff"} // tropo-blue
+  {name: "Infrastructure", value: Math.round(100*(annualInfra / totalCost)), format: (v) => `${v}%`, color: "#1093ff"}, // tropo-blue
+  {name: "Workload", value: Math.round(100*(annualWorkload / totalCost)), format: (v) => `${v}%`, color: "#000000"}, // black
 ]
 ```
 
@@ -255,6 +264,7 @@ const currentScenario = {
   fuelCost: fuelCost,
   upfrontRD: upfrontRD,
   annualInfra: annualInfra,
+  annualWorkload: annualWorkload,
   flights: flights,
   seatsPerFlight: seatsPerFlight
 }
@@ -316,6 +326,8 @@ ${scenarioInput}
 Upfront R&D Cost [$M] ${upfrontRDInput}
 
 Annual Infrastructure Cost [$M / year] ${annualInfraInput}
+
+Annual Workload Cost [$M / year] ${annualWorkloadInput}
 
 ## Fuel cost
 
@@ -396,7 +408,8 @@ ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costP
 - **Annual Fuel Consumption** ${Math.round(fuelConsumption)} Billions gallons / year &nbsp; (${Math.round(fuelConsumptionMt)} Mt / year)
 - **Additional fuel cost**: $${Math.round(additionalFuelCost)}M / year ($${(additionalFuelCost / contrailWarmingAvoided).toFixed(2)} per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale}))
 - **Annual infrastructure**: $${annualInfra}M / year ($${(annualInfra / contrailWarmingAvoided).toFixed(2)} per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale}))
-- **Amortized R&D cost**: $${Math.round(amortizedRDCost)}M / year ($${(amortizedRDCost / contrailWarmingAvoided).toFixed(2)} per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale}))
+- **Annual workload**: $${annualWorkload}M / year ($${(annualWorkload / contrailWarmingAvoided).toFixed(2)} per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale}))
+- **Amortized R&D cost**: $${amortizedRDCost.toFixed(2)}M / year ($${(amortizedRDCost / contrailWarmingAvoided).toFixed(2)} per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale}))
 
 </div>
 

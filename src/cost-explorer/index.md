@@ -321,7 +321,7 @@ ${(window.self === window.top) ? html`<em>See original post on the <a href='http
 
 ${scenarioInput}
 
-## Development cost
+## Implementation cost
 
 Upfront R&D Cost [$M] ${upfrontRDInput}
 

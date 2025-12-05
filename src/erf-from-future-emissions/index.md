@@ -124,9 +124,3 @@ Plot.plot({
 })
 
 ```
-
-<div style="max-width: 460px; margin: auto" class="source">
-
-[Source ↗︎](https://github.com/contrailcirrus/contrails-notebook-dash/blob/main/src/erf-from-future-emissions/index.md)
-
-</div>

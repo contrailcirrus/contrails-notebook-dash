@@ -278,3 +278,7 @@ blockquote {
   border-left: 2px solid var(--theme-foreground-fainter);
   font-style: italic;
 }
+
+#observablehq-footer {
+  margin: 0 auto;
+}

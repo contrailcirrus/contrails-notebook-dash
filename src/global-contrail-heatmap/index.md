@@ -336,9 +336,3 @@ Mitigation Efficacy [%] ${efficacyInput}
 <span class="muted">Mtonnes CO<sub>2-eq</sub> per year (GWP-100)</span>
 
 </div>
-
-<div class="source">
-
-[Source ↗︎](https://github.com/contrailcirrus/contrails-notebook-dash/blob/main/src/2019-global-erf-map/index.md)
-
-</div>

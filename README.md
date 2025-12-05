@@ -39,7 +39,7 @@ For more, see <https://observablehq.com/framework/getting-started>.
 > See <a href="https://notebook.contrails.org/<slug>">web version of this post</a> for interactive dashboard.
 
 </noscript>
-<iframe id="dash1" width="100%" height="500" frameborder="0" scrolling="no"
+<iframe id="dash1" class="gh-article-image" width="100%" height="500" frameborder="0" scrolling="no"
   src="https://dash.contrails.org/template/index.html">
 </iframe>
 <script type="text/javascript">

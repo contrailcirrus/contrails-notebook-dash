@@ -159,8 +159,7 @@ const fuelIntensityCO2 = 3.89     // kg CO2 / kg fuel, ICAO's well-to-wake figur
 const tonnesPerBarrel = 0.127     // tonnes / barrel Jet-A
 const gallonsPerBarrel = 42       // 42 US gallons / barrel
 const discountRate = 0.02         // 2%, assumed economic discount rate
-// const passengerRevenues = 693e9   // $ / year, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
-const totalRevenues = 979e9   // $ / year, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
+const totalRevenues = 979e9       // $ / year, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
 const loadFactor = 0.83           // 83%, 2019 load factor from Teoh et al 2024
 const fuelEfficiency = 0.087      // gal / RTK, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
 const RTK = 1.19e12                // RTK, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
@@ -187,7 +186,7 @@ const reroutingFactor = Generators.input(reroutingFactorInput)
 
 // Annual aviation fuel cost ($ / gal)
 // https://www.iata.org/en/publications/economics/fuel-monitor/
-const fuelCostInput = Inputs.range([2.0, 2.80], { value: inputs.fuelCost, step: 0.05 })
+const fuelCostInput = Inputs.range([2.0, 2.80], { value: inputs.fuelCost, step: 0.01 })
 const fuelCost = Generators.input(fuelCostInput)
 
 // R&D costs ($M / year)
@@ -236,7 +235,6 @@ const contrailWarmingAvoided = Math.max(((efficacy / 100) * contrailWarming) - (
 const additionalFuelCost = (additionalFuel / 100) * (fuelCost * fuelConsumption * 1e9) * reroutingFactor / 1e6
 
 // R&D costs ($M / year)
-// TODO: Does it make sense to have amortized cost the same as AGWP Timescale?
 const amortizedRDCost = upfrontRD * discountRate / (1 - (1 + discountRate)**(-agwpTimescale))
 
 // Total annual ($M / year)
@@ -392,7 +390,7 @@ ${efficacyInput}
 ## Scenario
 
 <details>
-<summary>Time Horizon (years)</summary>
+<summary>Time Horizon [years]</summary>
 
 *Time horizon for calculating CO<sub>2-eq</sub> [Global Warming Potential](https://en.wikipedia.org/wiki/Global_warming_potential). The time horizon is also used to amortize the total R&D costs (above) using a ${Math.round(100*discountRate)}% discount rate.*
 
@@ -402,7 +400,7 @@ ${agwpTimescaleInput}
 
 
 <details>
-<summary>Flights [Millions flights / year]:</summary>
+<summary>Flights [Millions flights / year]</summary>
 
 *Total annual (jet) flights globally.*
 
@@ -422,7 +420,7 @@ ${seatsPerFlightInput}
 ## Fuel
 
 <details>
-<summary>Fuel Cost [$ / gal]  &nbsp;&nbsp; <em>(\$${Math.round(fuelCostTonnes)} / tonne)</em> </summary>
+<summary>Fuel Cost [$ / gal]  &nbsp; <em>(\$${Math.round(fuelCostTonnes)} / tonne)</em> </summary>
 
 *The annual average cost of Jet-A fuel, in US dollars per US gallon.*
 
@@ -473,6 +471,20 @@ ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costP
 
 <!-- Additional outputs for reference -->
 <div class="grid grid-cols-2" style="grid-auto-rows: auto;">
+
+<div class="card">
+
+<details>
+<summary><h2>Total cost</h2></summary>
+
+<span class="big">$${Math.round(totalCost).toLocaleString('en-US')} M</span><br/>
+<span class="muted">per year</span>
+
+<span class="big">${(100 * totalCost * 1e6 / totalRevenues).toFixed(2)} %</span><br/>
+<span class="muted">of <a href="https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/">expected 2025 aviation revenues</a></span>
+
+</details>
+</div>
 
 <div class="card">
 
@@ -530,10 +542,10 @@ ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costP
 </details>
 </div>
 
-<div class="card">
+<!-- <div class="card">
 
 <details>
-<summary><h2>Fuel consumption</h2></summary>
+<summary><h2>Baseline Fuel Consumption</h2></summary>
 
 <span class="big">${Math.round(fuelConsumption)}</span><br/>
 <span class="muted">Billions gallons per year</span>
@@ -542,23 +554,7 @@ ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costP
 <span class="muted">Megatonnes CO<sub>2</sub> per year</span>
 
 </details>
-</div>
-
-<div class="card">
-
-<details>
-<summary><h2>Annual cost</h2></summary>
-
-<span class="big">$${Math.round(totalCost).toLocaleString('en-US')} M</span><br/>
-<span class="muted">per year</span>
-
-<span class="big">${(100 * totalCost * 1e6 / totalRevenues).toFixed(2)} %</span><br/>
-<span class="muted">of expected 2025 aviation revenues (<a href="https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/">IATA 2025)</span>
-
-footnote [^1]
-
-</details>
-</div>
+</div> -->
 
 <div class="source">
 

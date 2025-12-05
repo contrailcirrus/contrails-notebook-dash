@@ -324,7 +324,7 @@ ${scenarioInput}
 ## Implementation cost
 
 <details>
-<summary>R&D Cost [$M]</summary>
+<summary>R&D [$M]</summary>
 
 *The total R&D necessary to bring contrail management to full scale, in millions of US dollars.*
 
@@ -386,7 +386,7 @@ ${efficacyInput}
 <div class="card">
 
 <details>
-  <summary><b>Advanced Inputs</b></summary>
+<summary><b>Advanced Inputs</b></summary>
 
 ## Scenario
 
@@ -455,7 +455,7 @@ ${reroutingFactorInput}
 <span class="big">$${Math.round(totalCost).toLocaleString('en-US')} M</span><br/>
 <span class="muted">per year</span>
 
-<span class="big">$${(100 * totalCost * 1e6 / passengerRevenues).toFixed(2)} %</span><br/>
+<span class="big">${(100 * totalCost * 1e6 / passengerRevenues).toFixed(2)} %</span><br/>
 <span class="muted">of annual revenue</span>
 
 ## Mitigation cost
@@ -481,16 +481,83 @@ ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costP
 <!-- Additional outputs for reference -->
 <div class="card">
 
-## Additional Outputs
+<details>
+<summary><b>Components</b></summary>
 
-- **Annual Fuel Consumption** ${Math.round(fuelConsumption)} Billions gallons / year &nbsp; (${Math.round(fuelConsumptionMt)} Mt / year)
-- **Additional fuel cost**: $${Math.round(additionalFuelCost)}M / year ($${(additionalFuelCost / contrailWarmingAvoided).toFixed(2)} per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale}))
-- **Annual infrastructure**: $${annualInfra}M / year ($${(annualInfra / contrailWarmingAvoided).toFixed(2)} per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale}))
-- **Annual workload**: $${annualWorkload}M / year ($${(annualWorkload / contrailWarmingAvoided).toFixed(2)} per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale}))
-- **Amortized R&D cost**: $${amortizedRDCost.toFixed(2)}M / year ($${(amortizedRDCost / contrailWarmingAvoided).toFixed(2)} per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale}))
+<div class="grid grid-cols-2">
+
+<div>
+
+## Additional fuel
+
+<span class="big">$${Math.round(additionalFuelCost)}M</span><br/>
+<span class="muted">per year</span>
+
+<span class="big">$${(additionalFuelCost / contrailWarmingAvoided).toFixed(2)}</span><br/>
+<span class="muted">per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale})</span>
 
 </div>
 
+<div>
+
+## Forecast & Measurement Infrastructure
+
+<span class="big">$${annualInfra}M</span><br/>
+<span class="muted">per year</span>
+
+<span class="big">$${(annualInfra / contrailWarmingAvoided).toFixed(2)}</span><br/>
+<span class="muted">per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale})</span>
+
+
+</div>
+
+<div>
+
+## R&D
+
+<span class="big">$${amortizedRDCost.toFixed(2)}M</span><br/>
+<span class="muted">per year</span>
+
+<span class="big">$${(amortizedRDCost / contrailWarmingAvoided).toFixed(2)}</span><br/>
+<span class="muted">per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale})</span>
+
+
+</div>
+
+<div>
+
+## Workload
+
+<span class="big">$${annualWorkload}M</span><br/>
+<span class="muted">per year</span>
+
+<span class="big">$${(annualWorkload / contrailWarmingAvoided).toFixed(2)}</span><br/>
+<span class="muted">per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale})</span>
+
+
+</div>
+
+</details>
+</div>
+
+<!-- Other outputs -->
+<div class="card">
+
+<details>
+<summary><b>Additional Outputs</b></summary>
+
+## Fuel consumption
+
+<span class="big">${Math.round(fuelConsumption)}</span><br/>
+<span class="muted">Billions gallons per year</span>
+
+<span class="big">${Math.round(fuelConsumptionMt)}</span><br/>
+<span class="muted">Megatonnes CO<sub>2</sub> per year</span>
+
+</div>
+
+</details>
+</div>
 <div class="source">
 
 [Source ↗︎](https://github.com/contrailcirrus/contrails-notebook-dash/blob/main/src/cost-explorer/index.md?plain=1)

@@ -198,7 +198,7 @@ const annualInfraInput = Inputs.range([0, 200], { value: inputs.annualInfra, ste
 const annualInfra = Generators.input(annualInfraInput)
 
 // Annual additional workload costs ($M / year)
-const annualWorkloadInput = Inputs.range([0, 200], { value: inputs.annualWorkload, step: 5})
+const annualWorkloadInput = Inputs.range([0, 30], { value: inputs.annualWorkload, step: 5})
 const annualWorkload = Generators.input(annualWorkloadInput)
 
 // Global aviation activity (M flights / year)
@@ -323,21 +323,63 @@ ${scenarioInput}
 
 ## Implementation cost
 
-Upfront R&D Cost [$M] ${upfrontRDInput}
+<details>
+<summary>R&D Cost [$M]</summary>
 
-Annual Infrastructure Cost [$M / year] ${annualInfraInput}
+*The total R&D necessary to bring contrail management to full scale, in millions of US dollars.*
 
-Annual Workload Cost [$M / year] ${annualWorkloadInput}
+</details>
+
+${upfrontRDInput}
+
+<details>
+<summary>Forecast & Measurement Infrastructure [$M / year]</summary>
+
+*The infrastructure required to forecast, monitor, and measure contrails, in millions of US dollars per year.*
+
+</details>
+
+${annualInfraInput}
+
+<details>
+<summary>Workload [$M / year]</summary>
+
+*The additional human capital necessary to implement contrail avoidance at full scale, in millions of US dollars per year.*
+
+</details>
+
+${annualWorkloadInput}
 
 ## Fuel cost
 
-Additional fuel [%] ${additionalFuelInput}
+<details>
+<summary>Additional Fuel [%]</summary>
+
+*Additional fleet-wide fuel consumption, as a percentage of total fuel consumption.*
+
+</details>
+
+${additionalFuelInput}
 
 ## Mitigation Potential
 
-Contrail Cirrus Effective Radiative Forcing [mW / m<sup>2</sup>] ${contrailCirrusERFInput}
+<details>
+<summary>Contrail Cirrus Effective Radiative Forcing [mW / m<sup>2</sup>]</summary>
 
-Mitigation Efficacy [%] ${efficacyInput}
+*Global annual contrail [effective radiative forcing](https://en.wikipedia.org/wiki/Radiative_forcing)*.
+
+</details>
+
+${contrailCirrusERFInput}
+
+<details>
+<summary>Mitigation Efficacy [%]</summary>
+
+*Details*
+
+</details>
+
+${efficacyInput}
 
 </div>
 
@@ -348,19 +390,55 @@ Mitigation Efficacy [%] ${efficacyInput}
 
 ## Scenario
 
-Timescale (years): ${agwpTimescaleInput}
+<details>
+<summary>Time Horizon (years)</summary>
 
-Flights [Millions flights / year]: ${flightsInput}
+*Time horizon for calculating CO<sub>2-eq</sub> [Global Warming Potential](https://en.wikipedia.org/wiki/Global_warming_potential). The time horizon is also used to amortize the total R&D costs (above) using a ${Math.round(100*discountRate)}% discount rate.*
 
-Average seats per Flight: ${seatsPerFlightInput}
+</details>
+
+${agwpTimescaleInput}
+
+
+<details>
+<summary>Flights [Millions flights / year]:</summary>
+
+*Total annual (jet) flights globally.*
+
+</details>
+
+${flightsInput}
+
+<details>
+<summary>Average Seats per Flight</summary>
+
+*The average number of seats per jet aircraft.*
+
+</details>
+
+${seatsPerFlightInput}
 
 ## Fuel
 
-Fuel Cost [$ / gal] &nbsp;&nbsp; *(\$${Math.round(fuelCostTonnes)} / tonne)* ${fuelCostInput}
+<details>
+<summary>Fuel Cost [$ / gal]  &nbsp;&nbsp; <em>(\$${Math.round(fuelCostTonnes)} / tonne)</em> </summary>
 
-Rerouting Factor ${reroutingFactorInput}
+*The annual average cost of Jet-A fuel, in US dollars per US gallon.*
 
 </details>
+
+${fuelCostInput}
+
+<details>
+<summary>Rerouting Factor</summary>
+
+*This factor scales the additional fuel cost to account for other potential rerouting costs, like overflight charges and engine maintenance.*
+
+</details>
+
+${reroutingFactorInput}
+
+
 </div>
 
 

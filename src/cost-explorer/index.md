@@ -1,5 +1,5 @@
 ---
-title: Cost Explorer
+title: Contrail Cost Explorer
 ---
 
 <!-- ----- Dashboard imports ----- -->
@@ -7,6 +7,11 @@ title: Cost Explorer
 <!-- Add any custom styles for this dashboard -->
 <!-- Other global styles in `style.css` -->
 <style>
+
+  body {
+    /* Ghost post max-width */
+    max-width: 1000px;
+  }
   .share {
     position: absolute;
     right: 0;
@@ -290,12 +295,16 @@ const shareButtonText =html`Share
 const shareButton = Inputs.button(shareButtonText, {value: null, reduce: shareScenario});
 ```
 
-# Cost Explorer
+# Contrail Cost Explorer
 
 <div id="sharecontainer" class="share">${shareButton}</div>
 
 <!-- Only show this message when on dash.contrails.org -->
 ${(window.self === window.top) ? html`<em>See original post on the <a href='https://notebook.contrails.org'>Contrails Notebook</a></em>` : ""}
+
+<div class="grid grid-cols-2" style="grid-auto-rows: auto;">
+
+<div>
 
 <div class="card">
 
@@ -308,7 +317,7 @@ ${scenarioInput}
 <details>
 <summary>R&D [$M]</summary>
 
-*The total R&D necessary to bring contrail management to full scale, in millions of US dollars.*
+*The total R&D necessary to make contrail management standard practice, in millions of US dollars.*
 
 </details>
 
@@ -337,7 +346,7 @@ ${annualWorkloadInput}
 <details>
 <summary>Additional Fuel [%]</summary>
 
-*Additional fleet-wide fuel consumption, as a percentage of total fuel consumption.*
+*Additional fuel (across the whole fleet) for contrail avoidance, as a percentage of global annual fuel consumption.*
 
 </details>
 
@@ -348,7 +357,7 @@ ${additionalFuelInput}
 <details>
 <summary>Contrail Cirrus Effective Radiative Forcing [mW / m<sup>2</sup>]</summary>
 
-*Global annual contrail [effective radiative forcing](https://en.wikipedia.org/wiki/Radiative_forcing)*.
+*Global annual contrail [effective radiative forcing](https://en.wikipedia.org/wiki/Radiative_forcing). Central estimate and uncertainty bounds taken from [Lee et al. 2021](https://linkinghub.elsevier.com/retrieve/pii/S1352231020305689).*
 
 </details>
 
@@ -357,7 +366,7 @@ ${contrailCirrusERFInput}
 <details>
 <summary>Mitigation Efficacy [%]</summary>
 
-*Details*
+*Contrail avoidance will never be 100% effective. This factor reduces the mitigation potential to capture errors in contrail forecasting and infeasible avoidance measures.*
 
 </details>
 
@@ -386,7 +395,7 @@ ${agwpTimescaleInput}
 <details>
 <summary>Fuel Cost [$ / gal]  &nbsp; <em>(\$${Math.round(fuelCostTonnes)} / tonne)</em> </summary>
 
-*The annual average cost of Jet-A fuel, in US dollars per US gallon.*
+*The average cost of Jet-A fuel, in US dollars per US gallon.*
 
 </details>
 
@@ -401,11 +410,11 @@ ${fuelCostInput}
 
 ${reroutingFactorInput}
 
-
+</div>
 </div>
 
+<div>
 
-<div class="grid grid-cols-2" style="grid-auto-rows: auto;">
 <div class="card">
 
 ## Warming avoided
@@ -431,10 +440,6 @@ ${reroutingFactorInput}
 ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costPie.map(c => c.name), colorRange: costPie.map(c => c.color)})}
 
 </div>
-</div>
-
-<!-- Additional outputs for reference -->
-<div class="grid grid-cols-2" style="grid-auto-rows: auto;">
 
 <div class="card">
 
@@ -450,6 +455,9 @@ ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costP
 
 </details>
 </div>
+
+<!-- Additional outputs for reference -->
+<div class="grid grid-cols-2" style="grid-auto-rows: auto;">
 
 <div class="card">
 
@@ -468,7 +476,7 @@ ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costP
 <div class="card">
 
 <details>
-<summary><h2>Forecast & Measurement Infrastructure</h2></summary>
+<summary><h2>Infrastructure</h2></summary>
 
 <span class="big">$${annualInfra}M</span><br/>
 <span class="muted">per year</span>

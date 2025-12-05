@@ -223,6 +223,7 @@ button {
   cursor: pointer;
 }
 
+/* Ensure radio buttons have pointers */
 input[type="radio"], label {
   cursor: pointer;
 }
@@ -244,6 +245,7 @@ summary:hover {
   max-width: 640px;
 }
 
+/* Observable Plot classes */
 .plot {
    background-color: var(--theme-foreground);
    color: var(--theme-background);
@@ -251,4 +253,20 @@ summary:hover {
    border-radius: 0.25rem;
    display: block; 
    margin: auto;
+}
+
+/* Disable Observable formatting of h2 under h1 */
+h1 + h2 {
+  font-size: revert;
+  font-style: normal;
+  font-weight: 400;
+  margin-bottom: 0.25rem;
+}
+
+/* Blockquote */
+blockquote {
+  padding: 0 1.5rem;
+  margin: 1rem 0;
+  border-left: 2px solid var(--theme-foreground-fainter);
+  font-style: italic;
 }

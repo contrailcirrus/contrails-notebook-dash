@@ -67,8 +67,6 @@ const intParams = new Set([
   "upfrontRD",
   "annualInfra",
   "annualWorkload",
-  "flights",
-  "seatsPerFlight"
 ]);
 
 const floatParams = new Set([
@@ -112,8 +110,6 @@ const scenarioInputs = (scenario === "Nominal") ? {
   upfrontRD: 250,           // $M / year
   annualInfra: 20,          // $M / year
   annualWorkload: 10,       // $M / year
-  flights: 38,              // M flights / year
-  seatsPerFlight: 160,      // seats / flight
 } : (scenario === "Pessimistic") ? {
   contrailCirrusERF: 26,
   efficacy: 50,
@@ -123,8 +119,6 @@ const scenarioInputs = (scenario === "Nominal") ? {
   upfrontRD: 500,
   annualInfra: 200,
   annualWorkload: 30,
-  seatsPerFlight: 160,
-  flights: 38,
 } : (scenario === "Optimistic") ? {
   contrailCirrusERF: 57,
   efficacy: 80,
@@ -134,8 +128,6 @@ const scenarioInputs = (scenario === "Nominal") ? {
   upfrontRD: 200,
   annualInfra: 10,
   annualWorkload: 0,
-  flights: 38,
-  seatsPerFlight: 160,
 } : {};
 
 // merge the user inputs with the default scenario inputs
@@ -160,9 +152,11 @@ const tonnesPerBarrel = 0.127     // tonnes / barrel Jet-A
 const gallonsPerBarrel = 42       // 42 US gallons / barrel
 const discountRate = 0.02         // 2%, assumed economic discount rate
 const totalRevenues = 979e9       // $ / year, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
-const loadFactor = 0.83           // 83%, 2019 load factor from Teoh et al 2024
 const fuelEfficiency = 0.087      // gal / RTK, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
 const RTK = 1.19e12                // RTK, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
+const flights = 38                 // millions of annual flights, 2025 expectations, https://www.iata.org/en/iata-repository/pressroom/fact-sheets/industry-statistics/
+const loadFactor = 0.83            // 83%, 2019 load factor from Teoh et al 2024
+const seatsPerFlight = 160         // average seats per flight, https://www.oag.com/blog/average-flight-capacity-increasing-at-fastest-rate-ever
 ```
 
 <!-- Inputs -->
@@ -200,15 +194,6 @@ const annualInfra = Generators.input(annualInfraInput)
 // Annual additional workload costs ($M / year)
 const annualWorkloadInput = Inputs.range([0, 30], { value: inputs.annualWorkload, step: 5})
 const annualWorkload = Generators.input(annualWorkloadInput)
-
-// Global aviation activity (M flights / year)
-const flightsInput = Inputs.range([30, 50], { value: inputs.flights, step: 1})
-const flights = Generators.input(flightsInput)
-
-// Average seats per flight
-// https://www.oag.com/blog/average-flight-capacity-increasing-at-fastest-rate-ever
-const seatsPerFlightInput = Inputs.range([150, 180], { value: inputs.seatsPerFlight, step: 1})
-const seatsPerFlight = Generators.input(seatsPerFlightInput)
 ```
 
 <!-- Model -->
@@ -264,8 +249,6 @@ const currentScenario = {
   upfrontRD: upfrontRD,
   annualInfra: annualInfra,
   annualWorkload: annualWorkload,
-  flights: flights,
-  seatsPerFlight: seatsPerFlight
 }
 ```
 
@@ -398,25 +381,6 @@ ${efficacyInput}
 
 ${agwpTimescaleInput}
 
-
-<details>
-<summary>Flights [Millions flights / year]</summary>
-
-*Total annual (jet) flights globally.*
-
-</details>
-
-${flightsInput}
-
-<details>
-<summary>Average Seats per Flight</summary>
-
-*The average number of seats per jet aircraft.*
-
-</details>
-
-${seatsPerFlightInput}
-
 ## Fuel
 
 <details>
@@ -477,11 +441,12 @@ ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costP
 <details>
 <summary><h2>Total cost</h2></summary>
 
-<span class="big">$${Math.round(totalCost).toLocaleString('en-US')} M</span><br/>
+<span class="big">$${Math.round(totalCost).toLocaleString('en-US')}M</span><br/>
 <span class="muted">per year</span>
 
 <span class="big">${(100 * totalCost * 1e6 / totalRevenues).toFixed(2)} %</span><br/>
-<span class="muted">of <a href="https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/">expected 2025 aviation revenues</a></span>
+<span class="muted">of expected 2025 aviation revenues</span>
+<!-- <span class="muted">of <a href="https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/">expected 2025 aviation revenues</a></span> -->
 
 </details>
 </div>

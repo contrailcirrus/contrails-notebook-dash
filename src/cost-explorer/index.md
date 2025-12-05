@@ -159,7 +159,8 @@ const fuelIntensityCO2 = 3.89     // kg CO2 / kg fuel, ICAO's well-to-wake figur
 const tonnesPerBarrel = 0.127     // tonnes / barrel Jet-A
 const gallonsPerBarrel = 42       // 42 US gallons / barrel
 const discountRate = 0.02         // 2%, assumed economic discount rate
-const passengerRevenues = 693e9   // $ / year, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
+// const passengerRevenues = 693e9   // $ / year, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
+const totalRevenues = 979e9   // $ / year, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
 const loadFactor = 0.83           // 83%, 2019 load factor from Teoh et al 2024
 const fuelEfficiency = 0.087      // gal / RTK, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
 const RTK = 1.19e12                // RTK, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
@@ -386,7 +387,7 @@ ${efficacyInput}
 <div class="card">
 
 <details>
-<summary><b>Advanced Inputs</b></summary>
+<summary><h2>Advanced Inputs</h2></summary>
 
 ## Scenario
 
@@ -450,14 +451,6 @@ ${reroutingFactorInput}
 <span class="big">${Math.round(contrailWarmingAvoided)}</span><br/>
 <span class="muted">Mtonnes CO<sub>2-eq</sub> per year (GWP-${agwpTimescale})</span>
 
-## Annual cost
-
-<span class="big">$${Math.round(totalCost).toLocaleString('en-US')} M</span><br/>
-<span class="muted">per year</span>
-
-<span class="big">${(100 * totalCost * 1e6 / passengerRevenues).toFixed(2)} %</span><br/>
-<span class="muted">of annual revenue</span>
-
 ## Mitigation cost
 
 <span class="big">$ ${(totalCost / contrailWarmingAvoided).toFixed(2)}</span><br/>
@@ -479,16 +472,12 @@ ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costP
 </div>
 
 <!-- Additional outputs for reference -->
+<div class="grid grid-cols-2" style="grid-auto-rows: auto;">
+
 <div class="card">
 
 <details>
-<summary><b>Components</b></summary>
-
-<div class="grid grid-cols-2">
-
-<div>
-
-## Additional fuel
+<summary><h2>Additional fuel</h2></summary>
 
 <span class="big">$${Math.round(additionalFuelCost)}M</span><br/>
 <span class="muted">per year</span>
@@ -496,11 +485,13 @@ ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costP
 <span class="big">$${(additionalFuelCost / contrailWarmingAvoided).toFixed(2)}</span><br/>
 <span class="muted">per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale})</span>
 
+</details>
 </div>
 
-<div>
+<div class="card">
 
-## Forecast & Measurement Infrastructure
+<details>
+<summary><h2>Forecast & Measurement Infrastructure</h2></summary>
 
 <span class="big">$${annualInfra}M</span><br/>
 <span class="muted">per year</span>
@@ -508,12 +499,13 @@ ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costP
 <span class="big">$${(annualInfra / contrailWarmingAvoided).toFixed(2)}</span><br/>
 <span class="muted">per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale})</span>
 
-
+</details>
 </div>
 
-<div>
+<div class="card">
 
-## R&D
+<details>
+<summary><h2>R&D</h2></summary>
 
 <span class="big">$${amortizedRDCost.toFixed(2)}M</span><br/>
 <span class="muted">per year</span>
@@ -521,12 +513,13 @@ ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costP
 <span class="big">$${(amortizedRDCost / contrailWarmingAvoided).toFixed(2)}</span><br/>
 <span class="muted">per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale})</span>
 
-
+</details>
 </div>
 
-<div>
+<div class="card">
 
-## Workload
+<details>
+<summary><h2>Workload</h2></summary>
 
 <span class="big">$${annualWorkload}M</span><br/>
 <span class="muted">per year</span>
@@ -534,19 +527,13 @@ ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costP
 <span class="big">$${(annualWorkload / contrailWarmingAvoided).toFixed(2)}</span><br/>
 <span class="muted">per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale})</span>
 
-
-</div>
-
 </details>
 </div>
 
-<!-- Other outputs -->
 <div class="card">
 
 <details>
-<summary><b>Additional Outputs</b></summary>
-
-## Fuel consumption
+<summary><h2>Fuel consumption</h2></summary>
 
 <span class="big">${Math.round(fuelConsumption)}</span><br/>
 <span class="muted">Billions gallons per year</span>
@@ -554,10 +541,25 @@ ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costP
 <span class="big">${Math.round(fuelConsumptionMt)}</span><br/>
 <span class="muted">Megatonnes CO<sub>2</sub> per year</span>
 
+</details>
 </div>
+
+<div class="card">
+
+<details>
+<summary><h2>Annual cost</h2></summary>
+
+<span class="big">$${Math.round(totalCost).toLocaleString('en-US')} M</span><br/>
+<span class="muted">per year</span>
+
+<span class="big">${(100 * totalCost * 1e6 / totalRevenues).toFixed(2)} %</span><br/>
+<span class="muted">of expected 2025 aviation revenues (<a href="https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/">IATA 2025)</span>
+
+footnote [^1]
 
 </details>
 </div>
+
 <div class="source">
 
 [Source ↗︎](https://github.com/contrailcirrus/contrails-notebook-dash/blob/main/src/cost-explorer/index.md?plain=1)

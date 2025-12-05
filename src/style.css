@@ -233,6 +233,14 @@ summary {
   margin-bottom: 0.25rem;
 }
 
+summary h1,
+summary h2,
+summary h3,
+summary h4 {
+  display: inline;
+  margin: 0;
+}
+
 summary:hover {
   cursor: pointer;
   /*color: ;*/

@@ -72,7 +72,7 @@ const intParams = new Set([
   "upfrontRD",
   "ongoingRD",
   "annualInfra",
-  "annualWorkload",
+  "annualWorkforce",
 ]);
 
 const floatParams = new Set([
@@ -116,7 +116,7 @@ const scenarioInputs = (scenario === "Nominal") ? {
   upfrontRD: 250,           // $M / year
   ongoingRD: 10,            // $M / year
   annualInfra: 20,          // $M / year
-  annualWorkload: 15,       // $M / year
+  annualWorkforce: 15,       // $M / year
 } : (scenario === "Pessimistic") ? {
   contrailCirrusERF: 26,
   efficacy: 50,
@@ -126,7 +126,7 @@ const scenarioInputs = (scenario === "Nominal") ? {
   upfrontRD: 500,
   ongoingRD: 30,
   annualInfra: 200,
-  annualWorkload: 30,
+  annualWorkforce: 30,
 } : (scenario === "Optimistic") ? {
   contrailCirrusERF: 57,
   efficacy: 80,
@@ -136,7 +136,7 @@ const scenarioInputs = (scenario === "Nominal") ? {
   upfrontRD: 200,
   ongoingRD: 5,
   annualInfra: 10,
-  annualWorkload: 5,
+  annualWorkforce: 5,
 } : {};
 
 // merge the user inputs with the default scenario inputs
@@ -205,8 +205,8 @@ const annualInfraInput = Inputs.range([0, 200], { value: inputs.annualInfra, ste
 const annualInfra = Generators.input(annualInfraInput)
 
 // Annual additional workload costs ($M / year)
-const annualWorkloadInput = Inputs.range([0, 30], { value: inputs.annualWorkload, step: 1})
-const annualWorkload = Generators.input(annualWorkloadInput)
+const annualWorkforceInput = Inputs.range([0, 30], { value: inputs.annualWorkforce, step: 1})
+const annualWorkforce = Generators.input(annualWorkforceInput)
 ```
 
 <!-- Model -->
@@ -237,7 +237,7 @@ const amortizedRDCost = upfrontRD * discountRate / (1 - (1 + discountRate)**(-rn
 const RDCost = amortizedRDCost + ongoingRD
 
 // Total annual ($M / year)
-const totalCost = additionalFuelCost + RDCost + annualInfra + annualWorkload
+const totalCost = additionalFuelCost + RDCost + annualInfra + annualWorkforce
 ```
 
 <!-- Visuals -->
@@ -246,7 +246,7 @@ const costPie = [
   {name: "Fuel", value: Math.round(100*(additionalFuelCost / totalCost)), format: (v) => `${v}%`, color: "#f26400"}, // solar-orange
   {name: "Infrastructure", value: Math.round(100*(annualInfra / totalCost)), format: (v) => `${v}%`, color: "#1093ff"}, // tropo-blue
   {name: "R&D", value: Math.round(100*(RDCost / totalCost)), format: (v) => `${v}%`, color: "#99a1af"}, // gray-400
-  {name: "Workload", value: Math.round(100*(annualWorkload / totalCost)), format: (v) => `${v}%`, color: "#000000"}, // black
+  {name: "Workforce", value: Math.round(100*(annualWorkforce / totalCost)), format: (v) => `${v}%`, color: "#000000"}, // black
 ]
 ```
 
@@ -263,7 +263,7 @@ const currentScenario = {
   upfrontRD: upfrontRD,
   ongoingRD: ongoingRD,
   annualInfra: annualInfra,
-  annualWorkload: annualWorkload,
+  annualWorkforce: annualWorkforce,
 }
 ```
 
@@ -352,13 +352,13 @@ ${ongoingRDInput}
 ${annualInfraInput}
 
 <details>
-<summary>Workload [$M / year]</summary>
+<summary>Workforce [$M / year]</summary>
 
 *The additional human capital necessary to implement contrail avoidance at full scale, in millions of US dollars per year.*
 
 </details>
 
-${annualWorkloadInput}
+${annualWorkforceInput}
 
 ## Fuel cost
 
@@ -523,12 +523,12 @@ ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costP
 <div class="card">
 
 <details>
-<summary><h2>Workload</h2></summary>
+<summary><h2>Workforce</h2></summary>
 
-<span class="big">$${annualWorkload}M</span><br/>
+<span class="big">$${annualWorkforce}M</span><br/>
 <span class="muted">per year</span>
 
-<span class="big">$${(annualWorkload / contrailWarmingAvoided).toFixed(2)}</span><br/>
+<span class="big">$${(annualWorkforce / contrailWarmingAvoided).toFixed(2)}</span><br/>
 <span class="muted">per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale})</span>
 
 </details>

@@ -6,4 +6,3 @@ title: Dev
 
 > Dashboards in development
 
-- [Cost Explorer](/cost-explorer/index.html)

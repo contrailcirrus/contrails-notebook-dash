@@ -156,6 +156,7 @@ const fuelIntensityCO2 = 3.89     // kg CO2 / kg fuel, ICAO's well-to-wake figur
 const tonnesPerBarrel = 0.127     // tonnes / barrel Jet-A
 const gallonsPerBarrel = 42       // 42 US gallons / barrel
 const discountRate = 0.02         // 2%, assumed economic discount rate
+const rndAmortization = 50        // years, amortization time for upfront R&D
 const totalRevenues = 979e9       // $ / year, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
 const fuelEfficiency = 0.087      // gal / RTK, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
 const RTK = 1.19e12                // RTK, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
@@ -225,7 +226,7 @@ const contrailWarmingAvoided = Math.max(((efficacy / 100) * contrailWarming) - (
 const additionalFuelCost = (additionalFuel / 100) * (fuelCost * fuelConsumption * 1e9) * reroutingFactor / 1e6
 
 // R&D costs ($M / year)
-const amortizedRDCost = upfrontRD * discountRate / (1 - (1 + discountRate)**(-agwpTimescale))
+const amortizedRDCost = upfrontRD * discountRate / (1 - (1 + discountRate)**(-rndAmortization))
 
 // Total annual ($M / year)
 const totalCost = additionalFuelCost + amortizedRDCost + annualInfra + annualWorkload
@@ -317,7 +318,7 @@ ${scenarioInput}
 <details>
 <summary>R&D [$M]</summary>
 
-*The total R&D necessary to make contrail management standard practice, in millions of US dollars.*
+*The upfront R&D necessary to make contrail management standard practice, in millions of US dollars. This R&D value is amortized over ${rndAmortization} at a discount rate of ${discountRate} to come up with an annual cost.*
 
 </details>
 
@@ -464,7 +465,7 @@ ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costP
 <details>
 <summary><h2>Additional fuel</h2></summary>
 
-<span class="big">$${Math.round(additionalFuelCost)}M</span><br/>
+<span class="big">$${Math.round(additionalFuelCost).toLocaleString('en-US')}M</span><br/>
 <span class="muted">per year</span>
 
 <span class="big">$${(additionalFuelCost / contrailWarmingAvoided).toFixed(2)}</span><br/>

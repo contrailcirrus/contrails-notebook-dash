@@ -70,6 +70,7 @@ const intParams = new Set([
   "contrailCirrusERF",
   "efficacy",
   "upfrontRD",
+  "ongoingRD",
   "annualInfra",
   "annualWorkload",
 ]);
@@ -113,6 +114,7 @@ const scenarioInputs = (scenario === "Nominal") ? {
   reroutingFactor: 1.15,    //
   fuelCost: 2.05,           // $ / gal
   upfrontRD: 250,           // $M / year
+  ongoingRD: 10,            // $M / year
   annualInfra: 20,          // $M / year
   annualWorkload: 10,       // $M / year
 } : (scenario === "Pessimistic") ? {
@@ -122,6 +124,7 @@ const scenarioInputs = (scenario === "Nominal") ? {
   reroutingFactor: 1.2,
   fuelCost: 2.80,
   upfrontRD: 500,
+  ongoingRD: 30,
   annualInfra: 200,
   annualWorkload: 30,
 } : (scenario === "Optimistic") ? {
@@ -131,6 +134,7 @@ const scenarioInputs = (scenario === "Nominal") ? {
   reroutingFactor: 1.1,
   fuelCost: 2.00,
   upfrontRD: 200,
+  ongoingRD: 5,
   annualInfra: 10,
   annualWorkload: 0,
 } : {};
@@ -190,15 +194,18 @@ const fuelCostInput = Inputs.range([2.0, 2.80], { value: inputs.fuelCost, step: 
 const fuelCost = Generators.input(fuelCostInput)
 
 // R&D costs ($M / year)
-const upfrontRDInput = Inputs.range([0, 500], { value: inputs.upfrontRD, step: 10})
+const upfrontRDInput = Inputs.range([100, 500], { value: inputs.upfrontRD, step: 10})
 const upfrontRD = Generators.input(upfrontRDInput)
+
+const ongoingRDInput = Inputs.range([0, 30], { value: inputs.ongoingRD, step: 1})
+const ongoingRD = Generators.input(ongoingRDInput)
 
 // Annual monitoring infrastructure costs ($M / year)
 const annualInfraInput = Inputs.range([0, 200], { value: inputs.annualInfra, step: 5})
 const annualInfra = Generators.input(annualInfraInput)
 
 // Annual additional workload costs ($M / year)
-const annualWorkloadInput = Inputs.range([0, 30], { value: inputs.annualWorkload, step: 5})
+const annualWorkloadInput = Inputs.range([0, 30], { value: inputs.annualWorkload, step: 1})
 const annualWorkload = Generators.input(annualWorkloadInput)
 ```
 
@@ -227,17 +234,18 @@ const additionalFuelCost = (additionalFuel / 100) * (fuelCost * fuelConsumption 
 
 // R&D costs ($M / year)
 const amortizedRDCost = upfrontRD * discountRate / (1 - (1 + discountRate)**(-rndAmortization))
+const RDCost = amortizedRDCost + ongoingRD
 
 // Total annual ($M / year)
-const totalCost = additionalFuelCost + amortizedRDCost + annualInfra + annualWorkload
+const totalCost = additionalFuelCost + RDCost + annualInfra + annualWorkload
 ```
 
 <!-- Visuals -->
 ```js
 const costPie = [
   {name: "Fuel", value: Math.round(100*(additionalFuelCost / totalCost)), format: (v) => `${v}%`, color: "#f26400"}, // solar-orange
-  {name: "R&D", value: Math.round(100*(amortizedRDCost / totalCost)), format: (v) => `${v}%`, color: "#99a1af"}, // gray-400
   {name: "Infrastructure", value: Math.round(100*(annualInfra / totalCost)), format: (v) => `${v}%`, color: "#1093ff"}, // tropo-blue
+  {name: "R&D", value: Math.round(100*(RDCost / totalCost)), format: (v) => `${v}%`, color: "#99a1af"}, // gray-400
   {name: "Workload", value: Math.round(100*(annualWorkload / totalCost)), format: (v) => `${v}%`, color: "#000000"}, // black
 ]
 ```
@@ -253,6 +261,7 @@ const currentScenario = {
   reroutingFactor: reroutingFactor,
   fuelCost: fuelCost,
   upfrontRD: upfrontRD,
+  ongoingRD: ongoingRD,
   annualInfra: annualInfra,
   annualWorkload: annualWorkload,
 }
@@ -316,13 +325,22 @@ ${scenarioInput}
 ## Implementation cost
 
 <details>
-<summary>R&D [$M]</summary>
+<summary>Upfront R&D [$M]</summary>
 
 *The upfront R&D necessary to make contrail management standard practice, in millions of US dollars. This R&D value is amortized over ${rndAmortization} at a discount rate of ${discountRate} to come up with an annual cost.*
 
 </details>
 
 ${upfrontRDInput}
+
+<details>
+<summary>Ongoing R&D [$M / year]</summary>
+
+*The total R&D necessary to make contrail management standard practice, in millions of US dollars. This R&D value is amortized over ${years} at a discount rate of ${discountRate} to come up with an annual cost.*
+
+</details>
+
+${ongoingRDInput}
 
 <details>
 <summary>Forecast & Measurement Infrastructure [$M / year]</summary>
@@ -493,10 +511,10 @@ ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costP
 <details>
 <summary><h2>R&D</h2></summary>
 
-<span class="big">$${amortizedRDCost.toFixed(2)}M</span><br/>
+<span class="big">$${RDCost.toFixed(2)}M</span><br/>
 <span class="muted">per year</span>
 
-<span class="big">$${(amortizedRDCost / contrailWarmingAvoided).toFixed(2)}</span><br/>
+<span class="big">$${(RDCost / contrailWarmingAvoided).toFixed(2)}</span><br/>
 <span class="muted">per tonne CO<sub>2-eq</sub> (GWP-${agwpTimescale})</span>
 
 </details>

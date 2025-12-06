@@ -116,7 +116,7 @@ const scenarioInputs = (scenario === "Nominal") ? {
   upfrontRD: 250,           // $M / year
   ongoingRD: 10,            // $M / year
   annualInfra: 20,          // $M / year
-  annualWorkload: 10,       // $M / year
+  annualWorkload: 15,       // $M / year
 } : (scenario === "Pessimistic") ? {
   contrailCirrusERF: 26,
   efficacy: 50,
@@ -136,7 +136,7 @@ const scenarioInputs = (scenario === "Nominal") ? {
   upfrontRD: 200,
   ongoingRD: 5,
   annualInfra: 10,
-  annualWorkload: 0,
+  annualWorkload: 5,
 } : {};
 
 // merge the user inputs with the default scenario inputs

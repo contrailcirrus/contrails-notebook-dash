@@ -161,12 +161,13 @@ const tonnesPerBarrel = 0.127     // tonnes / barrel Jet-A
 const gallonsPerBarrel = 42       // 42 US gallons / barrel
 const discountRate = 0.02         // 2%, assumed economic discount rate
 const rndAmortization = 50        // years, amortization time for upfront R&D
-const totalRevenues = 979e9       // $ / year, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
+// const totalRevenues = 979e9       // $ / year, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
+const totalExpenses = 913e9       // $ / year, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
 const fuelEfficiency = 0.087      // gal / RTK, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
 const RTK = 1.19e12                // RTK, 2025 expectations, https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/
 const flights = 38                 // millions of annual flights, 2025 expectations, https://www.iata.org/en/iata-repository/pressroom/fact-sheets/industry-statistics/
-const loadFactor = 0.83            // 83%, 2019 load factor from Teoh et al 2024
-const seatsPerFlight = 160         // average seats per flight, https://www.oag.com/blog/average-flight-capacity-increasing-at-fastest-rate-ever
+// const loadFactor = 0.83            // 83%, 2019 load factor from Teoh et al 2024
+// const seatsPerFlight = 160         // average seats per flight, https://www.oag.com/blog/average-flight-capacity-increasing-at-fastest-rate-ever
 ```
 
 <!-- Inputs -->
@@ -316,6 +317,8 @@ ${(window.self === window.top) ? html`<em>See original post on the <a href='http
 
 <div>
 
+### Inputs
+
 <div class="card">
 
 ## Scenario
@@ -327,7 +330,7 @@ ${scenarioInput}
 <details>
 <summary>Upfront R&D [$M]</summary>
 
-*The upfront R&D necessary to make contrail management standard practice, in millions of US dollars. This R&D value is amortized over ${rndAmortization} at a discount rate of ${discountRate} to come up with an annual cost.*
+*The upfront R&D necessary to make contrail management standard practice, in millions of US dollars. This R&D value is amortized over ${rndAmortization} years at a discount rate of ${Math.round(discountRate * 100)}% to come up with an annual cost.*
 
 </details>
 
@@ -336,7 +339,7 @@ ${upfrontRDInput}
 <details>
 <summary>Ongoing R&D [$M / year]</summary>
 
-*The total R&D necessary to make contrail management standard practice, in millions of US dollars. This R&D value is amortized over ${years} at a discount rate of ${discountRate} to come up with an annual cost.*
+*The ongoing R&D necessary to maintain and improve contrail management practices over time, in millions of US dollars.*
 
 </details>
 
@@ -345,7 +348,7 @@ ${ongoingRDInput}
 <details>
 <summary>Forecast & Measurement Infrastructure [$M / year]</summary>
 
-*The infrastructure required to forecast, monitor, and measure contrails, in millions of US dollars per year.*
+*The recurring cost of infrastructure required to forecast, monitor, and measure contrails, in millions of US dollars per year.*
 
 </details>
 
@@ -354,7 +357,7 @@ ${annualInfraInput}
 <details>
 <summary>Workforce [$M / year]</summary>
 
-*The additional human capital necessary to implement contrail avoidance at full scale, in millions of US dollars per year.*
+*The additional human capital necessary to implement contrail avoidance at scale, in millions of US dollars per year.*
 
 </details>
 
@@ -376,7 +379,7 @@ ${additionalFuelInput}
 <details>
 <summary>Contrail Cirrus Effective Radiative Forcing [mW / m<sup>2</sup>]</summary>
 
-*Global annual contrail [effective radiative forcing](https://en.wikipedia.org/wiki/Radiative_forcing). Central estimate and uncertainty bounds taken from [Lee et al. 2021](https://linkinghub.elsevier.com/retrieve/pii/S1352231020305689).*
+*Global annual contrail effective radiative forcing (ERF). Central estimate and bounds taken from [Lee et al. 2021](https://linkinghub.elsevier.com/retrieve/pii/S1352231020305689).*
 
 </details>
 
@@ -396,14 +399,14 @@ ${efficacyInput}
 <div class="card">
 
 <details>
-<summary><h2>Advanced Inputs</h2></summary>
+<summary><h2>Additional Inputs</h2></summary>
 
 ## Scenario
 
 <details>
 <summary>Time Horizon [years]</summary>
 
-*Time horizon for calculating CO<sub>2-eq</sub> [Global Warming Potential](https://en.wikipedia.org/wiki/Global_warming_potential). The time horizon is also used to amortize the total R&D costs (above) using a ${Math.round(100*discountRate)}% discount rate.*
+*Time horizon for calculating CO<sub>2-eq</sub> [Global Warming Potential](https://en.wikipedia.org/wiki/Global_warming_potential).*
 
 </details>
 
@@ -434,6 +437,8 @@ ${reroutingFactorInput}
 
 <div>
 
+### Outputs
+
 <div class="card">
 
 ## Warming avoided
@@ -449,8 +454,8 @@ ${reroutingFactorInput}
 <span class="big">$ ${(totalCost / flights ).toFixed(2)}</span><br/>
 <span class="muted">per flight</span>
 
-<span class="big">$ ${((totalCost / flights) / (loadFactor * seatsPerFlight)).toFixed(2)}</span><br/>
-<span class="muted">per seat</span>
+<!-- <span class="big">$ ${((totalCost / flights) / (loadFactor * seatsPerFlight)).toFixed(2)}</span><br/>
+<span class="muted">per seat</span> -->
 
 </div>
 
@@ -468,9 +473,9 @@ ${DonutChart(costPie, {centerText: "Annual Cost", width: 300, colorDomain: costP
 <span class="big">$${Math.round(totalCost).toLocaleString('en-US')}M</span><br/>
 <span class="muted">per year</span>
 
-<span class="big">${(100 * totalCost * 1e6 / totalRevenues).toFixed(2)} %</span><br/>
-<span class="muted">of expected 2025 aviation revenues</span>
-<!-- <span class="muted">of <a href="https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/">expected 2025 aviation revenues</a></span> -->
+<span class="big">${(100 * totalCost * 1e6 / totalExpenses).toFixed(2)} %</span><br/>
+<!-- <span class="muted">of expected 2025 aviation revenues</span> -->
+<span class="muted">of expected <a href="https://www.iata.org/en/pressroom/2025-releases/2025-06-02-01/">2025 aviation expenses</a></span>
 
 </details>
 </div>

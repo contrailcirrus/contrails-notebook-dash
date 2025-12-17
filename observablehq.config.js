@@ -21,6 +21,12 @@ export default {
   head: `
     <meta name="robots" content="noindex">
     <link rel="icon" href="https://storage.googleapis.com/contrails-301217-public-data/website/dynamic.svg" type="image/svg+xml">
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-rSxPQzhl4lT6Ylos3MWOu.js"></script>
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
   `,
 
   // The path to the source root.

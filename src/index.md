@@ -12,7 +12,7 @@ title: Index
     - [Effective Radiative Forcing from 2019 Aviation Emissions](/erf-from-2019-emissions/index.html)
     - [Effective Radiative Forcing during 2019](/erf-during-2019/index.html)
     - [Effective Radiative Forcing from Future Emissions](/erf-from-future-emissions/index.html)
-- [**The Cost of Contrail Managemet**](https://notebook.contrails.org/the-cost-of-contrail-management/ )
+- [**The Cost of Contrail Management**](https://notebook.contrails.org/the-cost-of-contrail-management/ )
     - [Cost Explorer](/cost-explorer/index.html)
 
 ## Standalone Dashboards

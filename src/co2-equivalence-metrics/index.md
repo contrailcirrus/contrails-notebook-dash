@@ -1,0 +1,370 @@
+---
+title: Dashboard Template
+---
+
+<!-- Imports -->
+```js
+import "../components/observer.js";
+
+```
+
+<!-- Custom styles -->
+<style>
+    body {
+        /* Ghost post max-width */
+        max-width: 1000px;
+    }
+</style>
+
+<!-- Constant inputs -->
+```js
+// constants
+const seconds_per_year = 31557600; // s
+const mass_atmosphere = 5.1352e18; // kg 
+const m_co2 = 44.01; // g/mol
+const m_air = 28.97; // g/mol
+const eta_co2 = 400e-6;  // mol/mol
+const surface_area_earth = 510072000000000.0; // m
+
+// CO2 impulse response function coefficients
+// https://doi.org/10.5194/acp-13-2793-2013
+const a0 = 0.2174; // nondim
+const a1 = 0.2240; // nondim
+const a2 = 0.2824; // nondim
+const a3 = 0.2763; // nomdim
+const t1 = 394.4; // yr
+const t2 = 36.54; // yr
+const t3 = 4.304; // yr
+
+// Temperature impulse response function coefficients
+//  https://doi.org/10.1016/j.enpol.2007.08.039
+const c1 = 0.631; // K/(W/m2)
+const c2 = 0.429; // K/(W/m2)
+const d1 = 8.4;   // yr
+const d2 = 409.5; // yr
+
+```
+
+<!-- User inputs -->
+```js
+// Equivalence metric (GWP or GTP)
+const metric_input = Inputs.radio(["GWP", "GTP"], {value: "GWP"});
+const metric = Generators.input(metric_input);
+
+// Metric time horizon (years)
+const horizon_input = Inputs.range([5, 200], {step: 1, value: 100, transform: Math.sqrt});
+const horizon = Generators.input(horizon_input);
+
+```
+
+<!-- Read contrail radiative forcing from CSV file -->
+```js
+const rf_contrail = FileAttachment("contrail.csv").csv({"typed": true});
+
+```
+
+<!-- Compute contrail AGWP -->
+```js
+var agwp_contrail = 0.0;
+for (var i = 0; i < rf_contrail.length; i++) {
+    agwp_contrail += rf_contrail[i].rf * 300.0 * surface_area_earth; // J
+}
+
+```
+
+<!-- Compute contrail AGTP -->
+```js
+const agtp_contrail = agwp_contrail / (surface_area_earth * seconds_per_year) * (
+    c1 / d1 * Math.exp(-horizon / d1) +
+    c2 / d2 * Math.exp(-horizon / d2)
+);
+
+```
+
+<!-- Compute temperature change from contrail -->
+```js
+var t_contrail = [];
+for (var t = 0; t < 200; t++) {
+    const dT = agwp_contrail / (surface_area_earth * seconds_per_year) * (
+        c1 / d1 * Math.exp(-t / d1) +
+        c2 / d2 * Math.exp(-t / d2)
+    );
+    t_contrail.push({"t": t, "dT": dT});
+}
+
+```
+
+<!-- Compute AGWP for 1 kg CO2 -->
+```js
+const agwp_kg_co2 = 5.35 * seconds_per_year * surface_area_earth * (
+    a0 * horizon +
+    a1 * t1 * (1.0 - Math.exp(-horizon/t1)) +
+    a2 * t2 * (1.0 - Math.exp(-horizon/t2)) +
+    a3 * t3 * (1.0 - Math.exp(-horizon/t3))
+) / (eta_co2 * mass_atmosphere); // J/kg
+
+```
+
+<!-- Compute AGTP for 1 kg CO2 -->
+```js
+const rf0_kg = 5.35 / (eta_co2 * mass_atmosphere);
+const agtp_kg_co2 = rf0_kg * (
+    a0 * c1 * (1.0 - Math.exp(-horizon/d1)) +
+    a0 * c2 * (1.0 - Math.exp(-horizon/d2)) +
+    a1 * c1 * t1 / (t1 - d1) * (
+        Math.exp(-(t1 + d1) * horizon / (t1 * d1)) - Math.exp(-horizon / d1)
+    ) +
+    a1 * c2 * t1 / (t1 - d2) * (
+        Math.exp(-(t1 + d2) * horizon / (t1 * d2)) - Math.exp(-horizon / d2)
+    ) +
+    a2 * c1 * t2 / (t2 - d1) * (
+        Math.exp(-(t2 + d1) * horizon / (t2 * d1)) - Math.exp(-horizon / d1)
+    ) +
+    a2 * c2 * t2 / (t2 - d2) * (
+        Math.exp(-(t2 + d2) * horizon / (t2 * d2)) - Math.exp(-horizon / d2)
+    ) +
+    a3 * c1 * t3 / (t3 - d1) * (
+        Math.exp(-(t3 + d1) * horizon / (t3 * d1)) - Math.exp(-horizon / d1)
+    ) +
+    a3 * c2 * t3 / (t3 - d2) * (
+        Math.exp(-(t3 + d2) * horizon / (t3 * d2)) - Math.exp(-horizon / d2)
+    )
+)
+
+```
+
+<!-- Compute CO2 equivalent -->
+```js
+const co2e = metric == "GWP" ? agwp_contrail / agwp_kg_co2 : agtp_contrail / agtp_kg_co2;
+const rf0 = 5.35 * co2e / (eta_co2 * mass_atmosphere);
+
+```
+
+<!-- Compute radiative forcing from CO2 equivalent -->
+```js
+var rf_co2 = [];
+for (var t = 0; t <= 200; t++) {
+    const rf = rf0 * (
+        a0 +
+        a1 * Math.exp(-t/t1) +
+        a2 * Math.exp(-t/t2) +
+        a3 * Math.exp(-t/t3)
+    ); // W/m2
+    rf_co2.push({"t": t, "rf": rf});
+}
+
+```
+
+<!-- Compute temperature change from CO2 equivalent -->
+```js
+var t_co2 = [];
+for (var t = 0; t <= 200; t++) {
+    const dT = rf0 * (
+        a0 * c1 * (1.0 - Math.exp(-t/d1)) +
+        a0 * c2 * (1.0 - Math.exp(-t/d2)) +
+        a1 * c1 * t1 / (t1 - d1) * (Math.exp(-(t1 + d1) * t / (t1 * d1)) - Math.exp(-t / d1)) +
+        a1 * c2 * t1 / (t1 - d2) * (Math.exp(-(t1 + d2) * t / (t1 * d2)) - Math.exp(-t / d2)) +
+        a2 * c1 * t2 / (t2 - d1) * (Math.exp(-(t2 + d1) * t / (t2 * d1)) - Math.exp(-t / d1)) +
+        a2 * c2 * t2 / (t2 - d2) * (Math.exp(-(t2 + d2) * t / (t2 * d2)) - Math.exp(-t / d2)) +
+        a3 * c1 * t3 / (t3 - d1) * (Math.exp(-(t3 + d1) * t / (t3 * d1)) - Math.exp(-t / d1)) +
+        a3 * c2 * t3 / (t3 - d2) * (Math.exp(-(t3 + d2) * t / (t3 * d2)) - Math.exp(-t / d2))
+    )
+    t_co2.push({"t": t, "dT": dT})
+}
+// for labeling in plot
+const ilab = t_co2.findLastIndex((elem) => elem.dT < 20e-9);
+
+```
+
+<!-- Plot RF -->
+```js
+const contrail_ax = Plot.plot({
+    marginLeft: 50,
+    width: 250,
+    height: 200,
+    className: "plot",
+    x: {
+        label: "Time since takeoff (hours)",
+        line: true
+    },
+    y: {
+        line: true
+    },
+    marks: [
+        Plot.areaY(
+            rf_contrail,
+            {
+                x: (d) => d.t / 60.0,
+                y: (d) => 0.42 * d.rf * 1e9,
+                fill: metric == "GWP" ? "var(--theme-blue, blue)" : "gray",
+            },
+        ),
+        Plot.line(
+            rf_contrail,
+            {x: (d) => d.t / 60.0, y: (d) => 0.42 * d.rf * 1e9}
+        ),
+        Plot.text(
+            [`Contrails: ${(agwp_contrail / surface_area_earth).toFixed(1)} J/m²\n(cumulative)`],
+            {
+                x: 0.4,
+                y: 51000,
+                fill: metric == "GWP" ? "var(--theme-blue, blue)" : "gray",
+                textAnchor: "start"
+            }
+        )
+
+    ]
+});
+
+const co2_ax = Plot.plot({
+    width: 450,
+    height: 400,
+    className: "plot",
+    x: {
+        label: "Time since takeoff (years)",
+        line: true
+    },
+    y: {
+        label: "Effective radiative forcing (nW/m²)",
+        line: true,
+        domain: [0, 1e9 * rf0 * (1.0 + (25e3 / co2e)**0.5)]
+    },
+    marks: [
+        Plot.areaY(
+            rf_co2,
+            {
+                filter: (d) => d.t <= horizon,
+                x: (d) => d.t,
+                y: (d) => d.rf * 1e9,
+                fill: metric == "GWP" ? "var(--theme-blue, blue)" : "gray",
+            },
+        ),
+        Plot.line(
+            rf_co2,
+            {
+                x: (d) => d.t,
+                y: (d) => d.rf * 1e9,
+                strokeDasharray: "10,5"
+            }
+        ),
+        Plot.text(
+            [`CO2: ${(co2e * agwp_kg_co2 / surface_area_earth).toFixed(1)} J/m² over ${horizon} yr\n(cumulative)`],
+            {
+                x: horizon > 70 ? horizon - 5 : horizon + 5,
+                y: rf0 * 1e9 / 5,
+                fill: horizon > 70 ? "white" : metric == "GWP" ? "var(--theme-blue, blue)" : "gray",
+                textAnchor: horizon > 70 ? "end" : "start",
+            }
+        )
+
+    ]
+});
+
+const temp_ax = Plot.plot({
+    width: 450,
+    height: 400,
+    className: "plot",
+    x: {
+        label: "Time since takeoff (years)",
+        line: true
+    },
+    y: {
+        type: "log",
+        label: "Warming (nK)",
+        line: true,
+        domain: [0.01, 20],
+        tickFormat: "f",
+    },
+    marks: [
+        Plot.line(
+            t_contrail,
+            {x: (d) => d.t, y: (d) => d.dT * 1e9, clip: true}
+        ),
+        Plot.line(
+            t_co2,
+            {
+                x: (d) => d.t,
+                y: (d) => d.dT * 1e9,
+                strokeDasharray: "10,5",
+                clip: true
+            }
+        ),
+        Plot.dot(
+            [[horizon, agtp_contrail * 1e9]],
+            {stroke: null, fill: metric == "GTP" ? "var(--theme-blue, blue)" : "gray"}
+        ),
+        Plot.dot(
+            [[horizon, co2e * agtp_kg_co2 * 1e9]],
+            {stroke: null, fill: metric == "GTP" ? "var(--theme-blue, blue)" : "gray"}
+        ),
+        Plot.ruleX([horizon], {stroke: metric == "GTP" ? "var(--theme-blue, blue)" : "gray"}),
+        Plot.text(
+            [
+                `Contrails: ${(agtp_contrail * 1e9).toFixed(2)} nK after ${horizon} yr\n` +
+                `CO2: ${(co2e * agtp_kg_co2 * 1e9).toFixed(2)} nK after ${horizon} yr`
+            ],
+            {
+                x: horizon > 100 ? horizon - 5 : horizon + 5,
+                y: 16,
+                textAnchor: horizon > 100 ? "end" : "start",
+                fill: metric == "GTP" ? "var(--theme-blue, blue)" : "gray"
+            }
+        ),
+        Plot.text(
+            ["Contrails"],
+            {
+                x: 200,
+                y: 0.8e9 * t_contrail.at(-1).dT,
+                textAnchor: "end",
+            }
+        ),
+        Plot.text(
+            ["CO2"],
+            {
+                x: t_co2.at(-1).t,
+                y: t_co2.at(-1).dT > 0.2e-9 ? 0.8e9 * t_co2.at(-1).dT : 1.2e9 * t_co2.at(-1).dT,
+                filter: t_co2.at(-1).dT < 20,
+                textAnchor: "end"
+            }
+        )
+    ]
+})
+
+```
+
+This tool is a work in progress. Results have not been carefully checked for accuracy!
+
+<div class="grid grid-cols-3">
+<div class="card">
+
+## Equivalence Metric
+${metric_input}
+
+</div>
+<div class="card">
+
+## Time Horizon (years)
+${horizon_input}
+
+</div>
+<div class="card">
+
+## Contrail CO2 equivalent
+${Math.round(co2e / 1e3)} tonnes
+
+</div>
+</div>
+
+<div class="observablehq observablehq--block">
+    <svg class="plot" width=900 height=400>
+        <g transform="translate(0,0)">
+            ${co2_ax}
+        </g>
+        <g transform="translate(200,0)">
+            ${contrail_ax}
+        </g>
+        <g transform="translate(450,0)">
+            ${temp_ax}
+        </g>
+    </svg>
+</div>

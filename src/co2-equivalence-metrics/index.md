@@ -342,7 +342,7 @@ ${horizon_input}
 <div class="card">
 
 ## Contrail CO2e
-${co2e > 1e12 ? `${Math.round(co2e / 1e10) / 1e2} Gt` : `${Math.round(co2e / 1e9)} Mt`}
+<span class="big">${co2e > 1e12 ? `${Math.round(co2e / 1e10) / 1e2} Gt` : `${Math.round(co2e / 1e9)} Mt`}</span>
 </div>
 </div>
 

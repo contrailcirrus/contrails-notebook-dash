@@ -14,6 +14,22 @@ import "../components/observer.js";
         /* Ghost post max-width */
         max-width: 1000px;
     }
+
+    .subplot-cols-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    @media (max-width: 1000px) {
+        .subplot-cols-2 {
+            display: block;
+        }
+
+        .subplot {
+            margin-bottom: 10px;
+        }
+    }
 </style>
 
 <!-- Constant inputs -->
@@ -167,8 +183,7 @@ const ilab = t_co2.findLastIndex((elem) => elem.dT < 20e-9);
 
 <!-- Plot RF -->
 ```js
-
-const co2_ax = Plot.plot({
+const rf_ax = Plot.plot({
     width: 450,
     height: 400,
     className: "plot",
@@ -228,6 +243,9 @@ const co2_ax = Plot.plot({
     ]
 });
 
+```
+<!-- Plot temperature response -->
+```js
 const temp_ax = Plot.plot({
     width: 450,
     height: 400,
@@ -296,7 +314,14 @@ const temp_ax = Plot.plot({
             }
         )
     ]
-})
+});
+
+```
+
+<!-- Order axes based on layout and selected metric -->
+```js
+const first_ax = window.matchMedia('(max-width: 1000px)').matches && metric == "GTP" ? temp_ax : rf_ax;
+const second_ax = window.matchMedia('(max-width: 1000px)').matches && metric == "GTP" ? rf_ax : temp_ax;
 
 ```
 
@@ -307,32 +332,26 @@ This tool is a work in progress. Results have not been carefully checked for acc
 
 ## Equivalence Metric
 ${metric_input}
-
 </div>
 <div class="card">
 
 ## Time Horizon (years)
 ${horizon_input}
-
 </div>
+
 <div class="card">
 
-## Contrail CO2 equivalent
+## Contrail CO2e
 ${co2e > 1e12 ? `${Math.round(co2e / 1e10) / 1e2} Gt` : `${Math.round(co2e / 1e9)} Mt`}
-
 </div>
 </div>
 
-<div class="observablehq observablehq--block">
-    <svg class="plot" width=900 height=400>
-        <g transform="translate(0,0)">
-            ${co2_ax}
-        </g>
-        <g transform="translate(200,0)">
-            ${contrail_ax}
-        </g>
-        <g transform="translate(450,0)">
-            ${temp_ax}
-        </g>
-    </svg>
+<div class="subplot-cols-2">
+<div class="subplot">
+${first_ax}
+</div>
+
+<div class="subplot">
+${second_ax}
+</div>
 </div>

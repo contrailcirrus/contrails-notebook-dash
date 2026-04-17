@@ -255,8 +255,8 @@ summary:hover {
 
 /* Observable Plot classes */
 .plot {
-   background-color: var(--theme-foreground);
-   color: var(--theme-background);
+   background-color: var(--theme-background);
+   color: var(--theme-foreground);
    padding: 0.5em;
    border-radius: 0.25rem;
    display: block; 
@@ -277,6 +277,10 @@ blockquote {
   margin: 1rem 0;
   border-left: 2px solid var(--theme-foreground-fainter);
   font-style: italic;
+}
+
+#observablehq-main {
+  min-height: unset;
 }
 
 #observablehq-footer {

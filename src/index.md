@@ -14,6 +14,8 @@ title: Index
     - [Effective Radiative Forcing from Future Emissions](/erf-from-future-emissions/index.html)
 - [**The Cost of Contrail Management**](https://notebook.contrails.org/the-cost-of-contrail-management/ )
     - [Cost Explorer](/cost-explorer/index.html)
+- **Observing Contrails**
+    - [Hyperspectral sounder blind spot](/hyperspectral-sounder-blindspot/index.html)
 
 ## Standalone Dashboards
 

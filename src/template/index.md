@@ -26,21 +26,3 @@ import "../components/observer.js";
 
 Add content.
 See <https://observablehq.com/framework/markdown>.
-
-## Source links
-
-Always add a link back to the Github source wrapped in a `<div class="source">` element.
-
-```html run=false
-<div class="source">
-
-[Source ↗︎](https://github.com/contrailcirrus/contrails-notebook-dash/blob/main/src/template/index.md)
-
-</div>
-```
-
-<div class="source">
-
-[Source ↗︎](https://github.com/contrailcirrus/contrails-notebook-dash/blob/main/src/template/index.md)
-
-</div>

@@ -39,10 +39,12 @@ export default {
   // This snippet automatically links the source file on Github
   footer: ({path}) => `
     <div class="footer">
-      <picture>
-        <source srcset="static/logo-white.svg" media="(prefers-color-scheme: dark)">
-        <img src="static/logo-black.svg" alt="Contrails.org">
-      </picture>
+      <a href="https://contrails.org">
+        <picture>
+          <source srcset="static/logo-white.svg" media="(prefers-color-scheme: dark)">
+          <img src="static/logo-black.svg" alt="Contrails.org">
+        </picture>
+      </a>
       <div>
         <a href="https://github.com/contrailcirrus/contrails-notebook-dash/blob/main/src${path}.md?plain=1">Source ↗︎</a>
       </div>

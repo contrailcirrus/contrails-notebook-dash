@@ -1,5 +1,6 @@
 ---
-title: The hyperspectral sounder blind spot at cruise altitude
+title: Hyperspectral sounder blind spot
+footer: false
 ---
 
 <!-- ----- Dashboard imports ----- -->
@@ -18,6 +19,7 @@ import "../components/observer.js";
 
 <!-- ----------------------------- -->
 
+<!-- Data -->
 ```js
 const data = [
   {pressure: 1000, error: 15, temp_error: 1.2, alt_ft: 0,     alt_label: "Surface"},
@@ -36,25 +38,19 @@ const data = [
 const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(d3.csvFormat(data));
 ```
 
-```js
-function renderChart() {
-  const wrapper = document.createElement("div");
-  wrapper.style.width = "100%";
-  wrapper.style.maxWidth = "800px";
-  wrapper.style.margin = "0 auto";
+## The hyperspectral sounder blind spot at cruise altitudes
 
-  const plot = Plot.plot({
-    title: htl.html`<div style="font-family: 'Aeonik', sans-serif; font-size: clamp(20px, 4vw, 24px); font-weight: bold; color: #161A26; margin-bottom: 5px; line-height: 1.2;">
-      >_ The hyperspectral sounder blind spot at cruise altitudes
-    </div>`,
-    subtitle: htl.html`<div style="font-family: 'Aeonik', sans-serif; font-size: clamp(16px, 2vw, 16px); font-weight: normal; color: #161A26; margin-bottom: 15px; line-height: 1.4;">
-      Suomi-NPP satellite water vapor and temperature errors compared to collocated global radiosondes
-    </div>`,
+<div class="small">
+Suomi-NPP satellite water vapor and temperature errors compared to collocated radiosondes.
+</div>
+
+<!-- Plot -->
+```js
+Plot.plot({
+    className: "plot",
     style: {
       fontFamily: "Aeonik, sans-serif",
       fontSize: "16px",
-      color: "#161A26",
-      background: "transparent"
     },
     width: 800,
     height: 500,
@@ -62,7 +58,7 @@ function renderChart() {
     marginBottom: 60,
     x: {
       domain: [0, 100],
-      label: "RMS Error (% for Water Vapor, Kelvin for Temperature)",
+      label: "RMS Error (Kelvin for Temperature, % for Water Vapor)",
       grid: true
     },
     y: {
@@ -74,13 +70,12 @@ function renderChart() {
       // Cruise altitude shading
       Plot.rect([{x1: 0, x2: 100, y1: 30000, y2: 40000}], {
         x1: "x1", x2: "x2", y1: "y1", y2: "y2",
-        fill: "#F26400",
+        fill: "#99a1af",
         fillOpacity: 0.1
       }),
       Plot.text([{x: 98, y: 35000}], {
         x: "x", y: "y",
         text: () => "Typical cruise altitude\n of commercial aircraft",
-        fill: "#F26400",
         fontSize: 16,
         fontWeight: "bold",
         textAnchor: "end",
@@ -90,17 +85,23 @@ function renderChart() {
       // Temperature series (Tropo Blue)
       Plot.line(data, {x: "temp_error", y: "alt_ft", stroke: "#1093FF", strokeWidth: 3}),
       Plot.dot(data, {
-        x: "temp_error", y: "alt_ft",
-        fill: "#1093FF", r: 6, tip: true,
-        title: d => `Altitude: ${d.alt_label}\nPressure: ${d.pressure} hPa\nTemp Error: ${d.temp_error} K`
+        x: "temp_error",
+        y: "alt_ft",
+        fill: "#1093FF",
+        r: 6,
+        tip: true,
+        title: d => `Altitude: ${d.alt_label}\nPressure: ${d.pressure} hPa\nError: ${d.temp_error} K`
       }),
 
-      // Water vapor series (Meso Blue)
-      Plot.line(data, {x: "error", y: "alt_ft", stroke: "#162440", strokeWidth: 3}),
+      // Water vapor series (Orange)
+      Plot.line(data, {x: "error", y: "alt_ft", stroke: "#f26400", strokeWidth: 3}),
       Plot.dot(data, {
-        x: "error", y: "alt_ft",
-        fill: "#162440", r: 6, tip: true,
-        title: d => `Altitude: ${d.alt_label}\nPressure: ${d.pressure} hPa\nWater Vapor Error: ${d.error}%`
+        x: "error",
+        y: "alt_ft",
+        fill: "#f26400",
+        r: 6,
+        tip: true,
+        title: d => `Altitude: ${d.alt_label}\nPressure: ${d.pressure} hPa\nError: ${d.error}%`
       }),
 
       // Direct line labels
@@ -110,48 +111,15 @@ function renderChart() {
       }),
       Plot.text([{x: 22, y: 10000}], {
         x: "x", y: "y", text: () => "Water Vapor",
-        fill: "#162440", fontWeight: "bold", textAnchor: "start", dx: 10
+        fill: "#f26400", fontWeight: "bold", textAnchor: "start", dx: 10
       })
     ]
-  });
-
-  // Footer with citation + logo
-  const footer = document.createElement("div");
-  footer.style.display = "flex";
-  footer.style.justifyContent = "space-between";
-  footer.style.alignItems = "flex-end";
-  footer.style.marginTop = "10px";
-  footer.style.gap = "15px";
-
-  const citation = document.createElement("div");
-  citation.style.fontFamily = "Aeonik, sans-serif";
-  citation.style.fontSize = "clamp(11px, 2vw, 14px)";
-  citation.style.color = "#161A26";
-  citation.style.lineHeight = "1.3";
-  citation.innerHTML = `<a href="${csvContent}" download="nalli_2018_sounder_error.csv" style="color: #1093FF; text-decoration: underline; font-weight: bold; cursor: pointer;" title="Download CSV">Data</a> adapted from <a href="https://doi.org/10.1109/TGRS.2017.2744558" target="_blank" style="color: #1093FF; text-decoration: none; font-weight: bold;">Nalli et al. (2018)</a>`;
-
-  const logoLink = document.createElement("a");
-  logoLink.href = "https://contrails.org";
-  logoLink.target = "_blank";
-  logoLink.style.width = "25%";
-  logoLink.style.minWidth = "80px";
-  logoLink.style.maxWidth = "120px";
-  logoLink.style.flexShrink = "0";
-
-  const logoImg = document.createElement("img");
-  logoImg.src = "https://storage.ghost.io/c/0e/93/0e93dd1b-ada9-4033-b4c9-385cc66de4f3/content/images/2026/04/ContrailsOrg_Logo_Full_Black.svg";
-  logoImg.alt = "Contrails.org";
-  logoImg.style.width = "100%";
-  logoImg.style.display = "block";
-
-  logoLink.appendChild(logoImg);
-  footer.appendChild(citation);
-  footer.appendChild(logoLink);
-  wrapper.appendChild(plot);
-  wrapper.appendChild(footer);
-
-  return wrapper;
-}
+  })
 ```
 
-<div class="card">${renderChart()}</div>
+<div class="small">
+
+<a href="${csvContent}" download="nalli_2018_sounder_error.csv">Data</a> adapted from
+[Nalli et al. (2018)](https://doi.org/10.1109/TGRS.2017.2744558)
+
+</div>

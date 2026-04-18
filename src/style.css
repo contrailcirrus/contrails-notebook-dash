@@ -263,6 +263,11 @@ summary:hover {
    margin: auto;
 }
 
+/* Plot tooltip background correction */
+.plot g[aria-label="tip"] path {
+  fill: var(--theme-background);
+}
+
 /* Disable Observable formatting of h2 under h1 */
 h1 + h2 {
   font-size: revert;

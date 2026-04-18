@@ -106,6 +106,6 @@ Plot.plot({
 
 <div class="small">
 
-<a href="${FileAttachment('nalli_2018.csv').href}" download="nalli_2018_sounder_error.csv">Data</a> adapted from [Nalli et al. (2018)](https://doi.org/10.1109/TGRS.2017.2744558)
+<a href="nalli_2018_sounder_error.csv" download="nalli_2018.csv">Data</a> adapted from <a href="https://doi.org/10.1109/TGRS.2017.2744558">Nalli et al. (2018)</a>
 
 </div>

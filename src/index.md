@@ -1,5 +1,6 @@
 ---
 title: Index
+footer: false
 ---
 
 # Contrails Notebook Dashboards

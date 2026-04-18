@@ -37,7 +37,17 @@ export default {
   header: false, // what to show in the header (HTML)
   // footer: false, // what to show in the footer (HTML)
   // This snippet automatically links the source file on Github
-  footer: ({path}) => `<div class="source"><a href="https://github.com/contrailcirrus/contrails-notebook-dash/blob/main/src${path}.md?plain=1">Source ↗︎</a></div>`,
+  footer: ({path}) => `
+    <div class="footer">
+      <picture>
+        <source srcset="static/logo-white.svg" media="(prefers-color-scheme: dark)">
+        <img src="static/logo-black.svg" alt="Contrails.org">
+      </picture>
+      <div>
+        <a href="https://github.com/contrailcirrus/contrails-notebook-dash/blob/main/src${path}.md?plain=1">Source ↗︎</a>
+      </div>
+    </div>
+  `,
   sidebar: false, // whether to show the sidebar
   toc: false, // whether to show the table of contents
   pager: false, // whether to show previous & next links in the footer

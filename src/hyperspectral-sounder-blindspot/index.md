@@ -1,6 +1,5 @@
 ---
 title: Hyperspectral sounder blind spot
-footer: false
 ---
 
 <!-- ----- Dashboard imports ----- -->

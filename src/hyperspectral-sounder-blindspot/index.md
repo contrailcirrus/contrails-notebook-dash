@@ -20,22 +20,9 @@ import "../components/observer.js";
 <!-- ----------------------------- -->
 
 <!-- Data -->
-```js
-const data = [
-  {pressure: 1000, error: 15, temp_error: 1.2, alt_ft: 0,     alt_label: "Surface"},
-  {pressure: 800,  error: 18, temp_error: 0.9, alt_ft: 6500,  alt_label: "6,500 ft"},
-  {pressure: 700,  error: 21, temp_error: 0.8, alt_ft: 10000, alt_label: "10,000 ft"},
-  {pressure: 600,  error: 19, temp_error: 0.8, alt_ft: 14000, alt_label: "14,000 ft"},
-  {pressure: 500,  error: 24, temp_error: 0.9, alt_ft: 18000, alt_label: "18,000 ft"},
-  {pressure: 400,  error: 29, temp_error: 1.0, alt_ft: 24000, alt_label: "24,000 ft"},
-  {pressure: 300,  error: 30, temp_error: 1.2, alt_ft: 30000, alt_label: "30,000 ft"},
-  {pressure: 200,  error: 46, temp_error: 1.5, alt_ft: 39000, alt_label: "39,000 ft"},
-  {pressure: 100,  error: 86, temp_error: 1.8, alt_ft: 53000, alt_label: "53,000 ft"}
-];
-```
 
 ```js
-const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(d3.csvFormat(data));
+const data = FileAttachment("nalli_2018_sounder_error.csv").csv({typed: true});
 ```
 
 ## The hyperspectral sounder blind spot at cruise altitudes
@@ -119,7 +106,6 @@ Plot.plot({
 
 <div class="small">
 
-<a href="${csvContent}" download="nalli_2018_sounder_error.csv">Data</a> adapted from
-[Nalli et al. (2018)](https://doi.org/10.1109/TGRS.2017.2744558)
+<a href="${FileAttachment('nalli_2018.csv').href}" download="nalli_2018_sounder_error.csv">Data</a> adapted from [Nalli et al. (2018)](https://doi.org/10.1109/TGRS.2017.2744558)
 
 </div>

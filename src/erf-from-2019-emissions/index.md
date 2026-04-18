@@ -81,7 +81,7 @@ Plot.plot({
         line: true
     },
     marks: [
-        Plot.areaY(contrails, {x: "t", y: "erf", fill: "black"}),
+        Plot.areaY(contrails, {x: "t", y: "erf"}),
         Plot.text([[2021, 24.5]], {text: ["2019 contrails"], textAnchor: "start", fontWeight: "bold"}),
         Plot.text([[2021, 23.5]], {text: ["Large amount of short-lived warming"], textAnchor: "start"}),
         Plot.areaY(co2, {x: "t", y: "erf", fill: "gray"}),

@@ -102,14 +102,14 @@ Plot.plot({
         line: true
     },
     marks: [
-        Plot.line(data_total, {x: "t", y: "erf", stroke: "black"}),
-        Plot.line(data_contrail, {x: "t", y: "erf", stroke: "black", strokeDasharray: "35,10"}),
-        Plot.line(data_co2, {x: "t", y: "erf", stroke: "black", strokeDasharray: "5,5"}),
+        Plot.line(data_total, {x: "t", y: "erf"}),
+        Plot.line(data_contrail, {x: "t", y: "erf", strokeDasharray: "35,10"}),
+        Plot.line(data_co2, {x: "t", y: "erf", strokeDasharray: "5,5"}),
         Plot.text(labels, {x: "t", y: "erf", text: "label", dy: 10, textAnchor: "start"}),
-        Plot.ruleX(data_total, Plot.pointerX({x: "t", py: "erf", stroke: "lightgray"})),
-        Plot.dot(data_total, Plot.pointerX({x: "t", y: "erf", fill: "black"})),
-        Plot.dot(data_contrail, Plot.pointerX({x: "t", y: "erf", fill: "black"})),
-        Plot.dot(data_co2, Plot.pointerX({x: "t", y: "erf", fill: "black"})),
+        Plot.ruleX(data_total, Plot.pointerX({x: "t", py: "erf"})),
+        Plot.dot(data_total, Plot.pointerX({x: "t", y: "erf"})),
+        Plot.dot(data_contrail, Plot.pointerX({x: "t", y: "erf"})),
+        Plot.dot(data_co2, Plot.pointerX({x: "t", y: "erf"})),
         Plot.text(data_contrail, Plot.pointerX({px: "t", py: "erf", frameAnchor: "top-right", dy: -16.5, text: (d) => {
             const year = d.t;
             const erf_contrail = d.erf;

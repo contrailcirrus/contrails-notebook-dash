@@ -1,7 +1,6 @@
 # Contrails Notebook Dashboards
 
-This repository hosts public code and dashboards that support the [Contrails Notebook](https://notebook.contrails.org/).
-
+This repository hosts public code and dashboards at <https://dash.contrails.org> to support the [Contrails Notebook](https://notebook.contrails.org/) and other analyses.
 
 ## Setup
 
@@ -24,35 +23,42 @@ For more, see <https://observablehq.com/framework/getting-started>.
 
 ## Create new dashboard
 
-1. **Copy** [src/template](src/template) directory in the `src/` directory. Add files and subdirectories for components and data as necessary.
-2. **Update** template with dashboard
-3. **Push** to Github and the [static Observable site](https://dash.contrails.org) will update via [the Deploy Action](https://github.com/contrailcirrus/contrails-notebook-dash/blob/main/.github/workflows/deploy.yml)
+1. **Copy** the [src/template/](src/@template) directory to a new folder in `src/` named for your dashboard (e.g. `src/new-dashboard/`). Add files and subdirectories for components and data as necessary.
+2. **Update** `index.md` in this directory to create your dashboard.
+3. **Push** to Github. The [Deploy Action](https://github.com/contrailcirrus/contrails-notebook-dash/blob/main/.github/workflows/deploy.yml) will deploy your new site to <https//dash.contrails.org> (e.g. `dash.contrails.org/new-dashboard/index.html`)
 
+## Update the homepage
+
+New dashboards will not automatically be added to <https://dash.contrails.org>.
+
+[src/index.md](src/index.md) builds into the homepage hosted at `https://dash.contrails.org/index.html`.
+Update [src/index.md](src/index.md) to link to your dashboard when ready.
 
 ## Embed in Notebook Post
 
 **Embed** a dashboard by pasting the snippet below and updating dashboard `src="https://dash.contrails.org/..."` url in the `<iframe>` below:
 
 ```html run=false
+<iframe id="dash1" class="gh-article-image" width="100%" height="0" frameborder="0" scrolling="no"  style="border-radius: 5px" src="https://dash.contrails.org/<dashboard>/index.html"></iframe>
+<script type="text/javascript">addEventListener("message", (event) => dash1.height = event.data.height);</script>
 <noscript>
-
-> See <a href="https://notebook.contrails.org/<slug>">web version of this post</a> for interactive dashboard.
-
-(or add an <img src="" /> tag)
-
+<!-- default image -->
+<img src="https://<path>" width="100%" alt="<alt name>" />
+<!-- or -->
+<!-- <blockquote>See <a href="https://notebook.contrails.org/<slug>">web version of this post</a> for interactive dashboard.</blockquote> -->
 </noscript>
-<iframe id="dash1" class="gh-article-image" width="100%" height="0" frameborder="0" scrolling="no"
-  src="https://dash.contrails.org/template/index.html">
-</iframe>
-<script type="text/javascript">
-addEventListener("message", (event) => dash1.height = event.data.height);
-</script>
 ```
 
 ### E-mail Newsletter content
 
 Edit the content of the `<noscript>` block to show content in the e-mail newsletter. As its written,
-the e-mail version of the Notebook post will show a blockquote:
+the e-mail version of the Notebook post will show a default image:
+
+```html
+<img src="https://<path>" width="100%" alt="<alt name>" />
+```
+
+You can also show a blockquote instead:
 
 ```md
 > See <a href="https://notebook.contrails.org/<slug>">web version of this post</a> for interactive dashboard.
@@ -64,7 +70,7 @@ Update the Notebook post url with the post `<slug>`.
 
 The height of the `<iframe>` is set to "0" so that `<noscript>` tag takes precedence in the e-mail.
 The `<script>` tag creates an event listener that will receive a dynamic height from the dashboard
-(see [src/components/observer.js](src/components/observer.js)).
+(see [src/@components/observer.js](src/@components/observer.js)).
 
 iframe `id` (`"dash1"` in the example) must match the variable in the event listener (`dash1.height`) to set the height dynamically.
 
@@ -94,8 +100,12 @@ This Framework project looks like this:
 ```ini
 .
 ├─ src
-│  ├─ components
-│  │  └─ timeline.js           # common importable modules
+│  ├─ @components
+│  │  ├─ observer.js           # iframe observer for embed
+│  │  └─ other.js              # common importable modules
+│  ├─ @static
+│  │  ├─ 110m.topojson         # common data used across dashboard
+│  │  └─ image.svg             # common image used acros dashbaords
 │  ├─ example-dashboard1
 │  │  ├─ launches.csv.js       # a data loader for dashboard
 │  │  ├─ data.json             # a static data file for dashboard
@@ -111,7 +121,7 @@ This Framework project looks like this:
 
 **`src/index.md`** - This is the home page for your app. You can have as many additional pages as you’d like, but you should always have a home page, too.
 
-**`src/components`** - You can put shared [JavaScript modules](https://observablehq.com/framework/imports) anywhere in your source root, but we recommend putting them here. This helps you pull code out of Markdown files and into JavaScript modules, making it easier to reuse code across pages, write tests and run linters, and even share code with vanilla web applications.
+**`src/@components`** - You can put shared [JavaScript modules](https://observablehq.com/framework/imports) anywhere in your source root, but we recommend putting them here. This helps you pull code out of Markdown files and into JavaScript modules, making it easier to reuse code across pages, write tests and run linters, and even share code with vanilla web applications.
 
 **`observablehq.config.js`** - This is the [app configuration](https://observablehq.com/framework/config) file, such as the pages and sections in the sidebar navigation, and the app’s title.
 

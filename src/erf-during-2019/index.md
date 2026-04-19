@@ -4,7 +4,7 @@ title: Effective Radiative Forcing during 2019
 
 <!-- Imports -->
 ```js
-import "../components/observer.js";
+import "../@components/observer.js";
 
 ```
 

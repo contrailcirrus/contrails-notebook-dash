@@ -4,7 +4,7 @@ title: Effective Radiative Forcing from 2019 Aviation Emissions
 
 <!-- Imports -->
 ```js
-import "../components/observer.js";
+import "../@components/observer.js";
 
 ```
 

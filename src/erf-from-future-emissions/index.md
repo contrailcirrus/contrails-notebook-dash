@@ -4,7 +4,7 @@ title: Effective Radiative Forcing from Future Emissions
 
 <!-- Imports -->
 ```js
-import "../components/observer.js";
+import "../@components/observer.js";
 
 ```
 

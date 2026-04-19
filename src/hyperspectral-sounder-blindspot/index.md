@@ -12,14 +12,13 @@ title: Hyperspectral sounder blind spot
 ```js
 // Resize observer. Required to update parent `iframe` height dynamically.
 // See README for script tag required in post body.
-import "../components/observer.js";
+import "../@components/observer.js";
 
 ```
 
 <!-- ----------------------------- -->
 
 <!-- Data -->
-
 ```js
 const data = FileAttachment("nalli_2018_sounder_error.csv").csv({typed: true});
 ```

@@ -19,7 +19,7 @@ title: Global Contrail Heatmap
 ```js
 // Resize observer. Required to update parent `iframe` height dynamically.
 // See README for script tag required in post body.
-import "../components/observer.js";
+import "../@components/observer.js";
 ```
 
 <!-- ----------------------------- -->
@@ -39,8 +39,8 @@ const {
 
 ```js
 // geojson natural earth polygons
-const land = FileAttachment("data/ne_110m_land.geojson");
-const ocean = FileAttachment("data/ne_110m_ocean.geojson");
+const land = FileAttachment("../@static/ne_110m_land.geojson");
+const ocean = FileAttachment("../@static/ne_110m_ocean.geojson");
 const firsTopo = FileAttachment("data/firs.topojson").json();
 const firsImpact = FileAttachment("data/fir-impacts.json").json();
 

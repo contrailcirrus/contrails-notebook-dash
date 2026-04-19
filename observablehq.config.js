@@ -41,8 +41,8 @@ export default {
     <div class="footer">
       <a href="https://contrails.org">
         <picture>
-          <source srcset="static/logo-white.svg" media="(prefers-color-scheme: dark)">
-          <img src="static/logo-black.svg" alt="Contrails.org">
+          <source srcset="/@static/logo-white.svg" media="(prefers-color-scheme: dark)">
+          <img src="/@static/logo-black.svg" alt="Contrails.org">
         </picture>
       </a>
       <div>

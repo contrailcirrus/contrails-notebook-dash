@@ -32,9 +32,9 @@ title: Contrail Cost Explorer
 
 <!-- Imports -->
 ```js
-import "../components/observer.js";
+import "../@components/observer.js";
 
-import {DonutChart} from "../components/donutChart.js";
+import {DonutChart} from "../@components/donutChart.js";
 ```
 
 <!-- ----------------------------- -->

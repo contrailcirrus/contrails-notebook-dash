@@ -4,7 +4,7 @@ title: Dashboard Template
 
 <!-- Imports -->
 ```js
-import "../components/observer.js";
+import "../@components/observer.js";
 
 ```
 

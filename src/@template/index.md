@@ -12,7 +12,7 @@ title: Dashboard Template
 ```js
 // Resize observer. Required to update parent `iframe` height dynamically.
 // See README for script tag required in post body.
-import "../components/observer.js";
+import "../@components/observer.js";
 
 ```
 

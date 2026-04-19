@@ -16,6 +16,7 @@ footer: false
 - [**The Cost of Contrail Management**](https://notebook.contrails.org/the-cost-of-contrail-management/ )
     - [Cost Explorer](/cost-explorer/index.html)
 - **Observing Contrails**
+    - [GRUAN Map](/gruan-map/index.html)
     - [Hyperspectral sounder blind spot](/hyperspectral-sounder-blindspot/index.html)
 
 ## Standalone Dashboards

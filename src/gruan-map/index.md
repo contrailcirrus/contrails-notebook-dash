@@ -37,10 +37,10 @@ const longitudeInput = Inputs.range([-180, 180], {label: "Longitude", step: 1, v
 const longitude = Generators.input(longitudeInput)
 
 const siteColors = {
-  "certified": "#1093ff",  // tropo-blue
+  "certified": "#1093ff",   // tropo-blue
   "uncertified": "#f26400", // orange
-  "historical": "#99a1af", // grey
-  "candidate": "#162440", // meso blue
+  "historical": "#99a1af",  // grey
+  "candidate": "#162440",   // meso blue
 }
 ```
 
@@ -72,7 +72,7 @@ Plot.plot({
         strokeWidth: 0.5
     }),
 
-    // Labels - Matching map_show_labels: true
+    // Labels
     Plot.text(sites, {
       x: "longitude",
       y: "latitude",
@@ -92,7 +92,6 @@ Plot.plot({
       strokeWidth: 0.5,
       tip: {fontSize: 14},
       title: s => `${s.full_name} (${s["Station Code"]})\n${s["GRUAN Status"]}\n\nNumber of Sonde Profiles: ${s["Number of Sonde Profiles"]}\nAltitude: ${s["Altitude"]}\nFirst Launch: ${s["First Launch"]}\nLatest Launch: ${s["Latest Launch"]}`
-
     })
   ]
 })

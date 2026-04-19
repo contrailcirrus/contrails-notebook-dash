@@ -17,7 +17,7 @@ import "../@components/observer.js";
 
 <!-- ----------------------------- -->
 
-## Over 100,000 Sonde Profiles from GRAUN
+## Over 100,000 Sonde Profiles from GRUAN
 
 <!-- Data -->
 ```js
@@ -33,7 +33,7 @@ const countries110m = topojson.feature(world110m, world110m.objects.countries)
 
 <!-- Input -->
 ```js
-const longitudeInput = Inputs.range([-180, 180], {label: "longitude", step: 1, value: 90})
+const longitudeInput = Inputs.range([-180, 180], {label: "Longitude", step: 1, value: 90})
 const longitude = Generators.input(longitudeInput)
 
 const siteColors = {

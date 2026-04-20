@@ -49,7 +49,6 @@ const siteColors = {
 Plot.plot({
   className: "plot",
   width,
-  height: 500,
   color: {
     legend: true,
     domain: Object.keys(siteColors),

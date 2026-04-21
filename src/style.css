@@ -103,10 +103,13 @@ https://github.com/observablehq/framework/tree/main/src/style
   --syntax-markup-deleted-background: #ffeef0;
 }
 
-/* Dark mode */
+/* Logo on each page footer, defaults to light mode */
 .logo-dark { display: none; }
-@media (prefers-color-scheme: dark) {
 
+/* Dark mode */
+/* Disable dark mode for now, until we can fix ghost */
+/*@media (prefers-color-scheme: dark) {*/
+.dark {
   :root {
     --theme-foreground: var(--color-stratos-white);
     --theme-foreground-focus: var(--color-tropo-blue);

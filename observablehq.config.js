@@ -40,10 +40,8 @@ export default {
   footer: ({path}) => `
     <div class="footer">
       <a href="https://contrails.org">
-        <picture>
-          <source srcset="/@static/logo-white.svg" media="(prefers-color-scheme: dark)">
-          <img src="/@static/logo-black.svg" alt="Contrails.org">
-        </picture>
+        <img src="/@static/logo-black.svg" alt="Contrails.org" class="logo-light">
+        <img src="/@static/logo-white.svg" alt="Contrails.org" class="logo-dark">
       </a>
       <div>
         <a href="https://github.com/contrailcirrus/contrails-notebook-dash/blob/main/src${path}.md?plain=1">Source ↗︎</a>

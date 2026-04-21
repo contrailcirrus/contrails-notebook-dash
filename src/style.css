@@ -104,6 +104,7 @@ https://github.com/observablehq/framework/tree/main/src/style
 }
 
 /* Dark mode */
+.logo-dark { display: none; }
 @media (prefers-color-scheme: dark) {
 
   :root {
@@ -134,6 +135,9 @@ https://github.com/observablehq/framework/tree/main/src/style
     --syntax-markup-deleted: #ffdcd7;
     --syntax-markup-deleted-background: #67060c;
   }
+
+  .logo-dark { display: inline; }
+  .logo-light { display: none; }
 }
 
 /* --------------

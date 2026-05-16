@@ -18,6 +18,8 @@ footer: false
 - [**Observing Contrails**](https://notebook.contrails.org/observing-contrails-a-trifle-complicated/)
     - [GRUAN Map](/gruan-map/index.html)
     - [Hyperspectral sounder blind spot](/hyperspectral-sounder-blindspot/index.html)
+- [**Contrail Bench**](https://notebook.contrails.org/introducing-contrailbench/)
+    - [ContrailBench 2026Q1](/bench-2026q1/index.html)
 
 ## Standalone Dashboards
 

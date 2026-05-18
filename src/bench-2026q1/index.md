@@ -34,7 +34,7 @@ body { max-width: 860px; }
   transition: background 0.12s, color 0.12s, border-color 0.12s;
   white-space: nowrap;
 }
-.btn-toggle:hover:not(.dimmed) {
+.btn-toggle:hover:not(.dimmed):not(.active) {
   border-color: var(--theme-foreground-faint);
   color: var(--theme-foreground);
 }
@@ -71,8 +71,29 @@ body { max-width: 860px; }
   white-space: normal; line-height: 1.5; z-index: 100;
 }
 .ci-help:hover::after { display: block; }
-.bench-downloads { font-size: 12px; color: var(--theme-foreground-muted); margin-top: 0.5rem; }
-.bench-downloads a { color: var(--theme-foreground-muted); margin-right: 1rem; }
+.bench-downloads {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 12px;
+  color: var(--theme-foreground-muted);
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+.bench-downloads-links { display: flex; flex-wrap: wrap; gap: 0 1rem; align-items: center; }
+.bench-downloads a { color: var(--theme-foreground-muted); }
+.bench-downloads img.bench-logo { height: 24px; width: auto; display: block; flex-shrink: 0; }
+/* Title row with Share button */
+.title-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; margin: 1.5rem 0 0.25rem;
+}
+.title-row h1 { margin: 0 !important; }
+.title-row form { width: unset; }
+.title-row form svg { margin-bottom: -3px; }
+/* Hide the site footer entirely on this page — logo is rendered inline in download bar */
+#observablehq-footer { display: none !important; }
 </style>
 
 ```js
@@ -171,29 +192,43 @@ function ToggleButton(label, {value = true} = {}) {
 ```
 
 ```js
-const regionEl    = RadioButtons(["global","conus"], { value: "global", format: x => x === "global" ? "Global" : "Continental US" });
+// Read initial state from URL query params so shared links restore the view
+const urlParams = new URLSearchParams(location.search);
+const initRegion    = (() => { const v = urlParams.get("region"); return ["global","conus"].includes(v) ? v : "global"; })();
+const initSeason    = (() => { const v = urlParams.get("season"); return ["annual","winter","spring","summer","autumn"].includes(v) ? v : "annual"; })();
+const initForecasts = urlParams.has("forecasts")
+  ? urlParams.get("forecasts").split(",").filter(x => ["contrails-org","google"].includes(x))
+  : ["contrails-org"];
+const initSources   = urlParams.has("sources")
+  ? urlParams.get("sources").split(",").filter(x => ["IAGOS","GRUAN","ContrailWatch"].includes(x))
+  : ["IAGOS","GRUAN"];
+const initShowCI    = urlParams.get("ci") === "1";
+```
+
+```js
+const regionEl    = RadioButtons(["global","conus"], { value: initRegion, format: x => x === "global" ? "Global" : "Continental US" });
 const region      = Generators.input(regionEl);
 
 const seasonEl    = RadioButtons(["annual","winter","spring","summer","autumn"], {
-  value: "annual",
+  value: initSeason,
   format: x => ({annual:"All year",winter:"Winter",spring:"Spring",summer:"Summer",autumn:"Autumn"})[x],
 });
 const season = Generators.input(seasonEl);
 
 const forecastsEl = CheckButtons(["contrails-org","google"], {
-  value: ["contrails-org"],
+  value: initForecasts,
   format: x => FORECAST_LABEL[x],
 });
 const forecasts = Generators.input(forecastsEl);
 
 const sourcesEl = CheckButtons(["IAGOS","GRUAN","ContrailWatch"], {
-  value: ["IAGOS","GRUAN"],
+  value: initSources,
   format: x => x,
   className: x => x === "IAGOS" ? "source-iagos" : x === "GRUAN" ? "source-gruan" : "source-cw",
 });
 const sources   = Generators.input(sourcesEl);
 
-const showCIEl = ToggleButton("Confidence intervals", { value: false });
+const showCIEl = ToggleButton("Confidence intervals", { value: initShowCI });
 const showCI   = Generators.input(showCIEl);
 ```
 
@@ -212,14 +247,51 @@ const showCI   = Generators.input(showCIEl);
 }
 ```
 
-# ContrailBench V1
+```js
+// Title row + Share button (single setup; reads control state at click time)
+{
+  const shareButtonText = html`Share
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path d="M 21 5 A 3 3 0 1 1 15 5 A 3 3 0 1 1 21 5 M 9 12 A 3 3 0 1 1 3 12 A 3 3 0 1 1 9 12 M 21 19 A 3 3 0 1 1 15 19 A 3 3 0 1 1 21 19 M 8.5 10.5 L 15.5 6.5 M 8.5 13.5 L 15.5 17.5" stroke-width="2"/>
+    </svg>`;
+  const shareButton = Inputs.button(shareButtonText, {value: null, reduce: async () => {
+    const p = new URLSearchParams();
+    if (regionEl.value !== "global") p.set("region", regionEl.value);
+    if (seasonEl.value !== "annual") p.set("season", seasonEl.value);
+    const fcs = forecastsEl.value;
+    if (!(fcs.length === 1 && fcs[0] === "contrails-org")) p.set("forecasts", fcs.join(","));
+    const srcs = sourcesEl.value;
+    if (!(srcs.length === 2 && srcs.includes("IAGOS") && srcs.includes("GRUAN"))) p.set("sources", srcs.join(","));
+    if (showCIEl.value) p.set("ci", "1");
+    const qs = p.toString();
+    const url = `${location.origin}${location.pathname}${qs ? "?" + qs : ""}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      const btn = shareButton.querySelector("button");
+      btn.classList.add("observablehq-pre-copied");
+      btn.addEventListener("animationend", () => btn.classList.remove("observablehq-pre-copied"), { once: true });
+    } catch (_) {
+      window.prompt("Copy this link:", url);
+    }
+  }});
+  display(html`<div class="title-row">
+    <h1>ContrailBench V1</h1>
+    ${shareButton}
+  </div>`);
+}
+```
 
 ```js
 {
   const fLabel = forecasts.map(f => FORECAST_LABEL[f]).join(" & ") || "No forecast selected";
-  const rLabel = region === "global" ? "Global" : "CONUS";
+  const rLabel = region === "global" ? "Global" : "Continental US";
+  const srcParts = activeSources.flatMap((s, i) =>
+    i === 0
+      ? [html`<span style="color:${SOURCE_COLOR[s]};font-weight:600">${s}</span>`]
+      : [" · ", html`<span style="color:${SOURCE_COLOR[s]};font-weight:600">${s}</span>`]
+  );
   display(html`<p style="margin:0 0 1rem; color:var(--theme-foreground-muted); font-size:14px;">
-    ${fLabel} · ${rLabel}, ${SEASON_LABEL[season]}
+    ${fLabel} · ${rLabel}, ${SEASON_LABEL[season]}${srcParts.length ? html` · ${srcParts}` : ""}
   </p>`);
 }
 ```
@@ -227,7 +299,7 @@ const showCI   = Generators.input(showCIEl);
 ```js
 html`<div class="ctrl-row">
   <div class="ctrl-block"><span class="ctrl-label">Region</span>${regionEl}</div>
-  <div class="ctrl-block"><span class="ctrl-label">Season</span>${seasonEl}</div>
+  <div class="ctrl-block"><span class="ctrl-label">Season (Northern Hemisphere)</span>${seasonEl}</div>
   <div class="ctrl-block"><span class="ctrl-label">Forecast</span>${forecastsEl}</div>
   <div class="ctrl-block"><span class="ctrl-label">Observation sources</span>${sourcesEl}</div>
   <div class="ctrl-block">
@@ -281,7 +353,7 @@ const marks = [
 if (pcrRate !== null) {
   marks.push(
     Plot.ruleX([pcrRate], { stroke:"#939598", strokeDasharray:"4 3", strokeWidth:1 }),
-    Plot.text([[pcrRate + 0.7, 2]], { text:[`IAGOS PCR rate (${pcrRate}%)`], fill:"#939598", fontSize:13, textAnchor:"start" }),
+    Plot.text([[pcrRate + 0.3, 3.5]], { text:[`IAGOS PCR rate (${pcrRate}%)`], fill:"#939598", fontSize:13, textAnchor:"start" }),
   );
 }
 
@@ -309,14 +381,24 @@ for (const src of activeSources) {
   }
 }
 
+if (forecasts.length > 1) {
+  marks.push(
+    Plot.line([[0.5, 97], [3, 97]], { stroke: "#888", strokeWidth: 2, className: "forecast-inline-legend" }),
+    Plot.text([[3.5, 97]], { text: ["Contrails.org"], fill: "#888", fontSize: 13, textAnchor: "start", className: "forecast-inline-legend" }),
+    Plot.line([[0.5, 92], [3, 92]], { stroke: "#888", strokeWidth: 2, strokeDasharray: "5 3", className: "forecast-inline-legend" }),
+    Plot.text([[3.5, 92]], { text: ["Google"], fill: "#888", fontSize: 13, textAnchor: "start", className: "forecast-inline-legend" }),
+  );
+}
+
 const chartEl = Plot.plot({
   className: "plot",
   width: W, height: H,
   style: { fontSize: "15px" },
-  marginLeft: 60,
+  marginLeft: 72,
   marginBottom: 52,
+  marginTop: 24,
   x: { label: "Flight distance in forecast PCR (%)", domain:[0,28], line:true, labelOffset: 42 },
-  y: { label: "Hit rate (%)", domain:[0,100], line:true, labelOffset: 52 },
+  y: { label: "Hit rate (%)", domain:[0,100], line:true, labelOffset: 62 },
   marks,
 });
 display(chartEl);
@@ -358,11 +440,19 @@ html`<div style="font-size:12px; color:var(--theme-foreground-muted); margin-top
 
 ```js
 {
-  const dlBtn = html`<button type="button" class="btn-toggle" style="margin-bottom:0.5rem">⬇ Download PNG</button>`;
-  dlBtn.addEventListener("click", async () => {
+  const csvUrl = await FileAttachment("benchmarks.csv").url();
+  const logoUrl = await FileAttachment("../@static/logo-black.svg").url();
+
+  const pngLink = html`<a href="#">⬇ Download PNG</a>`;
+  const csvLink = html`<a href="${csvUrl}" download="contrailbench-2026q1.csv">⬇ Download data (CSV)</a>`;
+  const srcLink = html`<a href="https://github.com/contrailcirrus/contrails-notebook-dash/blob/main/src/bench-2026q1/index.md?plain=1" target="_blank">Source ↗︎</a>`;
+
+  pngLink.addEventListener("click", async (e) => {
+    e.preventDefault();
     const svg = chartEl.querySelector ? (chartEl.querySelector("svg") ?? chartEl) : chartEl;
     const clone = svg.cloneNode(true);
-    // Inline a style block so CSS vars resolve when rasterised off-page
+    // Remove in-chart forecast legend — will be redrawn as canvas overlay
+    for (const el of clone.querySelectorAll(".forecast-inline-legend")) el.remove();
     const st = document.createElement("style");
     st.textContent = `svg { font-family: system-ui, sans-serif; }`;
     clone.prepend(st);
@@ -375,11 +465,13 @@ html`<div style="font-size:12px; color:var(--theme-foreground-muted); margin-top
     const chartH = parseInt(svg.getAttribute("height")) || H;
     const pad = 16;
     const headerH = 72;
+    const chartMarginLeft = 72; // matches Plot.plot marginLeft
+    const chartMarginTop  = 24; // matches Plot.plot marginTop
 
-    // Build subtitle text
     const fLabel = forecasts.map(f => FORECAST_LABEL[f]).join(" & ") || "No forecast selected";
     const rLabel = region === "global" ? "Global" : "Continental US";
-    const subtitle = `${fLabel} · ${rLabel}, ${SEASON_LABEL[season]}`;
+    const legendSrcItems = activeSources.filter(s => long.some(d => d.source === s));
+    const legendFcastItems = forecasts.length > 1 ? forecasts : [];
 
     const canvas = document.createElement("canvas");
     canvas.width = chartW * scale;
@@ -387,40 +479,53 @@ html`<div style="font-size:12px; color:var(--theme-foreground-muted); margin-top
     const ctx = canvas.getContext("2d");
     ctx.scale(scale, scale);
 
-    // White background
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, chartW, headerH + chartH);
+    await document.fonts.ready;
 
     // Title
     ctx.fillStyle = "#161a26";
-    ctx.font = "700 20px system-ui, sans-serif";
+    ctx.font = "700 20px Aeonik, system-ui, sans-serif";
     ctx.fillText("ContrailBench V1", pad, pad + 20);
 
-    // Subtitle
+    // Subtitle with colored source names
+    let sx = pad;
+    const subY = pad + 20 + 8 + 13;
     ctx.fillStyle = "#888888";
-    ctx.font = "400 13px system-ui, sans-serif";
-    ctx.fillText(subtitle, pad, pad + 20 + 8 + 13);
-
-    // Logo (top-right; skip silently if unavailable)
-    try {
-      const logoResp = await fetch("/@static/logo-black.svg");
-      if (logoResp.ok) {
-        const logoBlob = await logoResp.blob();
-        const logoUrl = URL.createObjectURL(logoBlob);
-        await new Promise(res => {
-          const logoImg = new Image();
-          logoImg.onload = () => {
-            const logoH = 28;
-            const logoW = logoImg.naturalWidth * (logoH / logoImg.naturalHeight);
-            ctx.drawImage(logoImg, chartW - logoW - pad, (headerH - logoH) / 2, logoW, logoH);
-            URL.revokeObjectURL(logoUrl);
-            res();
-          };
-          logoImg.onerror = res;
-          logoImg.src = logoUrl;
-        });
+    ctx.font = "400 13px Aeonik, system-ui, sans-serif";
+    const subtitleBase = `${fLabel} · ${rLabel}, ${SEASON_LABEL[season]}`;
+    ctx.fillText(subtitleBase, sx, subY);
+    sx += ctx.measureText(subtitleBase).width;
+    if (legendSrcItems.length > 0) {
+      ctx.fillStyle = "#888888";
+      ctx.fillText(" · ", sx, subY);
+      sx += ctx.measureText(" · ").width;
+      for (let i = 0; i < legendSrcItems.length; i++) {
+        if (i > 0) {
+          ctx.fillStyle = "#888888"; ctx.font = "400 13px Aeonik, system-ui, sans-serif";
+          ctx.fillText(" · ", sx, subY); sx += ctx.measureText(" · ").width;
+        }
+        const src = legendSrcItems[i];
+        ctx.fillStyle = SOURCE_COLOR[src];
+        ctx.font = "700 13px Aeonik, system-ui, sans-serif";
+        ctx.fillText(src, sx, subY);
+        sx += ctx.measureText(src).width;
+        ctx.font = "400 13px Aeonik, system-ui, sans-serif";
       }
-    } catch (_) {}
+    }
+
+    // Logo: load /@static/logo-black.svg and draw in top-right
+    const logoH = 24;
+    const logoW = Math.round(logoH * 796.795 / 132.633);
+    await new Promise(res => {
+      const logoImg = new Image();
+      logoImg.onload = () => {
+        ctx.drawImage(logoImg, chartW - logoW - pad, (headerH - logoH) / 2, logoW, logoH);
+        res();
+      };
+      logoImg.onerror = (e) => { console.warn("PNG logo failed to load", e); res(); };
+      logoImg.src = logoUrl;
+    });
 
     // Chart SVG
     await new Promise((res, rej) => {
@@ -431,6 +536,30 @@ html`<div style="font-size:12px; color:var(--theme-foreground-muted); margin-top
     });
     URL.revokeObjectURL(chartUrl);
 
+    // Legend overlaid on top-left of chart plot area
+    let lx = chartMarginLeft + 8;
+    let ly = headerH + chartMarginTop + 8;
+    ctx.font = "400 13px Aeonik, system-ui, sans-serif";
+    for (const src of legendSrcItems) {
+      const color = SOURCE_COLOR[src];
+      ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.setLineDash([]);
+      ctx.beginPath(); ctx.moveTo(lx, ly + 5); ctx.lineTo(lx + 22, ly + 5); ctx.stroke();
+      ctx.fillStyle = color; ctx.beginPath(); ctx.arc(lx + 11, ly + 5, 3, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = color; ctx.fillText(src, lx + 28, ly + 9);
+      ly += 20;
+    }
+    if (legendFcastItems.length > 0) {
+      ly += 4;
+      for (const fcast of legendFcastItems) {
+        ctx.strokeStyle = "#888"; ctx.lineWidth = 2;
+        ctx.setLineDash(fcast === "google" ? [5, 3] : []);
+        ctx.beginPath(); ctx.moveTo(lx, ly + 5); ctx.lineTo(lx + 22, ly + 5); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = "#555"; ctx.fillText(FORECAST_LABEL[fcast], lx + 28, ly + 9);
+        ly += 20;
+      }
+    }
+
     canvas.toBlob(b => {
       const a = document.createElement("a");
       a.href = URL.createObjectURL(b);
@@ -438,17 +567,10 @@ html`<div style="font-size:12px; color:var(--theme-foreground-muted); margin-top
       a.click();
     }, "image/png");
   });
-  display(dlBtn);
-}
-```
 
-```js
-html`<div class="bench-downloads">
-  Download data:
-  ${forecasts.map(f => {
-    const parts = [region, ...(season !== "annual" ? [season] : []), f];
-    const stem = parts.join("-");
-    return html`<a href="${BASE_URL}/${stem}.pq">${FORECAST_LABEL[f]} ↓</a><a href="${BASE_URL}/${stem}-ci.pq">${FORECAST_LABEL[f]} CI ↓</a>`;
-  })}
-</div>`
+  display(html`<div class="bench-downloads">
+    <div class="bench-downloads-links">${pngLink} ${csvLink} ${srcLink}</div>
+    <a href="https://contrails.org" target="_blank" rel="noopener"><img class="bench-logo" src="${logoUrl}" alt="Contrails.org"></a>
+  </div>`);
+}
 ```

@@ -104,39 +104,63 @@ import "../@components/observer.js";
 ```js
 // Sync theme with parent frame (e.g. Furo dark-mode toggle on the ContrailBench docs site)
 {
+  const DARK_CSS = `
+    :root, :root[data-theme="dark"] {
+      color-scheme: dark;
+      --theme-foreground: #dfdfd6;
+      --theme-foreground-focus: oklch(0.712564 0.257662 265.758);
+      --theme-background-b: #161616;
+      --theme-background-a: color-mix(in srgb, var(--theme-foreground) 4%, var(--theme-background-b));
+      --theme-background: var(--theme-background-a);
+      --theme-background-alt: var(--theme-background-b);
+      --theme-foreground-alt: color-mix(in srgb, var(--theme-foreground) 90%, var(--theme-background-b));
+      --theme-foreground-muted: color-mix(in srgb, var(--theme-foreground) 60%, var(--theme-background-b));
+      --theme-foreground-faint: color-mix(in srgb, var(--theme-foreground) 50%, var(--theme-background-b));
+      --theme-foreground-fainter: color-mix(in srgb, var(--theme-foreground) 30%, var(--theme-background-b));
+      --theme-foreground-faintest: color-mix(in srgb, var(--theme-foreground) 14%, var(--theme-background-b));
+    }
+    .bench-logo-light { display: none; }
+    .bench-logo-dark  { display: block; }
+    .btn-toggle.source-iagos.active {
+      background: #dfdfd6; border-color: #dfdfd6; color: #161616;
+    }
+    .btn-toggle.source-iagos:hover:not(.dimmed):not(.active) {
+      border-color: #dfdfd6; color: #dfdfd6;
+    }
+    svg [fill="#161a26"]   { fill: #dfdfd6; }
+    svg [stroke="#161a26"] { stroke: #dfdfd6; }
+  `;
+
+  // Light override forces light vars even when the OS prefers-color-scheme is dark
+  // (Observable's built-in @media (prefers-color-scheme: dark) would otherwise win
+  // when we simply remove the dark override).
+  const LIGHT_CSS = `
+    :root, :root[data-theme="light"] {
+      color-scheme: light;
+      --theme-foreground: #161616;
+      --theme-foreground-focus: oklch(0.712564 0.257662 265.758);
+      --theme-background-b: #ffffff;
+      --theme-background-a: color-mix(in srgb, var(--theme-foreground) 4%, var(--theme-background-b));
+      --theme-background: var(--theme-background-b);
+      --theme-background-alt: var(--theme-background-a);
+      --theme-foreground-alt: color-mix(in srgb, var(--theme-foreground) 90%, var(--theme-background-b));
+      --theme-foreground-muted: color-mix(in srgb, var(--theme-foreground) 60%, var(--theme-background-b));
+      --theme-foreground-faint: color-mix(in srgb, var(--theme-foreground) 50%, var(--theme-background-b));
+      --theme-foreground-fainter: color-mix(in srgb, var(--theme-foreground) 30%, var(--theme-background-b));
+      --theme-foreground-faintest: color-mix(in srgb, var(--theme-foreground) 14%, var(--theme-background-b));
+    }
+    .bench-logo-light { display: block; }
+    .bench-logo-dark  { display: none; }
+  `;
+
   const applyTheme = (dark) => {
     let el = document.getElementById("_bench-theme-override");
-    if (dark) {
-      if (!el) { el = document.createElement("style"); el.id = "_bench-theme-override"; document.head.appendChild(el); }
-      el.textContent = `
-        :root {
-          color-scheme: dark;
-          --theme-foreground: #dfdfd6;
-          --theme-foreground-focus: oklch(0.712564 0.257662 265.758);
-          --theme-background-b: #161616;
-          --theme-background-a: color-mix(in srgb, var(--theme-foreground) 4%, var(--theme-background-b));
-          --theme-background: var(--theme-background-a);
-          --theme-background-alt: var(--theme-background-b);
-          --theme-foreground-alt: color-mix(in srgb, var(--theme-foreground) 90%, var(--theme-background-b));
-          --theme-foreground-muted: color-mix(in srgb, var(--theme-foreground) 60%, var(--theme-background-b));
-          --theme-foreground-faint: color-mix(in srgb, var(--theme-foreground) 50%, var(--theme-background-b));
-          --theme-foreground-fainter: color-mix(in srgb, var(--theme-foreground) 30%, var(--theme-background-b));
-          --theme-foreground-faintest: color-mix(in srgb, var(--theme-foreground) 14%, var(--theme-background-b));
-        }
-        .bench-logo-light { display: none; }
-        .bench-logo-dark  { display: block; }
-        .btn-toggle.source-iagos.active {
-          background: #dfdfd6; border-color: #dfdfd6; color: #161616;
-        }
-        .btn-toggle.source-iagos:hover:not(.dimmed):not(.active) {
-          border-color: #dfdfd6; color: #dfdfd6;
-        }
-        svg [fill="#161a26"]   { fill: #dfdfd6; }
-        svg [stroke="#161a26"] { stroke: #dfdfd6; }
-      `;
-    } else {
-      el?.remove();
+    if (!el) {
+      el = document.createElement("style");
+      el.id = "_bench-theme-override";
+      document.head.appendChild(el);
     }
+    el.textContent = dark ? DARK_CSS : LIGHT_CSS;
   };
 
   window.addEventListener("message", (e) => {

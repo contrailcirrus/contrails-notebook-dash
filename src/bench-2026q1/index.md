@@ -129,6 +129,9 @@ import "../@components/observer.js";
     }
     svg [fill="#161a26"]   { fill: #dfdfd6; }
     svg [stroke="#161a26"] { stroke: #dfdfd6; }
+    /* Inline style="color:#161a26" on the IAGOS title-line span and legend
+       row label can't be overridden without !important. */
+    [style*="#161a26"] { color: #dfdfd6 !important; }
   `;
 
   // Light override forces light vars even when the OS prefers-color-scheme is dark

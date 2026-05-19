@@ -119,13 +119,15 @@ import "../@components/observer.js";
       --theme-foreground-fainter: color-mix(in srgb, var(--theme-foreground) 30%, var(--theme-background-b));
       --theme-foreground-faintest: color-mix(in srgb, var(--theme-foreground) 14%, var(--theme-background-b));
     }
-    .bench-logo-light { display: none; }
-    .bench-logo-dark  { display: block; }
+    .bench-logo-light { display: none !important; }
+    .bench-logo-dark  { display: block !important; }
+    /* Base IAGOS rules live in a <style> inside <main> (later in document
+       order), so they win on specificity ties — use !important here. */
     .btn-toggle.source-iagos.active {
-      background: #dfdfd6; border-color: #dfdfd6; color: #161616;
+      background: #dfdfd6 !important; border-color: #dfdfd6 !important; color: #161616 !important;
     }
     .btn-toggle.source-iagos:hover:not(.dimmed):not(.active) {
-      border-color: #dfdfd6; color: #dfdfd6;
+      border-color: #dfdfd6 !important; color: #dfdfd6 !important;
     }
     svg [fill="#161a26"]   { fill: #dfdfd6; }
     svg [stroke="#161a26"] { stroke: #dfdfd6; }
@@ -152,8 +154,8 @@ import "../@components/observer.js";
       --theme-foreground-fainter: color-mix(in srgb, var(--theme-foreground) 30%, var(--theme-background-b));
       --theme-foreground-faintest: color-mix(in srgb, var(--theme-foreground) 14%, var(--theme-background-b));
     }
-    .bench-logo-light { display: block; }
-    .bench-logo-dark  { display: none; }
+    .bench-logo-light { display: block !important; }
+    .bench-logo-dark  { display: none !important; }
   `;
 
   const applyTheme = (dark) => {

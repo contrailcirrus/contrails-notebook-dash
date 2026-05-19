@@ -168,14 +168,16 @@ import "../@components/observer.js";
 
   window.addEventListener("message", (e) => {
     if (e.data?.type === "theme") {
-      console.debug("[benchframe-theme] iframe received", e.data.value);
+      console.log("[benchframe-theme] iframe received", e.data.value);
       applyTheme(e.data.value === "dark");
     }
   });
 
+  console.log("[benchframe-theme] iframe listener installed; parent ==", window.parent === window ? "self (standalone)" : "other (iframed)");
+
   // Ask parent for its current theme on load
   if (window.parent !== window) {
-    console.debug("[benchframe-theme] iframe requesting theme from parent");
+    console.log("[benchframe-theme] iframe requesting theme from parent");
     window.parent.postMessage({ type: "theme-request" }, "*");
   }
 }

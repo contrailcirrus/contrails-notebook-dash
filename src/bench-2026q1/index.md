@@ -102,8 +102,8 @@ import "../@components/observer.js";
 ```
 
 ```js
-// Sync theme with parent frame (e.g. Furo dark-mode toggle on the ContrailBench docs site)
-{
+// Sync theme with parent frame; isDark is a reactive cell that re-renders the chart on toggle
+const isDark = Generators.observe(notify => {
   const applyTheme = (dark) => {
     let el = document.getElementById("_bench-theme-override");
     if (dark) {
@@ -125,10 +125,17 @@ import "../@components/observer.js";
         }
         .bench-logo-light { display: none; }
         .bench-logo-dark  { display: block; }
+        .btn-toggle.source-iagos.active {
+          background: #dfdfd6; border-color: #dfdfd6; color: #161616;
+        }
+        .btn-toggle.source-iagos:hover:not(.dimmed):not(.active) {
+          border-color: #dfdfd6; color: #dfdfd6;
+        }
       `;
     } else {
       el?.remove();
     }
+    notify(dark);
   };
 
   window.addEventListener("message", (e) => {
@@ -137,7 +144,8 @@ import "../@components/observer.js";
 
   // Ask parent for its current theme on load
   if (window.parent !== window) window.parent.postMessage({ type: "theme-request" }, "*");
-}
+  notify(false); // initial state: light
+});
 ```
 
 ```js
@@ -150,7 +158,6 @@ const SOURCE_COLS = {
   "GRUAN":         { val: "gruan_hit_rate",         lo: "gruan_hit_rate_lo",         hi: "gruan_hit_rate_hi"         },
   "ContrailWatch": { val: "contrailwatch_hit_rate", lo: "contrailwatch_hit_rate_lo", hi: "contrailwatch_hit_rate_hi" },
 };
-const SOURCE_COLOR   = { "IAGOS": "#161a26", "GRUAN": "#1093ff", "ContrailWatch": "#f26400" };
 const FORECAST_LABEL = { "contrails-org": "Contrails.org", "google": "Google" };
 const SEASON_LABEL   = {
   annual: "January–December 2024",
@@ -164,6 +171,15 @@ const IAGOS_PCR = {
   "global/summer":  7.0, "global/autumn":  9.5, "conus/annual":   9.5,
 };
 const BASE_URL = "https://storage.googleapis.com/contrailbench-public-data/2026Q1/benchmarks";
+```
+
+```js
+// Reactive: re-evaluated whenever isDark changes, causing the chart to re-render
+const SOURCE_COLOR = {
+  "IAGOS": isDark ? "#dfdfd6" : "#161a26",
+  "GRUAN": "#1093ff",
+  "ContrailWatch": "#f26400",
+};
 ```
 
 ```js

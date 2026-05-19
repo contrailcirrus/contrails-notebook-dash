@@ -161,9 +161,12 @@ import "../@components/observer.js";
     if (!el) {
       el = document.createElement("style");
       el.id = "_bench-theme-override";
-      document.head.appendChild(el);
     }
     el.textContent = dark ? DARK_CSS : LIGHT_CSS;
+    // Re-append so the override is always the LAST stylesheet in <head>:
+    // the page's base <style> block is injected after Observable boots, so
+    // unless we keep our override at the end the base rules win on tie.
+    document.head.appendChild(el);
   };
 
   window.addEventListener("message", (e) => {

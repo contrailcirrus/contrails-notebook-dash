@@ -84,6 +84,7 @@ body { max-width: 860px; }
 .bench-downloads-links { display: flex; flex-wrap: wrap; gap: 0 1rem; align-items: center; }
 .bench-downloads a { color: var(--theme-foreground-muted); }
 .bench-downloads img.bench-logo { height: 24px; width: auto; display: block; flex-shrink: 0; }
+.bench-logo-dark { display: none; }
 /* Title row with Share button */
 .title-row {
   display: flex; align-items: center; justify-content: space-between;
@@ -98,6 +99,45 @@ body { max-width: 860px; }
 
 ```js
 import "../@components/observer.js";
+```
+
+```js
+// Sync theme with parent frame (e.g. Furo dark-mode toggle on the ContrailBench docs site)
+{
+  const applyTheme = (dark) => {
+    let el = document.getElementById("_bench-theme-override");
+    if (dark) {
+      if (!el) { el = document.createElement("style"); el.id = "_bench-theme-override"; document.head.appendChild(el); }
+      el.textContent = `
+        :root {
+          color-scheme: dark;
+          --theme-foreground: #dfdfd6;
+          --theme-foreground-focus: oklch(0.712564 0.257662 265.758);
+          --theme-background-b: #161616;
+          --theme-background-a: color-mix(in srgb, var(--theme-foreground) 4%, var(--theme-background-b));
+          --theme-background: var(--theme-background-a);
+          --theme-background-alt: var(--theme-background-b);
+          --theme-foreground-alt: color-mix(in srgb, var(--theme-foreground) 90%, var(--theme-background-b));
+          --theme-foreground-muted: color-mix(in srgb, var(--theme-foreground) 60%, var(--theme-background-b));
+          --theme-foreground-faint: color-mix(in srgb, var(--theme-foreground) 50%, var(--theme-background-b));
+          --theme-foreground-fainter: color-mix(in srgb, var(--theme-foreground) 30%, var(--theme-background-b));
+          --theme-foreground-faintest: color-mix(in srgb, var(--theme-foreground) 14%, var(--theme-background-b));
+        }
+        .bench-logo-light { display: none; }
+        .bench-logo-dark  { display: block; }
+      `;
+    } else {
+      el?.remove();
+    }
+  };
+
+  window.addEventListener("message", (e) => {
+    if (e.data?.type === "theme") applyTheme(e.data.value === "dark");
+  });
+
+  // Ask parent for its current theme on load
+  if (window.parent !== window) window.parent.postMessage({ type: "theme-request" }, "*");
+}
 ```
 
 ```js
@@ -325,7 +365,8 @@ const long = filtered.flatMap(r =>
     const val = +r[c.val];
     if (isNaN(val)) return [];
     return [{
-      buffer:      +r.horizontal_buffer,
+      horizontal_buffer: +r.horizontal_buffer,
+      probability_threshold: +r.probability_threshold,
       penalty:     +r.penalty     * 100,
       penalty_lo:  +r.penalty_lo  * 100,
       penalty_hi:  +r.penalty_hi  * 100,
@@ -368,9 +409,12 @@ for (const src of activeSources) {
       Plot.dot(rows, {
         x:"penalty", y:"hit_rate", fill:color, r:4, tip:true,
         title: d => {
-          const ftype = d.forecast === "contrails-org" ? "Deterministic" : "Probabilistic";
-          const bufLabel = d.forecast === "contrails-org" ? "Buffer" : "Threshold";
-          return `Source: ${d.source}\nForecast type: ${ftype}\n${bufLabel}: ${d.buffer}\nPenalty: ${d.penalty.toFixed(1)} %\nHit rate: ${d.hit_rate.toFixed(1)} %`;
+          const fName  = FORECAST_LABEL[d.forecast];
+          const ftype  = d.forecast === "contrails-org" ? "Deterministic" : "Probabilistic";
+          const paramLine = d.forecast === "contrails-org"
+            ? `Horizontal Buffer: +${d.horizontal_buffer} 0.25\u00b0 \u00d7 0.25\u00b0 cell`
+            : `Probability Threshold: ${(d.probability_threshold * 100).toFixed(1)}%`;
+          return `Forecast: ${fName}\nSource: ${d.source}\nType: ${ftype}\n${paramLine}\nPenalty: ${d.penalty.toFixed(1)} %\nHit rate: ${d.hit_rate.toFixed(1)} %`;
         },
       }),
     );
@@ -397,7 +441,7 @@ const chartEl = Plot.plot({
   marginLeft: 72,
   marginBottom: 52,
   marginTop: 24,
-  x: { label: "Flight distance in forecast PCR (%)", domain:[0,28], line:true, labelOffset: 42 },
+  x: { label: "Flight distance in forecast PCR (%)", domain:[0,32], line:true, labelOffset: 42 },
   y: { label: "Hit rate (%)", domain:[0,100], line:true, labelOffset: 62 },
   marks,
 });
@@ -441,7 +485,9 @@ html`<div style="font-size:12px; color:var(--theme-foreground-muted); margin-top
 ```js
 {
   const csvUrl = await FileAttachment("benchmarks.csv").url();
-  const logoUrl = await FileAttachment("../@static/logo-black.svg").url();
+  const logoBlackUrl = await FileAttachment("../@static/logo-black.svg").url();
+  const logoWhiteUrl = await FileAttachment("../@static/logo-white.svg").url();
+  const logoUrl = logoBlackUrl; // PNG download always uses light-mode logo
 
   const pngLink = html`<a href="#">⬇ Download PNG</a>`;
   const csvLink = html`<a href="${csvUrl}" download="contrailbench-2026q1.csv">⬇ Download data (CSV)</a>`;
@@ -570,7 +616,10 @@ html`<div style="font-size:12px; color:var(--theme-foreground-muted); margin-top
 
   display(html`<div class="bench-downloads">
     <div class="bench-downloads-links">${pngLink} ${csvLink} ${srcLink}</div>
-    <a href="https://contrails.org" target="_blank" rel="noopener"><img class="bench-logo" src="${logoUrl}" alt="Contrails.org"></a>
+    <a href="https://contrails.org" target="_blank" rel="noopener">
+      <img class="bench-logo bench-logo-light" src="${logoBlackUrl}" alt="Contrails.org">
+      <img class="bench-logo bench-logo-dark"  src="${logoWhiteUrl}" alt="Contrails.org">
+    </a>
   </div>`);
 }
 ```

@@ -164,11 +164,17 @@ import "../@components/observer.js";
   };
 
   window.addEventListener("message", (e) => {
-    if (e.data?.type === "theme") applyTheme(e.data.value === "dark");
+    if (e.data?.type === "theme") {
+      console.debug("[benchframe-theme] iframe received", e.data.value);
+      applyTheme(e.data.value === "dark");
+    }
   });
 
   // Ask parent for its current theme on load
-  if (window.parent !== window) window.parent.postMessage({ type: "theme-request" }, "*");
+  if (window.parent !== window) {
+    console.debug("[benchframe-theme] iframe requesting theme from parent");
+    window.parent.postMessage({ type: "theme-request" }, "*");
+  }
 }
 ```
 
@@ -438,17 +444,7 @@ for (const src of activeSources) {
     const dash = (forecasts.length > 1 && fcast === "google") ? "5 3" : null;
     marks.push(
       Plot.line(rows, { x:"penalty", y:"hit_rate", stroke:color, strokeWidth:2, strokeDasharray:dash }),
-      Plot.dot(rows, {
-        x:"penalty", y:"hit_rate", fill:color, r:4, tip:true,
-        title: d => {
-          const fName  = FORECAST_LABEL[d.forecast];
-          const ftype  = d.forecast === "contrails-org" ? "Deterministic" : "Probabilistic";
-          const paramLine = d.forecast === "contrails-org"
-            ? `Horizontal Buffer: +${d.horizontal_buffer} 0.25\u00b0 \u00d7 0.25\u00b0 cell`
-            : `Probability Threshold: ${(d.probability_threshold * 100).toFixed(1)}%`;
-          return `Forecast: ${fName}\nSource: ${d.source}\nType: ${ftype}\n${paramLine}\nPenalty: ${d.penalty.toFixed(1)} %\nHit rate: ${d.hit_rate.toFixed(1)} %`;
-        },
-      }),
+      Plot.dot(rows, { x:"penalty", y:"hit_rate", fill:color, r:4 }),
     );
     if (showCI) marks.push(
       Plot.ruleY(rows, { y:"hit_rate", x1:"penalty_lo", x2:"penalty_hi", stroke:color, strokeOpacity:0.4, strokeWidth:1.5 }),
@@ -456,6 +452,23 @@ for (const src of activeSources) {
     );
   }
 }
+
+// Single global tooltip across all (source, forecast) groups — avoids the
+// duplicated tips that appear when per-mark tip:true on overlapping points
+// each spawn their own tooltip.
+marks.push(
+  Plot.tip(long, Plot.pointer({
+    x: "penalty", y: "hit_rate",
+    title: d => {
+      const fName  = FORECAST_LABEL[d.forecast];
+      const ftype  = d.forecast === "contrails-org" ? "Deterministic" : "Probabilistic";
+      const paramLine = d.forecast === "contrails-org"
+        ? `Horizontal Buffer: +${d.horizontal_buffer} 0.25\u00b0 \u00d7 0.25\u00b0 cell`
+        : `Probability Threshold: ${(d.probability_threshold * 100).toFixed(1)}%`;
+      return `Forecast: ${fName}\nSource: ${d.source}\nType: ${ftype}\n${paramLine}\nPenalty: ${d.penalty.toFixed(1)} %\nHit rate: ${d.hit_rate.toFixed(1)} %`;
+    },
+  })),
+);
 
 if (forecasts.length > 1) {
   marks.push(

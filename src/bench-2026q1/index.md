@@ -378,8 +378,13 @@ const showCI   = Generators.input(showCIEl);
       ? [html`<span style="color:${SOURCE_COLOR[s]};font-weight:600">${s}</span>`]
       : [" · ", html`<span style="color:${SOURCE_COLOR[s]};font-weight:600">${s}</span>`]
   );
+  // Keep the source list together so that if the line wraps, it wraps as a
+  // unit onto row 2 rather than splitting individual source names across rows.
+  const srcBlock = srcParts.length
+    ? html`<span style="white-space:nowrap"> · ${srcParts}</span>`
+    : "";
   display(html`<p style="margin:0 0 1rem; color:var(--theme-foreground-muted); font-size:14px;">
-    ${fLabel} · ${rLabel}, ${SEASON_LABEL[season]}${srcParts.length ? html` · ${srcParts}` : ""}
+    ${fLabel} · ${rLabel}, ${SEASON_LABEL[season]}${srcBlock}
   </p>`);
 }
 ```

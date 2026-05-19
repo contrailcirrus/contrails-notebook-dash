@@ -95,6 +95,11 @@ body { max-width: 860px; }
 .title-row form svg { margin-bottom: -3px; }
 /* Hide the site footer entirely on this page — logo is rendered inline in download bar */
 #observablehq-footer { display: none !important; }
+/* Observable Framework wraps content in #observablehq-center with 32px margin
+   on all sides. In a narrow iframe (e.g. embedded in the Furo docs site) that
+   loses ~64px of horizontal width, forcing the subtitle to wrap unnecessarily.
+   Reclaim most of the horizontal margin while keeping a small visual gutter. */
+#observablehq-center { margin-left: 8px !important; margin-right: 8px !important; }
 </style>
 
 ```js
@@ -384,7 +389,7 @@ const showCI   = Generators.input(showCIEl);
     ? html`<span style="white-space:nowrap"> · ${srcParts}</span>`
     : "";
   display(html`<p style="margin:0 0 1rem; color:var(--theme-foreground-muted); font-size:14px;">
-    ${fLabel} · ${rLabel}, ${SEASON_LABEL[season]}${srcBlock}
+    ${fLabel} · ${rLabel}, <span style="white-space:nowrap">${SEASON_LABEL[season]}</span>${srcBlock}
   </p>`);
 }
 ```

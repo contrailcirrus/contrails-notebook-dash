@@ -383,13 +383,15 @@ const showCI   = Generators.input(showCIEl);
       ? [html`<span style="color:${SOURCE_COLOR[s]};font-weight:600">${s}</span>`]
       : [" · ", html`<span style="color:${SOURCE_COLOR[s]};font-weight:600">${s}</span>`]
   );
-  // Keep the source list together so that if the line wraps, it wraps as a
-  // unit onto row 2 rather than splitting individual source names across rows.
+  // Keep both the base (forecast/region/season) and the source list as
+  // single non-breaking units, so the ONLY break opportunity is the space
+  // between them — i.e. when wrapping is necessary, sources move as a unit
+  // to row 2 instead of breaking mid-phrase.
   const srcBlock = srcParts.length
     ? html`<span style="white-space:nowrap"> · ${srcParts}</span>`
     : "";
   display(html`<p style="margin:0 0 1rem; color:var(--theme-foreground-muted); font-size:14px;">
-    ${fLabel} · ${rLabel}, <span style="white-space:nowrap">${SEASON_LABEL[season]}</span>${srcBlock}
+    <span style="white-space:nowrap">${fLabel} · ${rLabel}, ${SEASON_LABEL[season]}</span>${srcBlock}
   </p>`);
 }
 ```

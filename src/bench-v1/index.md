@@ -99,8 +99,6 @@ title: ContrailBench V1
   }
   .bench-downloads-links { display: flex; flex-wrap: wrap; gap: 0 1rem; align-items: center; }
   .bench-downloads a { color: var(--theme-foreground-muted); }
-  .bench-downloads img.bench-logo { height: 24px; width: auto; display: block; flex-shrink: 0; }
-  .bench-logo-dark { display: none; }
   /* Title row with Share button */
   .title-row {
     display: flex; align-items: center; justify-content: space-between;
@@ -109,8 +107,6 @@ title: ContrailBench V1
   .title-row h1 { margin: 0 !important; }
   .title-row form { width: unset; }
   .title-row form svg { margin-bottom: -3px; }
-  /* Hide the site footer entirely on this page — logo is rendered inline in download bar */
-  #observablehq-footer { display: none !important; }
 </style>
 
 ```js
@@ -135,8 +131,8 @@ import "../@components/observer.js";
       --theme-foreground-fainter: color-mix(in srgb, var(--theme-foreground) 30%, var(--theme-background-b));
       --theme-foreground-faintest: color-mix(in srgb, var(--theme-foreground) 14%, var(--theme-background-b));
     }
-    .bench-logo-light { display: none !important; }
-    .bench-logo-dark  { display: block !important; }
+    .logo-light { display: none !important; }
+    .logo-dark  { display: block !important; }
     /* Base IAGOS rules live in a <style> inside <main> (later in document
        order), so they win on specificity ties — use !important here. */
     .btn-toggle.source-iagos.active {
@@ -170,8 +166,8 @@ import "../@components/observer.js";
       --theme-foreground-fainter: color-mix(in srgb, var(--theme-foreground) 30%, var(--theme-background-b));
       --theme-foreground-faintest: color-mix(in srgb, var(--theme-foreground) 14%, var(--theme-background-b));
     }
-    .bench-logo-light { display: block !important; }
-    .bench-logo-dark  { display: none !important; }
+    .logo-light { display: block !important; }
+    .logo-dark  { display: none !important; }
   `;
 
   const applyTheme = (dark) => {
@@ -803,11 +799,6 @@ html`<div
   const csvLink = html`<a href="${csvUrl}" download="contrailbench-2026q1.csv"
     >⬇ Download data (CSV)</a
   >`;
-  const srcLink = html`<a
-    href="https://github.com/contrailcirrus/contrails-notebook-dash/blob/main/src/bench-2026q1/index.md?plain=1"
-    target="_blank"
-    >Source ↗︎</a
-  >`;
 
   pngLink.addEventListener("click", async (e) => {
     e.preventDefault();
@@ -967,19 +958,7 @@ html`<div
 
   display(
     html`<div class="bench-downloads">
-      <div class="bench-downloads-links">${pngLink} ${csvLink} ${srcLink}</div>
-      <a href="https://contrails.org" target="_blank" rel="noopener">
-        <img
-          class="bench-logo bench-logo-light"
-          src="${logoBlackUrl}"
-          alt="Contrails.org"
-        />
-        <img
-          class="bench-logo bench-logo-dark"
-          src="${logoWhiteUrl}"
-          alt="Contrails.org"
-        />
-      </a>
+      <div class="bench-downloads-links">${pngLink} ${csvLink}</div>
     </div>`,
   );
 }

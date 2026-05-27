@@ -541,8 +541,8 @@ const pcrRate = IAGOS_PCR[`${region}/${season}`] ?? null;
 ```
 
 ```js
-const W = Math.min(width, 860);
-const H = Math.max(250, Math.round(W * (420 / 860)));
+const W = Math.min(width - 32, 860);  // subtracting padding of 2rem = 32px
+const H = Math.max(250, Math.round(W * (460 / 860)));
 const screenAngleDeg = (Math.atan2(H / 100, W / 28) * 180) / Math.PI;
 
 const marks = [

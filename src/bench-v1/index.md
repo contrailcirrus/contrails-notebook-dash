@@ -6,6 +6,22 @@ title: ContrailBench V1
 <style>
   body { max-width: 860px; }
 
+  .share {
+    position: absolute;
+    right: 0;
+    top: 0;
+
+    form {
+      width: unset;
+    }
+    svg {
+      margin-bottom: -3px;
+    }
+    /* "Copied!" text */
+    .observablehq-pre-copied::before {
+      padding: 0px 8px;
+    }
+  }
   /* ── Toggle button groups ─────────────────────────────────── */
   .ctrl-row {
     display: flex;
@@ -417,100 +433,80 @@ const showCI = Generators.input(showCIEl);
 }
 ```
 
+
+<!-- Share -->
 ```js
-// Title row + Share button (single setup; reads control state at click time)
-{
-  const shareButtonText = html`Share
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-    >
-      <path
-        d="M 21 5 A 3 3 0 1 1 15 5 A 3 3 0 1 1 21 5 M 9 12 A 3 3 0 1 1 3 12 A 3 3 0 1 1 9 12 M 21 19 A 3 3 0 1 1 15 19 A 3 3 0 1 1 21 19 M 8.5 10.5 L 15.5 6.5 M 8.5 13.5 L 15.5 17.5"
-        stroke-width="2"
-      />
-    </svg>`;
-  const shareButton = Inputs.button(shareButtonText, {
-    value: null,
-    reduce: async () => {
-      const p = new URLSearchParams();
-      if (regionEl.value !== "global") p.set("region", regionEl.value);
-      if (seasonEl.value !== "annual") p.set("season", seasonEl.value);
-      const fcs = forecastsEl.value;
-      if (!(fcs.length === 1 && fcs[0] === "contrails-org"))
-        p.set("forecasts", fcs.join(","));
-      const srcs = sourcesEl.value;
-      if (
-        !(srcs.length === 2 && srcs.includes("IAGOS") && srcs.includes("GRUAN"))
-      )
-        p.set("sources", srcs.join(","));
-      if (showCIEl.value) p.set("ci", "1");
-      const qs = p.toString();
-      const url = `${location.origin}${location.pathname}${qs ? "?" + qs : ""}`;
-      try {
-        await navigator.clipboard.writeText(url);
-        const btn = shareButton.querySelector("button");
-        btn.classList.add("observablehq-pre-copied");
-        btn.addEventListener(
-          "animationend",
-          () => btn.classList.remove("observablehq-pre-copied"),
-          { once: true },
-        );
-      } catch (_) {
-        window.prompt("Copy this link:", url);
-      }
-    },
-  });
-  display(
-    html`<div class="title-row">
-      <h1>ContrailBench V1</h1>
-      ${shareButton}
-    </div>`,
-  );
+const currentScenario = {
+  region: region,
+  season: season,
+  forecasts: forecasts,
+  sources: sources,
+  ci: showCI
 }
 ```
 
 ```js
-{
-  const fLabel =
-    forecasts.map((f) => FORECAST_LABEL[f]).join(" & ") ||
-    "No forecast selected";
-  const rLabel = region === "global" ? "Global" : "Continental US";
-  const srcParts = activeSources.flatMap((s, i) =>
-    i === 0
-      ? [
-          html`<span style="color:${SOURCE_COLOR[s]};font-weight:600"
-            >${s}</span
-          >`,
-        ]
-      : [
-          " · ",
-          html`<span style="color:${SOURCE_COLOR[s]};font-weight:600"
-            >${s}</span
-          >`,
-        ],
-  );
-  // Keep both the base (forecast/region/season) and the source list as
-  // single non-breaking units, so the ONLY break opportunity is the space
-  // between them — i.e. when wrapping is necessary, sources move as a unit
-  // to row 2 instead of breaking mid-phrase.
-  const srcBlock = srcParts.length
-    ? html`<span style="white-space:nowrap"> · ${srcParts}</span>`
-    : "";
-  display(
-    html`<p
-      style="margin:0 0 1rem; color:var(--theme-foreground-muted); font-size:14px;"
-    >
-      <span style="white-space:nowrap"
-        >${fLabel} · ${rLabel}, ${SEASON_LABEL[season]}</span
-      >${srcBlock}
-    </p>`,
-  );
+const showCopied = () => {
+  const button = document.getElementById("sharecontainer").querySelector('button');
+
+  // hack to steal the "Copied" text and animation from the <pre> code blocks
+  button.classList.add("observablehq-pre-copied");
+  button.addEventListener("animationend", () => button.classList.remove("observablehq-pre-copied"), { once: true });
 }
+
+const shareScenario = async () => {
+  const baseUrl = location.origin + location.pathname;
+  const params = new URLSearchParams(currentScenario);
+  const paramString = params.toString();
+  const shareUrl = `${baseUrl}?${paramString}`
+
+  try {
+    await navigator.share({
+      title: "ContrailBench v1",
+      url: shareUrl
+    })
+  } catch (e) {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      showCopied()
+      // alert("Copied scenario URL to clipboard")
+    } catch (error) {
+      console.error(error)
+    }
+  }
+}
+
+const shareButtonText =html`Share
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path d="M 21 5 A 3 3 0 1 1 15 5 A 3 3 0 1 1 21 5 M 9 12 A 3 3 0 1 1 3 12 A 3 3 0 1 1 9 12 M 21 19 A 3 3 0 1 1 15 19 A 3 3 0 1 1 21 19 M 8.5 10.5 L 15.5 6.5 M 8.5 13.5 L 15.5 17.5" stroke-width="2"/>
+    </svg>`
+const shareButton = Inputs.button(shareButtonText, {value: null, reduce: shareScenario});
 ```
+
+# ContrailBench
+
+### `v1`
+
+<div id="sharecontainer" class="share">${shareButton}</div>
+
+```js
+// Data selection labels
+const fLabel =
+  forecasts.map((f) => FORECAST_LABEL[f]).join(", ") ||
+  "No forecast selected";
+const rLabel = region === "global" ? "Global" : "Continental US";
+const sLabel = activeSources.join(", ") || "No observations selected";
+// const sLabel = activeSources.flatMap(s => html`<span style="color:${SOURCE_COLOR[s]};font-weight:600">${s}</span>&nbsp;`) || "No observations selected";
+```
+
+<small>
+
+**Forecast**: ${fLabel} <br/>
+**Region**:  ${rLabel} <br/>
+**Season**: ${SEASON_LABEL[season]} <br/>
+**Observations**:  ${sLabel}
+
+</small>
 
 ```js
 html`<div class="ctrl-row">

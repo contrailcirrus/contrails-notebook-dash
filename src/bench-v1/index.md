@@ -490,25 +490,6 @@ const shareButton = Inputs.button(shareButtonText, {value: null, reduce: shareSc
 <div id="sharecontainer" class="share">${shareButton}</div>
 
 ```js
-// Data selection labels
-const fLabel =
-  forecasts.map((f) => FORECAST_LABEL[f]).join(", ") ||
-  "No forecast selected";
-const rLabel = region === "global" ? "Global" : "Continental US";
-const sLabel = activeSources.join(", ") || "No observations selected";
-// const sLabel = activeSources.flatMap(s => html`<span style="color:${SOURCE_COLOR[s]};font-weight:600">${s}</span>&nbsp;`) || "No observations selected";
-```
-
-<small>
-
-**Forecast**: ${fLabel} <br/>
-**Region**:  ${rLabel} <br/>
-**Season**: ${SEASON_LABEL[season]} <br/>
-**Observations**:  ${sLabel}
-
-</small>
-
-```js
 html`<div class="ctrl-row">
   <div class="ctrl-block">
     <span class="ctrl-label">Region</span>${regionEl}

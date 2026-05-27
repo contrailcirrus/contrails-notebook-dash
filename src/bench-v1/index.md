@@ -726,15 +726,8 @@ html`<div
   ${legendForecasts.length > 1
     ? legendSources.map(
         (src) =>
-          html`<div
-            style="display:flex; align-items:center; gap:1rem; margin-bottom:3px;"
-          >
-            <span
-              style="min-width:90px; font-weight:600; color:${SOURCE_COLOR[
-                src
-              ]}"
-              >${src}</span
-            >
+          html`<div style="display:flex;align-items:center;gap:1rem;margin-bottom:3px;">
+            <span style="min-width:90px;font-weight:600;color:${SOURCE_COLOR[src]}">${src}</span>
             <span style="display:flex; align-items:center; gap:4px;">
               <svg width="26" height="10" style="vertical-align:middle">
                 <line

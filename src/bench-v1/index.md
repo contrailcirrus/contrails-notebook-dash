@@ -782,12 +782,10 @@ html`<div
 
 ```js
 const csvUrl = await FileAttachment("benchmarks.csv").url();
-const logoBlackUrl = await FileAttachment("../@static/logo-black.svg").url();
-const logoWhiteUrl = await FileAttachment("../@static/logo-white.svg").url();
-const logoUrl = logoBlackUrl; // PNG download always uses light-mode logo
+const logoUrl = await FileAttachment("../@static/logo-black.svg").url();; // PNG download always uses light-mode logo
 
 const pngLink = html`<a href="#">⬇ Download PNG</a>`;
-const csvLink = html`<a href="${csvUrl}" download="contrailbench-2026q1.csv"
+const csvLink = html`<a href="${csvUrl}" download="contrailbench-v1.csv"
   >⬇ Download data (CSV)</a
 >`;
 
@@ -807,7 +805,7 @@ pngLink.addEventListener("click", async (e) => {
   const svgBlob = new Blob([svgStr], { type: "image/svg+xml;charset=utf-8" });
   const chartUrl = URL.createObjectURL(svgBlob);
 
-  const scale = 2;
+  const scale = 3;
   const chartW = parseInt(svg.getAttribute("width")) || W;
   const chartH = parseInt(svg.getAttribute("height")) || H;
   const pad = 16;
@@ -837,7 +835,7 @@ pngLink.addEventListener("click", async (e) => {
   // Title
   ctx.fillStyle = "#161a26";
   ctx.font = "700 20px Aeonik, system-ui, sans-serif";
-  ctx.fillText("ContrailBench V1", pad, pad + 20);
+  ctx.fillText("ContrailBench v1", pad, pad + 20);
 
   // Subtitle with colored source names
   let sx = pad;

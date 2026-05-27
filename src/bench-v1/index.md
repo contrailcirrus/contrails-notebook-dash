@@ -98,14 +98,6 @@ title: ContrailBench V1
   }
   .bench-downloads-links { display: flex; flex-wrap: wrap; gap: 0 1rem; align-items: center; }
   .bench-downloads a { color: var(--theme-foreground-muted); }
-  /* Title row with Share button */
-  .title-row {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 1rem; margin: 1.5rem 0 0.25rem;
-  }
-  .title-row h1 { margin: 0 !important; }
-  .title-row form { width: unset; }
-  .title-row form svg { margin-bottom: -3px; }
 </style>
 
 ```js

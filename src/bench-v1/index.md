@@ -549,8 +549,8 @@ const pcrRate = IAGOS_PCR[`${region}/${season}`] ?? null;
 ```
 
 ```js
-const W = Math.min(width, 680);
-const H = Math.round((W * 420) / 680);
+const W = Math.min(width, 860);
+const H = Math.max(250, Math.round(W * (420 / 860)));
 const screenAngleDeg = (Math.atan2(H / 100, W / 28) * 180) / Math.PI;
 
 const marks = [
@@ -657,12 +657,12 @@ if (forecasts.length > 1) {
   marks.push(
     Plot.line(
       [
-        [0.5, 97],
-        [3, 97],
+        [0.5, 95],
+        [3, 95],
       ],
       { stroke: "#888", strokeWidth: 2, className: "forecast-inline-legend" },
     ),
-    Plot.text([[3.5, 97]], {
+    Plot.text([[3.5, 95]], {
       text: ["Contrails.org"],
       fill: "#888",
       fontSize: 13,
@@ -671,8 +671,8 @@ if (forecasts.length > 1) {
     }),
     Plot.line(
       [
-        [0.5, 92],
-        [3, 92],
+        [0.5, 88],
+        [3, 88],
       ],
       {
         stroke: "#888",
@@ -681,7 +681,7 @@ if (forecasts.length > 1) {
         className: "forecast-inline-legend",
       },
     ),
-    Plot.text([[3.5, 92]], {
+    Plot.text([[3.5, 88]], {
       text: ["Google"],
       fill: "#888",
       fontSize: 13,
@@ -696,7 +696,8 @@ const chartEl = Plot.plot({
   width: W,
   height: H,
   style: { fontSize: "15px" },
-  marginLeft: 72,
+  marginLeft: 40,
+  marginRight: 0,
   marginBottom: 52,
   marginTop: 24,
   x: {
@@ -705,7 +706,7 @@ const chartEl = Plot.plot({
     line: true,
     labelOffset: 42,
   },
-  y: { label: "Hit rate (%)", domain: [0, 100], line: true, labelOffset: 62 },
+  y: { label: "Hit rate (%)", domain: [0, 100], line: true, labelOffset: 5 },
   marks,
 });
 display(chartEl);

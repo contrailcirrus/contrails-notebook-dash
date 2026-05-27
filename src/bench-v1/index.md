@@ -89,13 +89,12 @@ title: ContrailBench V1
   .ci-help:hover::after { display: block; }
   .bench-downloads {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
+    align-items: flex-end;
+    justify-content: flex-end;
     gap: 1rem;
     font-size: 12px;
     color: var(--theme-foreground-muted);
-    margin-top: 0.5rem;
-    margin-bottom: 0;
+    margin: 1rem 0;
   }
   .bench-downloads-links { display: flex; flex-wrap: wrap; gap: 0 1rem; align-items: center; }
   .bench-downloads a { color: var(--theme-foreground-muted); }
@@ -782,177 +781,173 @@ html`<div
 ```
 
 ```js
-{
-  const csvUrl = await FileAttachment("benchmarks.csv").url();
-  const logoBlackUrl = await FileAttachment("../@static/logo-black.svg").url();
-  const logoWhiteUrl = await FileAttachment("../@static/logo-white.svg").url();
-  const logoUrl = logoBlackUrl; // PNG download always uses light-mode logo
+const csvUrl = await FileAttachment("benchmarks.csv").url();
+const logoBlackUrl = await FileAttachment("../@static/logo-black.svg").url();
+const logoWhiteUrl = await FileAttachment("../@static/logo-white.svg").url();
+const logoUrl = logoBlackUrl; // PNG download always uses light-mode logo
 
-  const pngLink = html`<a href="#">⬇ Download PNG</a>`;
-  const csvLink = html`<a href="${csvUrl}" download="contrailbench-2026q1.csv"
-    >⬇ Download data (CSV)</a
-  >`;
+const pngLink = html`<a href="#">⬇ Download PNG</a>`;
+const csvLink = html`<a href="${csvUrl}" download="contrailbench-2026q1.csv"
+  >⬇ Download data (CSV)</a
+>`;
 
-  pngLink.addEventListener("click", async (e) => {
-    e.preventDefault();
-    const svg = chartEl.querySelector
-      ? chartEl.querySelector("svg") ?? chartEl
-      : chartEl;
-    const clone = svg.cloneNode(true);
-    // Remove in-chart forecast legend — will be redrawn as canvas overlay
-    for (const el of clone.querySelectorAll(".forecast-inline-legend"))
-      el.remove();
-    const st = document.createElement("style");
-    st.textContent = `svg { font-family: system-ui, sans-serif; }`;
-    clone.prepend(st);
-    const svgStr = new XMLSerializer().serializeToString(clone);
-    const svgBlob = new Blob([svgStr], { type: "image/svg+xml;charset=utf-8" });
-    const chartUrl = URL.createObjectURL(svgBlob);
+pngLink.addEventListener("click", async (e) => {
+  e.preventDefault();
+  const svg = chartEl.querySelector
+    ? chartEl.querySelector("svg") ?? chartEl
+    : chartEl;
+  const clone = svg.cloneNode(true);
+  // Remove in-chart forecast legend — will be redrawn as canvas overlay
+  for (const el of clone.querySelectorAll(".forecast-inline-legend"))
+    el.remove();
+  const st = document.createElement("style");
+  st.textContent = `svg { font-family: system-ui, sans-serif; }`;
+  clone.prepend(st);
+  const svgStr = new XMLSerializer().serializeToString(clone);
+  const svgBlob = new Blob([svgStr], { type: "image/svg+xml;charset=utf-8" });
+  const chartUrl = URL.createObjectURL(svgBlob);
 
-    const scale = 2;
-    const chartW = parseInt(svg.getAttribute("width")) || W;
-    const chartH = parseInt(svg.getAttribute("height")) || H;
-    const pad = 16;
-    const headerH = 72;
-    const chartMarginLeft = 72; // matches Plot.plot marginLeft
-    const chartMarginTop = 24; // matches Plot.plot marginTop
+  const scale = 2;
+  const chartW = parseInt(svg.getAttribute("width")) || W;
+  const chartH = parseInt(svg.getAttribute("height")) || H;
+  const pad = 16;
+  const headerH = 72;
+  const chartMarginLeft = 72; // matches Plot.plot marginLeft
+  const chartMarginTop = 24; // matches Plot.plot marginTop
 
-    const fLabel =
-      forecasts.map((f) => FORECAST_LABEL[f]).join(" & ") ||
-      "No forecast selected";
-    const rLabel = region === "global" ? "Global" : "Continental US";
-    const legendSrcItems = activeSources.filter((s) =>
-      long.some((d) => d.source === s),
-    );
-    const legendFcastItems = forecasts.length > 1 ? forecasts : [];
+  const fLabel =
+    forecasts.map((f) => FORECAST_LABEL[f]).join(" & ") ||
+    "No forecast selected";
+  const rLabel = region === "global" ? "Global" : "Continental US";
+  const legendSrcItems = activeSources.filter((s) =>
+    long.some((d) => d.source === s),
+  );
+  const legendFcastItems = forecasts.length > 1 ? forecasts : [];
 
-    const canvas = document.createElement("canvas");
-    canvas.width = chartW * scale;
-    canvas.height = (headerH + chartH) * scale;
-    const ctx = canvas.getContext("2d");
-    ctx.scale(scale, scale);
+  const canvas = document.createElement("canvas");
+  canvas.width = chartW * scale;
+  canvas.height = (headerH + chartH) * scale;
+  const ctx = canvas.getContext("2d");
+  ctx.scale(scale, scale);
 
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, chartW, headerH + chartH);
-    await document.fonts.ready;
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, chartW, headerH + chartH);
+  await document.fonts.ready;
 
-    // Title
-    ctx.fillStyle = "#161a26";
-    ctx.font = "700 20px Aeonik, system-ui, sans-serif";
-    ctx.fillText("ContrailBench V1", pad, pad + 20);
+  // Title
+  ctx.fillStyle = "#161a26";
+  ctx.font = "700 20px Aeonik, system-ui, sans-serif";
+  ctx.fillText("ContrailBench V1", pad, pad + 20);
 
-    // Subtitle with colored source names
-    let sx = pad;
-    const subY = pad + 20 + 8 + 13;
+  // Subtitle with colored source names
+  let sx = pad;
+  const subY = pad + 20 + 8 + 13;
+  ctx.fillStyle = "#888888";
+  ctx.font = "400 13px Aeonik, system-ui, sans-serif";
+  const subtitleBase = `${fLabel} · ${rLabel}, ${SEASON_LABEL[season]}`;
+  ctx.fillText(subtitleBase, sx, subY);
+  sx += ctx.measureText(subtitleBase).width;
+  if (legendSrcItems.length > 0) {
     ctx.fillStyle = "#888888";
-    ctx.font = "400 13px Aeonik, system-ui, sans-serif";
-    const subtitleBase = `${fLabel} · ${rLabel}, ${SEASON_LABEL[season]}`;
-    ctx.fillText(subtitleBase, sx, subY);
-    sx += ctx.measureText(subtitleBase).width;
-    if (legendSrcItems.length > 0) {
-      ctx.fillStyle = "#888888";
-      ctx.fillText(" · ", sx, subY);
-      sx += ctx.measureText(" · ").width;
-      for (let i = 0; i < legendSrcItems.length; i++) {
-        if (i > 0) {
-          ctx.fillStyle = "#888888";
-          ctx.font = "400 13px Aeonik, system-ui, sans-serif";
-          ctx.fillText(" · ", sx, subY);
-          sx += ctx.measureText(" · ").width;
-        }
-        const src = legendSrcItems[i];
-        ctx.fillStyle = SOURCE_COLOR[src];
-        ctx.font = "700 13px Aeonik, system-ui, sans-serif";
-        ctx.fillText(src, sx, subY);
-        sx += ctx.measureText(src).width;
+    ctx.fillText(" · ", sx, subY);
+    sx += ctx.measureText(" · ").width;
+    for (let i = 0; i < legendSrcItems.length; i++) {
+      if (i > 0) {
+        ctx.fillStyle = "#888888";
         ctx.font = "400 13px Aeonik, system-ui, sans-serif";
+        ctx.fillText(" · ", sx, subY);
+        sx += ctx.measureText(" · ").width;
       }
+      const src = legendSrcItems[i];
+      ctx.fillStyle = SOURCE_COLOR[src];
+      ctx.font = "700 13px Aeonik, system-ui, sans-serif";
+      ctx.fillText(src, sx, subY);
+      sx += ctx.measureText(src).width;
+      ctx.font = "400 13px Aeonik, system-ui, sans-serif";
     }
+  }
 
-    // Logo: load /@static/logo-black.svg and draw in top-right
-    const logoH = 24;
-    const logoW = Math.round((logoH * 796.795) / 132.633);
-    await new Promise((res) => {
-      const logoImg = new Image();
-      logoImg.onload = () => {
-        ctx.drawImage(
-          logoImg,
-          chartW - logoW - pad,
-          (headerH - logoH) / 2,
-          logoW,
-          logoH,
-        );
-        res();
-      };
-      logoImg.onerror = (e) => {
-        console.warn("PNG logo failed to load", e);
-        res();
-      };
-      logoImg.src = logoUrl;
-    });
+  // Logo: load /@static/logo-black.svg and draw in top-right
+  const logoH = 24;
+  const logoW = Math.round((logoH * 796.795) / 132.633);
+  await new Promise((res) => {
+    const logoImg = new Image();
+    logoImg.onload = () => {
+      ctx.drawImage(
+        logoImg,
+        chartW - logoW - pad,
+        (headerH - logoH) / 2,
+        logoW,
+        logoH,
+      );
+      res();
+    };
+    logoImg.onerror = (e) => {
+      console.warn("PNG logo failed to load", e);
+      res();
+    };
+    logoImg.src = logoUrl;
+  });
 
-    // Chart SVG
-    await new Promise((res, rej) => {
-      const img = new Image();
-      img.onload = () => {
-        ctx.drawImage(img, 0, headerH);
-        res();
-      };
-      img.onerror = rej;
-      img.src = chartUrl;
-    });
-    URL.revokeObjectURL(chartUrl);
+  // Chart SVG
+  await new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => {
+      ctx.drawImage(img, 0, headerH);
+      res();
+    };
+    img.onerror = rej;
+    img.src = chartUrl;
+  });
+  URL.revokeObjectURL(chartUrl);
 
-    // Legend overlaid on top-left of chart plot area
-    let lx = chartMarginLeft + 8;
-    let ly = headerH + chartMarginTop + 8;
-    ctx.font = "400 13px Aeonik, system-ui, sans-serif";
-    for (const src of legendSrcItems) {
-      const color = SOURCE_COLOR[src];
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 2.5;
-      ctx.setLineDash([]);
+  // Legend overlaid on top-left of chart plot area
+  let lx = chartMarginLeft + 8;
+  let ly = headerH + chartMarginTop + 8;
+  ctx.font = "400 13px Aeonik, system-ui, sans-serif";
+  for (const src of legendSrcItems) {
+    const color = SOURCE_COLOR[src];
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(lx, ly + 5);
+    ctx.lineTo(lx + 22, ly + 5);
+    ctx.stroke();
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(lx + 11, ly + 5, 3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = color;
+    ctx.fillText(src, lx + 28, ly + 9);
+    ly += 20;
+  }
+  if (legendFcastItems.length > 0) {
+    ly += 4;
+    for (const fcast of legendFcastItems) {
+      ctx.strokeStyle = "#888";
+      ctx.lineWidth = 2;
+      ctx.setLineDash(fcast === "google" ? [5, 3] : []);
       ctx.beginPath();
       ctx.moveTo(lx, ly + 5);
       ctx.lineTo(lx + 22, ly + 5);
       ctx.stroke();
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.arc(lx + 11, ly + 5, 3, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = color;
-      ctx.fillText(src, lx + 28, ly + 9);
+      ctx.setLineDash([]);
+      ctx.fillStyle = "#555";
+      ctx.fillText(FORECAST_LABEL[fcast], lx + 28, ly + 9);
       ly += 20;
     }
-    if (legendFcastItems.length > 0) {
-      ly += 4;
-      for (const fcast of legendFcastItems) {
-        ctx.strokeStyle = "#888";
-        ctx.lineWidth = 2;
-        ctx.setLineDash(fcast === "google" ? [5, 3] : []);
-        ctx.beginPath();
-        ctx.moveTo(lx, ly + 5);
-        ctx.lineTo(lx + 22, ly + 5);
-        ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.fillStyle = "#555";
-        ctx.fillText(FORECAST_LABEL[fcast], lx + 28, ly + 9);
-        ly += 20;
-      }
-    }
+  }
 
-    canvas.toBlob((b) => {
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(b);
-      a.download = `contrailbench-${region}-${season}.png`;
-      a.click();
-    }, "image/png");
-  });
-
-  display(
-    html`<div class="bench-downloads">
-      <div class="bench-downloads-links">${pngLink} ${csvLink}</div>
-    </div>`,
-  );
-}
+  canvas.toBlob((b) => {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(b);
+    a.download = `contrailbench-${region}-${season}.png`;
+    a.click();
+  }, "image/png");
+});
 ```
+
+<div class="bench-downloads">
+  <div class="bench-downloads-links">${pngLink} ${csvLink}</div>
+</div>

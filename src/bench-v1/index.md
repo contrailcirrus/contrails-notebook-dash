@@ -235,8 +235,6 @@ const IAGOS_PCR = {
   "global/autumn": 9.5,
   "conus/annual": 9.5,
 };
-const BASE_URL =
-  "https://storage.googleapis.com/contrailbench-public-data/2026Q1/benchmarks";
 ```
 
 ```js

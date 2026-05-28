@@ -591,7 +591,7 @@ const chartEl = Plot.plot({
   height: H,
   style: { fontSize: "15px" },
   marginLeft: 40,
-  marginRight: 0,
+  marginRight: 5,
   marginBottom: 52,
   marginTop: 24,
   x: {

@@ -19,7 +19,7 @@ footer: false
     - [GRUAN Map](/gruan-map/index.html)
     - [Hyperspectral sounder blind spot](/hyperspectral-sounder-blindspot/index.html)
 - [**Contrail Bench**](https://notebook.contrails.org/introducing-contrailbench/)
-    - [ContrailBench V1](/bench-v1/index.html)
+    - [ContrailBench v1](/bench-v1/index.html)
 
 ## Standalone Dashboards
 

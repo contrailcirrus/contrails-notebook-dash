@@ -236,37 +236,28 @@ const initShowCI = urlParams.get("ci") === "1";
 ```
 
 ```js
-const regionEl = RadioButtons(["global", "conus"], {
+const regionEl = Inputs.radio(["global", "conus"], {
   value: initRegion,
   format: (x) => (x === "global" ? "Global" : "Continental US"),
 });
 const region = Generators.input(regionEl);
 
-const seasonEl = RadioButtons(
-  ["annual", "winter", "spring", "summer", "autumn"],
-  {
-    value: initSeason,
-    format: (x) =>
-      ({
-        annual: "All year",
-        winter: "Winter",
-        spring: "Spring",
-        summer: "Summer",
-        autumn: "Autumn",
-      })[x],
-  },
-);
-const season = Generators.input(seasonEl);
-
-const forecastsEl = CheckButtons(["contrails-org", "google"], {
+const forecastsEl = Inputs.checkbox(["contrails-org", "google"], {
   value: initForecasts,
   format: (x) => FORECAST_LABEL[x],
 });
 const forecasts = Generators.input(forecastsEl);
 
-const sourcesEl = CheckButtons(["IAGOS", "GRUAN", "ContrailWatch"], {
+const showCIEl = Inputs.toggle({label: "Confidence intervals", value: initShowCI });
+const showCI = Generators.input(showCIEl);
+```
+
+```js
+// Dim ContrailWatch when on Global
+const sourcesEl = Inputs.checkbox(["IAGOS", "GRUAN", "ContrailWatch"], {
   value: initSources,
   format: (x) => x,
+  disabled: region === "global" ? ["ContrailWatch"] : [],
   className: (x) =>
     x === "IAGOS"
       ? "source-iagos"
@@ -275,26 +266,26 @@ const sourcesEl = CheckButtons(["IAGOS", "GRUAN", "ContrailWatch"], {
       : "source-cw",
 });
 const sources = Generators.input(sourcesEl);
-
-const showCIEl = ToggleButton("Confidence intervals", { value: initShowCI });
-const showCI = Generators.input(showCIEl);
-```
-
-```js
-// Dim ContrailWatch when on Global
-{
-  sourcesEl._setDimmed("ContrailWatch", region === "global");
-}
 ```
 
 ```js
 // Dim seasonal options when on CONUS (only annual available)
-{
-  for (const s of ["winter", "spring", "summer", "autumn"])
-    seasonEl._btns[s]?.classList.toggle("dimmed", region === "conus");
-  if (region === "conus" && season !== "annual")
-    seasonEl._btns["annual"]?.click();
-}
+const seasonEl = Inputs.radio(
+  ["annual", "winter", "spring", "summer", "autumn"],
+  {
+    value: region === "conus" ? "annual" : initSeason,
+    format: (x) =>
+      ({
+        annual: "All year",
+        winter: "Winter",
+        spring: "Spring",
+        summer: "Summer",
+        autumn: "Autumn",
+      })[x],
+    disabled: region === "conus" ? ["winter", "spring", "summer", "autumn"] : []
+  },
+);
+const season = Generators.input(seasonEl);
 ```
 
 <!-- Share -->

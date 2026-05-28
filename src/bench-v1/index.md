@@ -677,9 +677,9 @@ html`<div
 const csvUrl = await FileAttachment("benchmarks.csv").url();
 const logoUrl = await FileAttachment("../@static/logo-black.svg").url();; // PNG download always uses light-mode logo
 
-const pngLink = html`<a href="#">⬇ Download PNG</a>`;
+const pngLink = html`<a href="#">↓ Download PNG</a>`;
 const csvLink = html`<a href="${csvUrl}" download="contrailbench-v1.csv"
-  >⬇ Download data (CSV)</a
+  >↓ Download data (CSV)</a
 >`;
 
 pngLink.addEventListener("click", async (e) => {

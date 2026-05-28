@@ -524,6 +524,7 @@ marks.push(
   Plot.tip(
     long,
     Plot.pointer({
+      anchor: "top",
       x: "penalty",
       y: "hit_rate",
       title: (d) => {

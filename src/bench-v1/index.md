@@ -4,6 +4,7 @@ title: ContrailBench v1
 
 <!-- ─── Styles ─────────────────────────────────────────────────────────────── -->
 <style>
+  /* Share button */
   .share {
     position: absolute;
     right: 0;
@@ -21,21 +22,6 @@ title: ContrailBench v1
     }
   }
   /* ── Toggle button groups ─────────────────────────────────── */
-  .ctrl-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.4rem 2rem;
-    align-items: flex-start;
-    margin: 1rem 0 0.75rem;
-  }
-  .ctrl-block { display: flex; flex-direction: column; gap: 5px; }
-  .ctrl-label {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--theme-foreground-muted);
-  }
   .btn-group { display: flex; flex-wrap: wrap; gap: 5px; }
   .btn-toggle {
     padding: 5px 13px;
@@ -67,35 +53,20 @@ title: ContrailBench v1
   .btn-toggle.source-gruan:hover:not(.dimmed):not(.active) { border-color: #1093ff; color: #1093ff; }
   .btn-toggle.source-cw.active            { background: #f26400; border-color: #f26400; color: #fff; }
   .btn-toggle.source-cw:hover:not(.dimmed):not(.active)    { border-color: #f26400; color: #f26400; }
-  .ci-row { display: flex; align-items: center; gap: 7px; }
-  .ci-help {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 16px; height: 16px; border-radius: 50%;
-    background: var(--theme-foreground-fainter);
-    color: var(--theme-foreground); font-size: 10px; font-weight: 700;
-    cursor: help; position: relative; flex-shrink: 0;
-  }
-  .ci-help::after {
-    content: attr(data-tip);
-    display: none; position: absolute;
-    left: 22px; top: -4px;
-    background: var(--theme-foreground); color: var(--theme-background);
-    padding: 7px 11px; border-radius: 4px;
-    font-size: 12px; font-weight: 400; width: 300px;
-    white-space: normal; line-height: 1.5; z-index: 100;
-  }
-  .ci-help:hover::after { display: block; }
+
+  /* Download links below plot */
   .bench-downloads {
     display: flex;
     align-items: flex-end;
     justify-content: flex-end;
     gap: 1rem;
     font-size: 12px;
-    color: var(--theme-foreground-muted);
     margin: 1rem 0;
+
+    a {
+      color: var(--theme-foreground-muted);
+    }
   }
-  .bench-downloads-links { display: flex; flex-wrap: wrap; gap: 0 1rem; align-items: center; }
-  .bench-downloads a { color: var(--theme-foreground-muted); }
 </style>
 
 ```js
@@ -778,7 +749,8 @@ pngLink.addEventListener("click", async (e) => {
   ${chartEl}
 
   <div class="bench-downloads">
-    <div class="bench-downloads-links">${pngLink} ${csvLink}</div>
+    <div>${pngLink}</div>
+    <div>${csvLink}</div>
   </div>
 </div>
 

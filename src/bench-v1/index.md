@@ -21,8 +21,13 @@ title: ContrailBench v1
       padding: 0px 8px;
     }
   }
-  /* ── Toggle button groups ─────────────────────────────────── */
-  .btn-group { display: flex; flex-wrap: wrap; gap: 5px; }
+  /* Customize input checkboxs and radios to look like buttons */
+  input[type=checkbox], input[type=radio] {
+    display: none;
+  }
+  label {
+    margin: 0 5px 5px 0 !important;
+  }
   .btn-toggle {
     padding: 5px 13px;
     border-radius: 99px;
@@ -34,7 +39,7 @@ title: ContrailBench v1
     transition: background 0.12s, color 0.12s, border-color 0.12s;
     white-space: nowrap;
   }
-  .btn-toggle:hover:not(.dimmed):not(.active) {
+  .btn-toggle:hover:not(.disabled):not(.active) {
     border-color: var(--theme-foreground-faint);
     color: var(--theme-foreground);
   }
@@ -43,16 +48,62 @@ title: ContrailBench v1
     border-color: var(--theme-foreground);
     color: var(--theme-background);
   }
-  .btn-toggle.dimmed {
+  .btn-toggle.disabled {
     opacity: 0.3;
     cursor: not-allowed;
   }
-  .btn-toggle.source-iagos.active         { background: #161a26; border-color: #161a26; color: #fff; }
-  .btn-toggle.source-iagos:hover:not(.dimmed):not(.active) { border-color: #161a26; color: #161a26; }
-  .btn-toggle.source-gruan.active         { background: #1093ff; border-color: #1093ff; color: #fff; }
-  .btn-toggle.source-gruan:hover:not(.dimmed):not(.active) { border-color: #1093ff; color: #1093ff; }
-  .btn-toggle.source-cw.active            { background: #f26400; border-color: #f26400; color: #fff; }
-  .btn-toggle.source-cw:hover:not(.dimmed):not(.active)    { border-color: #f26400; color: #f26400; }
+
+  /* Add color to source buttons */
+  .btn-toggle.source-iagos.active {
+    background: #161a26;
+    border-color: #161a26;
+    color: #fff;
+  }
+  .btn-toggle.source-iagos:hover:not(.disabled):not(.active) {
+    border-color: #161a26;
+    color: #161a26;
+  }
+  .btn-toggle.source-gruan.active {
+    background: #1093ff;
+    border-color: #1093ff;
+    color: #fff;
+  }
+  .btn-toggle.source-gruan:hover:not(.disabled):not(.active) {
+    border-color: #1093ff;
+    color: #1093ff;
+  }
+  .btn-toggle.source-cw.active {
+    background: #f26400;
+    border-color: #f26400;
+    color: #fff;
+  }
+  .btn-toggle.source-cw:hover:not(.disabled):not(.active)    {
+    border-color: #f26400;
+    color: #f26400;
+  }
+
+  /* Data-tips on buttons for help */
+  [data-tip] {
+    position: relative;
+    cursor: pointer;
+  }
+
+  [data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    left: 160px;
+    /*top: -4p;*/
+    width: 200px;
+    background: var(--theme-foreground);
+    color: var(--theme-background);
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: normal;
+    font-size: 12px;
+    line-height: 1.4;
+    pointer-events: none;
+    z-index: 100;
+  }
 
   /* Download links below plot */
   .bench-downloads {
@@ -73,10 +124,12 @@ title: ContrailBench v1
 import "../@components/observer.js";
 ```
 
+<!-- Benchmark data -->
 ```js
 const allData = await FileAttachment("benchmarks.csv").csv({ typed: true });
 ```
 
+<!-- Constants -->
 ```js
 const SOURCE_COLS = {
   IAGOS: {
@@ -100,7 +153,15 @@ const SOURCE_COLOR = {
   GRUAN: "#1093ff",
   ContrailWatch: "#f26400",
 };
-const FORECAST_LABEL = { "contrails-org": "Contrails.org", google: "Google" };
+const FORECAST_LABEL = { "contrails-org": "Contrails.org", "google": "Google" };
+const REGION_LABEL = {"global": "Global", "conus": "Continental US"};
+const SEASON_BTN_LABEL = {
+  "annual": "All year",
+  "winter": "Winter",
+  "spring": "Spring",
+  "summer": "Summer",
+  "autumn": "Autumn",
+}
 const SEASON_LABEL = {
   annual: "January–December 2024",
   winter: "January/February/December 2024 (NH winter)",
@@ -118,95 +179,7 @@ const IAGOS_PCR = {
 };
 ```
 
-```js
-function RadioButtons(choices, { value, format = (d) => d } = {}) {
-  let current = value ?? choices[0];
-  const el = html`<div class="btn-group"></div>`;
-  const btns = {};
-  for (const c of choices) {
-    const b = html`<button
-      type="button"
-      class="btn-toggle${c === current ? " active" : ""}"
-    >
-      ${format(c)}
-    </button>`;
-    b.addEventListener("click", () => {
-      if (b.classList.contains("dimmed")) return;
-      Object.values(btns).forEach((x) => x.classList.remove("active"));
-      b.classList.add("active");
-      current = c;
-      el.dispatchEvent(new Event("input", { bubbles: true }));
-    });
-    btns[c] = b;
-    el.append(b);
-  }
-  Object.defineProperty(el, "value", { get: () => current });
-  el._btns = btns;
-  return el;
-}
-
-function CheckButtons(
-  choices,
-  { value = [], format = (d) => d, className = () => "" } = {},
-) {
-  let current = [...value];
-  const el = html`<div class="btn-group"></div>`;
-  const btns = {};
-  for (const c of choices) {
-    const extra = className(c) ? ` ${className(c)}` : "";
-    const b = html`<button
-      type="button"
-      class="btn-toggle${extra}${current.includes(c) ? " active" : ""}"
-    >
-      ${format(c)}
-    </button>`;
-    b.addEventListener("click", () => {
-      if (b.classList.contains("dimmed")) return;
-      const idx = current.indexOf(c);
-      if (idx >= 0) current = current.filter((v) => v !== c);
-      else current = [...current, c];
-      b.classList.toggle("active", current.includes(c));
-      el.dispatchEvent(new Event("input", { bubbles: true }));
-    });
-    btns[c] = b;
-    el.append(b);
-  }
-  Object.defineProperty(el, "value", {
-    get: () => current,
-    set: (v) => {
-      current = [...v];
-      Object.entries(btns).forEach(([c, b]) =>
-        b.classList.toggle("active", current.includes(c)),
-      );
-    },
-  });
-  el._btns = btns;
-  el._setDimmed = (choice, on) => {
-    btns[choice]?.classList.toggle("dimmed", on);
-    if (on && current.includes(choice))
-      el.value = current.filter((v) => v !== choice);
-  };
-  return el;
-}
-
-function ToggleButton(label, { value = true } = {}) {
-  let current = value;
-  const b = html`<button
-    type="button"
-    class="btn-toggle${current ? " active" : ""}"
-  >
-    ${label}
-  </button>`;
-  b.addEventListener("click", () => {
-    current = !current;
-    b.classList.toggle("active", current);
-    b.dispatchEvent(new Event("input", { bubbles: true }));
-  });
-  Object.defineProperty(b, "value", { get: () => current });
-  return b;
-}
-```
-
+<!-- URL parameters -->
 ```js
 // Read initial state from URL query params so shared links restore the view
 const urlParams = new URLSearchParams(location.search);
@@ -235,57 +208,92 @@ const initSources = urlParams.has("sources")
 const initShowCI = urlParams.get("ci") === "1";
 ```
 
+<!-- Inputs -->
 ```js
 const regionEl = Inputs.radio(["global", "conus"], {
   value: initRegion,
-  format: (x) => (x === "global" ? "Global" : "Continental US"),
+  format: (x) => html`<div class="btn-toggle">${REGION_LABEL[x]}</div>`,
 });
 const region = Generators.input(regionEl);
 
 const forecastsEl = Inputs.checkbox(["contrails-org", "google"], {
   value: initForecasts,
-  format: (x) => FORECAST_LABEL[x],
+  format: (x) => html`<div class="btn-toggle">${FORECAST_LABEL[x]}</div>`,
 });
 const forecasts = Generators.input(forecastsEl);
 
-const showCIEl = Inputs.toggle({label: "Confidence intervals", value: initShowCI });
+const showCIEl = Inputs.checkbox(["Confidence intervals"], {
+  value: initShowCI,
+  format: (x) => html`<div class="btn-toggle">${x}</div>`,
+});
 const showCI = Generators.input(showCIEl);
 ```
 
 ```js
-// Dim ContrailWatch when on Global
+const SOURCE_CHECKBOX_CLASS = {
+  "IAGOS": "btn-toggle source-iagos",
+  "GRUAN": "btn-toggle source-gruan",
+  "ContrailWatch": "btn-toggle source-cw"
+}
 const sourcesEl = Inputs.checkbox(["IAGOS", "GRUAN", "ContrailWatch"], {
   value: initSources,
-  format: (x) => x,
-  disabled: region === "global" ? ["ContrailWatch"] : [],
-  className: (x) =>
-    x === "IAGOS"
-      ? "source-iagos"
-      : x === "GRUAN"
-      ? "source-gruan"
-      : "source-cw",
+  format: (x) => html`<div class=${SOURCE_CHECKBOX_CLASS[x]}>${x}</div>`,
+  disabled: region === "global" ? ["ContrailWatch"] : [],  // disable ContrailWatch on Global
 });
 const sources = Generators.input(sourcesEl);
 ```
 
 ```js
-// Dim seasonal options when on CONUS (only annual available)
 const seasonEl = Inputs.radio(
   ["annual", "winter", "spring", "summer", "autumn"],
   {
     value: region === "conus" ? "annual" : initSeason,
-    format: (x) =>
-      ({
-        annual: "All year",
-        winter: "Winter",
-        spring: "Spring",
-        summer: "Summer",
-        autumn: "Autumn",
-      })[x],
-    disabled: region === "conus" ? ["winter", "spring", "summer", "autumn"] : []
+    format: (x) => html`<div class="btn-toggle">${SEASON_BTN_LABEL[x]}</div>`,
+    disabled: region === "conus" ? ["winter", "spring", "summer", "autumn"] : []  // Disable seasonal options when on CONUS
   },
 );
 const season = Generators.input(seasonEl);
+```
+
+```js
+// Activate and disable buttons based on checked or disabled values
+// NOTE: Observable stores all "input.value" fields as integers, so we have
+// to jump through some hoops to determine if its "active"
+// We could probably abstract all this into a lib in the future
+regionEl.querySelectorAll("label").forEach(label => {
+  const input = label.querySelector("input");
+  const btn = label.querySelector(".btn-toggle")
+  btn.classList.toggle("active", label.textContent === REGION_LABEL[region]);
+  btn.classList.toggle("disabled", input.disabled);
+});
+
+forecastsEl.querySelectorAll("label").forEach(label => {
+  const input = label.querySelector("input");
+  const btn = label.querySelector(".btn-toggle")
+  btn.classList.toggle("active", forecasts.map(f => FORECAST_LABEL[f]).includes(label.textContent));
+  btn.classList.toggle("disabled", input.disabled);
+});
+
+seasonEl.querySelectorAll("label").forEach(label => {
+  const input = label.querySelector("input");
+  const btn = label.querySelector(".btn-toggle")
+  btn.classList.toggle("active", label.textContent === SEASON_BTN_LABEL[season]);
+  btn.classList.toggle("disabled", input.disabled);
+});
+
+sourcesEl.querySelectorAll("label").forEach(label => {
+  const input = label.querySelector("input");
+  const btn = label.querySelector(".btn-toggle")
+  btn.classList.toggle("active", sources.includes(label.textContent));
+  btn.classList.toggle("disabled", input.disabled);
+});
+
+showCIEl.querySelectorAll("label").forEach(label => {
+  const input = label.querySelector("input");
+  const btn = label.querySelector(".btn-toggle")
+  btn.classList.toggle("active", showCI.includes(label.textContent));
+  label.dataset.tip = "Error bars show 95% bias-corrected and accelerated (BCa) bootstrap confidence intervals, estimated by resampling daily flight data 1,000 times per forecast–dataset pair."
+});
 ```
 
 <!-- Share -->
@@ -363,7 +371,7 @@ ${sourcesEl}
 
 ## Options
 
-${showCIEl} <span class="ci-help" data-tip="Error bars show 95% bias-corrected and accelerated (BCa) bootstrap confidence intervals, estimated by resampling daily flight data 1,000 times per forecast–dataset pair.">?</span>
+${showCIEl}
 
 </div>
 

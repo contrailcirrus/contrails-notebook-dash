@@ -92,7 +92,6 @@ title: ContrailBench v1
     content: attr(data-tip);
     position: absolute;
     left: 160px;
-    /*top: -4p;*/
     width: 200px;
     background: var(--theme-foreground);
     color: var(--theme-background);
@@ -581,7 +580,7 @@ const chartEl = Plot.plot({
 <!-- Export figure image and data -->
 ```js
 const csvUrl = await FileAttachment("benchmarks.csv").url();
-const logoUrl = await FileAttachment("../@static/logo-black.svg").url();; // PNG download always uses light-mode logo
+const logoUrl = await FileAttachment("../@static/logo-black.svg").url(); // PNG download always uses light-mode logo
 
 const pngLink = html`<a href="#">↓ Download PNG</a>`;
 const csvLink = html`<a href="${csvUrl}" download="contrailbench-v1.csv"

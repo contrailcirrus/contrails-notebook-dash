@@ -21,6 +21,21 @@ title: ContrailBench v1
       padding: 0px 8px;
     }
   }
+
+  /* Adjust grid of input buttons */
+  .grid {
+    grid-auto-rows: unset;
+    gap: 0;
+  }
+  @container (min-width: 640px) {
+    .grid {
+      gap: 1rem;
+    }
+    .grid-cols-2 {
+      grid-template-columns: 1fr 2fr;
+    }
+  }
+
   /* Customize input checkboxs and radios to look like buttons */
   input[type=checkbox], input[type=radio] {
     display: none;
@@ -351,28 +366,38 @@ const shareButton = Inputs.button(shareButtonText, {value: null, reduce: shareSc
 
 <div id="sharecontainer" class="share">${shareButton}</div>
 
-<div class="card">
+<div class="grid grid-cols-2">
+  <div>
 
-## Region
-
-${regionEl}
-
-## Season (Northern Hemisphere)
-
-${seasonEl}
-
-## Forecast
-
+<small>Forecast</small>
 ${forecastsEl}
 
-## Observation sources
+  </div>
+  <div>
 
+<small>Observation sources</small>
 ${sourcesEl}
 
-## Options
+  </div>
+  <div>
 
+<small>Region</small>
+${regionEl}
+
+  </div>
+  <div>
+
+<small>Season (Northern Hemisphere)</small>
+${seasonEl}
+
+  </div>
+  <div></div>
+  <div>
+
+<small>Options</small>
 ${showCIEl}
 
+  </div>
 </div>
 
 <!-- Pre-processing -->

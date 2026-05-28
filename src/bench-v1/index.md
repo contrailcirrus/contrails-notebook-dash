@@ -179,7 +179,7 @@ const IAGOS_PCR = {
 };
 ```
 
-<!-- URL parameters -->
+<!-- URL parameters and defaults-->
 ```js
 // Read initial state from URL query params so shared links restore the view
 const urlParams = new URLSearchParams(location.search);
@@ -375,6 +375,7 @@ ${showCIEl}
 
 </div>
 
+<!-- Pre-processing -->
 ```js
 const activeSources =
   region === "global" ? sources.filter((s) => s !== "ContrailWatch") : sources;
@@ -411,6 +412,7 @@ const long = filtered.flatMap((r) =>
 const pcrRate = IAGOS_PCR[`${region}/${season}`] ?? null;
 ```
 
+<!-- Figure -->
 ```js
 const W = Math.min(width - 32, 860);  // subtracting padding of 2rem = 32px
 const H = Math.max(250, Math.round(W * (460 / 860)));
@@ -575,7 +577,7 @@ const chartEl = Plot.plot({
 });
 ```
 
-
+<!-- Export figure image and data -->
 ```js
 const csvUrl = await FileAttachment("benchmarks.csv").url();
 const logoUrl = await FileAttachment("../@static/logo-black.svg").url();; // PNG download always uses light-mode logo

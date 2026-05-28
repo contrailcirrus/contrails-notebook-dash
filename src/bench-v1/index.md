@@ -1,5 +1,5 @@
 ---
-title: ContrailBench V1
+title: ContrailBench v1
 ---
 
 <!-- ─── Styles ─────────────────────────────────────────────────────────────── -->

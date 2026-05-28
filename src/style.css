@@ -276,6 +276,13 @@ summary:hover {
    margin: auto;
 }
 
+/* set plot background on cards */
+.card .plot {
+  background-color: var(--theme-background-alt);
+  padding: 0;
+}
+
+
 /* Plot tooltip background correction */
 .plot g[aria-label="tip"] path {
   fill: var(--theme-background);

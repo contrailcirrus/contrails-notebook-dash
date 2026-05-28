@@ -4,8 +4,6 @@ title: ContrailBench V1
 
 <!-- ─── Styles ─────────────────────────────────────────────────────────────── -->
 <style>
-  body { max-width: 860px; }
-
   .share {
     position: absolute;
     right: 0;
@@ -420,7 +418,6 @@ const showCI = Generators.input(showCIEl);
 }
 ```
 
-
 <!-- Share -->
 ```js
 const currentScenario = {
@@ -476,33 +473,29 @@ const shareButton = Inputs.button(shareButtonText, {value: null, reduce: shareSc
 
 <div id="sharecontainer" class="share">${shareButton}</div>
 
-```js
-html`<div class="ctrl-row">
-  <div class="ctrl-block">
-    <span class="ctrl-label">Region</span>${regionEl}
-  </div>
-  <div class="ctrl-block">
-    <span class="ctrl-label">Season (Northern Hemisphere)</span>${seasonEl}
-  </div>
-  <div class="ctrl-block">
-    <span class="ctrl-label">Forecast</span>${forecastsEl}
-  </div>
-  <div class="ctrl-block">
-    <span class="ctrl-label">Observation sources</span>${sourcesEl}
-  </div>
-  <div class="ctrl-block">
-    <span class="ctrl-label">Options</span>
-    <div class="ci-row">
-      ${showCIEl}
-      <span
-        class="ci-help"
-        data-tip="Error bars show 95% bias-corrected and accelerated (BCa) bootstrap confidence intervals, estimated by resampling daily flight data 1,000 times per forecast–dataset pair."
-        >?</span
-      >
-    </div>
-  </div>
-</div>`
-```
+<div class="card">
+
+## Region
+
+${regionEl}
+
+## Season (Northern Hemisphere)
+
+${seasonEl}
+
+## Forecast
+
+${forecastsEl}
+
+## Observation sources
+
+${sourcesEl}
+
+## Options
+
+${showCIEl} <span class="ci-help" data-tip="Error bars show 95% bias-corrected and accelerated (BCa) bootstrap confidence intervals, estimated by resampling daily flight data 1,000 times per forecast–dataset pair.">?</span>
+
+</div>
 
 ```js
 const activeSources =
@@ -701,7 +694,6 @@ const chartEl = Plot.plot({
   y: { label: "Hit rate (%)", domain: [0, 100], line: true, labelOffset: 5 },
   marks,
 });
-display(chartEl);
 ```
 
 ```js
@@ -939,6 +931,15 @@ pngLink.addEventListener("click", async (e) => {
 });
 ```
 
-<div class="bench-downloads">
-  <div class="bench-downloads-links">${pngLink} ${csvLink}</div>
+### Benchmarks
+
+<div class="card">
+  ${chartEl}
+
+  <div class="bench-downloads">
+    <div class="bench-downloads-links">${pngLink} ${csvLink}</div>
+  </div>
 </div>
+
+
+

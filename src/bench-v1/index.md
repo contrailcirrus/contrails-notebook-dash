@@ -97,6 +97,26 @@ title: ContrailBench v1
     color: #f26400;
   }
 
+  /* Allow CI button to have help next to it */
+  .btn-toggle.ci {
+    display: inline-flex;
+  }
+  .ci-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0.5rem;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--theme-foreground-fainter);
+    color: var(--theme-foreground);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: help;
+  }
+
+
   /* Data-tips on buttons for help */
   [data-tip] {
     position: relative;
@@ -106,7 +126,8 @@ title: ContrailBench v1
   [data-tip]:hover::after {
     content: attr(data-tip);
     position: absolute;
-    left: 160px;
+    top: 35px;
+    left: 10px;
     width: 200px;
     background: var(--theme-foreground);
     color: var(--theme-background);
@@ -239,7 +260,8 @@ const forecasts = Generators.input(forecastsEl);
 
 const showCIEl = Inputs.checkbox([CI_LABEL], {
   value: initShowCI,
-  format: (x) => html`<div class="btn-toggle">${x}</div>`,
+  format: (x) => html`<div class="btn-toggle ci">${x}</div>
+  <div class="ci-btn" data-tip="Error bars show 95% bias-corrected and accelerated (BCa) bootstrap confidence intervals, estimated by resampling daily flight data 1,000 times per forecast–dataset pair.">?</div>`,
 });
 const showCI = Generators.input(showCIEl);
 ```
@@ -294,6 +316,9 @@ seasonEl.querySelectorAll("label").forEach(label => {
   const btn = label.querySelector(".btn-toggle")
   btn.classList.toggle("active", label.textContent === SEASON_BTN_LABEL[season]);
   btn.classList.toggle("disabled", input.disabled);
+  if (input.disabled) {
+    label.dataset.tip = "Seasons only available for Global region."
+  }
 });
 
 sourcesEl.querySelectorAll("label").forEach(label => {
@@ -301,13 +326,15 @@ sourcesEl.querySelectorAll("label").forEach(label => {
   const btn = label.querySelector(".btn-toggle")
   btn.classList.toggle("active", sources.includes(label.textContent));
   btn.classList.toggle("disabled", input.disabled);
+  if (input.disabled) {
+    label.dataset.tip = "ContrailWatch only available for Continental US region."
+  }
 });
 
 showCIEl.querySelectorAll("label").forEach(label => {
   const input = label.querySelector("input");
   const btn = label.querySelector(".btn-toggle")
   btn.classList.toggle("active", showCI.includes(label.textContent));
-  label.dataset.tip = "Error bars show 95% bias-corrected and accelerated (BCa) bootstrap confidence intervals, estimated by resampling daily flight data 1,000 times per forecast–dataset pair."
 });
 ```
 

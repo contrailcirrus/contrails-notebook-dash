@@ -155,6 +155,7 @@ const SOURCE_COLOR = {
 };
 const FORECAST_LABEL = { "contrails-org": "Contrails.org", "google": "Google" };
 const REGION_LABEL = {"global": "Global", "conus": "Continental US"};
+const CI_LABEL = "Confidence intervals"
 const SEASON_BTN_LABEL = {
   "annual": "All year",
   "winter": "Winter",
@@ -205,7 +206,7 @@ const initSources = urlParams.has("sources")
       .split(",")
       .filter((x) => ["IAGOS", "GRUAN", "ContrailWatch"].includes(x))
   : ["IAGOS", "GRUAN"];
-const initShowCI = urlParams.get("ci") === "1";
+const initShowCI = urlParams.get("ci") === "true" ? [CI_LABEL] : [] ;
 ```
 
 <!-- Inputs -->
@@ -222,7 +223,7 @@ const forecastsEl = Inputs.checkbox(["contrails-org", "google"], {
 });
 const forecasts = Generators.input(forecastsEl);
 
-const showCIEl = Inputs.checkbox(["Confidence intervals"], {
+const showCIEl = Inputs.checkbox([CI_LABEL], {
   value: initShowCI,
   format: (x) => html`<div class="btn-toggle">${x}</div>`,
 });
@@ -303,7 +304,7 @@ const currentScenario = {
   season: season,
   forecasts: forecasts,
   sources: sources,
-  ci: showCI
+  ci: showCI ? "true" : "false"
 }
 ```
 

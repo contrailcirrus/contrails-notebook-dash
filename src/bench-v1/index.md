@@ -36,6 +36,14 @@ title: ContrailBench v1
     }
   }
 
+  /* On mobile, remove the 2rem margin. This will look bad on dash.contrails.org, but
+     good everywhere else */
+  @media (max-width: 640px) {
+    #observablehq-center {
+      margin: 0;
+    }
+  }
+
   /* Customize input checkboxs and radios to look like buttons */
   input[type=checkbox], input[type=radio] {
     display: none;

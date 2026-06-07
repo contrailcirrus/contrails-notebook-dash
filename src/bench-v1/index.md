@@ -249,7 +249,12 @@ const initSources = urlParams.has("sources")
       .split(",")
       .filter((x) => ["IAGOS", "GRUAN", "ContrailWatch"].includes(x))
   : ["IAGOS", "GRUAN"];
-const initShowCI = urlParams.get("ci") === "true" ? [CI_LABEL] : [] ;
+const initShowCI = (() => {
+  const v = urlParams.get("ci");
+  return v === "true"
+    ? [CI_LABEL]
+    : [];
+})();
 ```
 
 <!-- Inputs -->
@@ -340,9 +345,8 @@ sourcesEl.querySelectorAll("label").forEach(label => {
 });
 
 showCIEl.querySelectorAll("label").forEach(label => {
-  const input = label.querySelector("input");
   const btn = label.querySelector(".btn-toggle")
-  btn.classList.toggle("active", showCI.includes(label.textContent));
+  btn.classList.toggle("active", showCI.includes(label.textContent?.split("\n")[0]));
 });
 ```
 
@@ -527,7 +531,7 @@ for (const src of activeSources) {
       }),
       Plot.dot(rows, { x: "penalty", y: "hit_rate", fill: color, r: 4 }),
     );
-    if (showCI)
+    if (showCI.includes(CI_LABEL)) {
       marks.push(
         Plot.ruleY(rows, {
           y: "hit_rate",
@@ -546,6 +550,7 @@ for (const src of activeSources) {
           strokeWidth: 1.5,
         }),
       );
+    }
   }
 }
 

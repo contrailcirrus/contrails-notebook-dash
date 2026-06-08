@@ -4,6 +4,11 @@ title: ContrailBench v1
 
 <!-- ─── Styles ─────────────────────────────────────────────────────────────── -->
 <style>
+
+  /* Better ghost width */
+  body {
+    max-width: 780px;
+  }
   /* Share button */
   .share {
     position: absolute;

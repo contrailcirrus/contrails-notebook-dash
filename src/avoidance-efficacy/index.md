@@ -152,8 +152,8 @@ const waterfallData = wfCats.map((cat, i) => ({
   y2: wfBottoms[i] + wfHeights[i],
   h: wfHeights[i],
   color: wfColors[i],
-  label: wfHeights[i] >= 1.5
-    ? `${wfSigns[i]}${wfHeights[i].toFixed(1)}%\n${(wfHeights[i] / 100 * co2eq_per_flight).toFixed(1)} t`
+  label: wfHeights[i] > 0.05
+    ? `${wfSigns[i]}${wfHeights[i].toFixed(1)}%`
     : "",
 }));
 
@@ -209,7 +209,7 @@ const waterfallChart = Plot.plot({
         g.appendChild(rect);
         const label = doc.createElementNS(ns, "text");
         label.setAttribute("x", (x1px + x2px) / 2);
-        label.setAttribute("y", Math.min(y1px, y2px) - 4);
+        label.setAttribute("y", Math.min(y1px, y2px) - 18);
         label.setAttribute("text-anchor", "middle");
         label.setAttribute("font-size", "9");
         label.setAttribute("fill", "#2042a0");
@@ -226,9 +226,10 @@ const waterfallChart = Plot.plot({
     }),
     Plot.text(waterfallData.filter(d => d.label), {
       x: "x",
-      y: d => (d.y1 + d.y2) / 2,
+      y: d => Math.max(d.y1, d.y2),
       text: "label",
-      fill: "white", fontWeight: "bold", fontSize: 9,
+      fill: "black", fontWeight: "bold", fontSize: 9,
+      lineAnchor: "bottom", dy: -8,
     }),
     Plot.ruleY([100], {stroke: "gray", strokeOpacity: 0.3, strokeWidth: 0.8}),
     Plot.line(connectorLines, {x: "x", y: "y", stroke: "#555", strokeDasharray: "4,2", strokeOpacity: 0.6}),

@@ -7,4 +7,5 @@ title: Dev
 > Dashboards in development
 
 - [CO2 Equivalence Metrics](/co2-equivalence-metrics/index.html)
+- [Contrail Avoidance Efficacy](/avoidance-efficacy/index.html)
 
